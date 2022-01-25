@@ -18,7 +18,7 @@ source papyroAPI/bin/activate
 Instalar o FastAPI:
 
 ```bash
-pip install fastapi[all]
+pip install fastapi[all] sqlalchemy alembic
 ```
 
 Depois de dar start na venv e instalar o fastApi na mesma, clone o repositório, acesse o mesmo e rode o comando:
@@ -26,3 +26,14 @@ Depois de dar start na venv e instalar o fastApi na mesma, clone o repositório,
 ```bash
 uvicorn main:app --reload
 ```
+
+Migrations(Básico do básico):
+
+```bash
+alembic revison --autogenerate -m "Nova coluna blablabla"
+```
+
+```bash
+alembic upgrade head
+```
+
