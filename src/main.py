@@ -1,11 +1,17 @@
 from fastapi import FastAPI
-from src.routers import usuario
+from fastapi.middleware.cors import CORSMiddleware
+from src.routers import router
 
 app = FastAPI()
 
+#CORS
+origins=['http://localhost:3000']
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/")
-async def root():
-    return {"message": "Morto pela mesma alma que tentei salvar."}
-
-app.include_router(usuario.router)
+app.include_router(router.router)
