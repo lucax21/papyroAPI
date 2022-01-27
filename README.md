@@ -24,7 +24,7 @@ pip install fastapi[all] sqlalchemy alembic
 Depois de dar start na venv e instalar o fastApi na mesma, clone o repositório, acesse o mesmo e rode o comando:
 
 ```bash
-uvicorn main:app --reload
+uvicorn src.main:app --reload --reload-dir=src
 ```
 
 Migrations(Básico do básico):
