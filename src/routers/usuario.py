@@ -14,7 +14,3 @@ async def dados_usuario(db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
 
-@router.post("/usuario", status_code=status.HTTP_201_CREATED)
-async def criar_usuario(usuario: schemas.Usuario, db: Session = Depends(get_db)):
-    usuario_criado = RepositorioUsuario(db).criar_usuario(usuario)
-    return usuario_criado

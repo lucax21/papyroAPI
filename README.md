@@ -18,7 +18,7 @@ source papyroAPI/bin/activate
 Instalar o FastAPI e outras coisas:
 
 ```bash
-pip install fastapi[all] sqlalchemy alembic "passlib[bcrypt]"
+pip install fastapi[all] sqlalchemy alembic "passlib[bcrypt]" "python-jose[cryptography]"
 ```
 
 Depois de dar start na venv e instalar o fastApi na mesma, clone o repositório, acesse o mesmo e rode o comando:
