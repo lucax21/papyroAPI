@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from src.schemas import schemas
+from src.schemas.usuario import Usuario 
 from src.infra.sqlalchemy.models import models
 
 class RepositorioUsuario():
@@ -8,7 +8,7 @@ class RepositorioUsuario():
     def __init__(self, session: Session):
         self.session = session
 
-    def criar_usuario(self, usuario: schemas.Usuario):
+    def criar_usuario(self, usuario: Usuario):
         db_usuario = models.Usuario(nome=usuario.nome,
                 email=usuario.email,
                 apelido=usuario.apelido,

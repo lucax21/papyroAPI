@@ -21,11 +21,3 @@ class UsuarioSimples(BaseModel):
     
     class Config:
         orm_mode = True
-
-class Login(BaseModel):
-    senha: str
-    email: str
-
-class LoginSucesso(BaseModel):
-    usuario: UsuarioSimples
-    access_token: str

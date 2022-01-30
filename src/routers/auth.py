@@ -1,9 +1,8 @@
-from urllib import response
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from src.schemas.schemas import LoginSucesso
 from src.infra.providers import hash_provider, token_provider
-from src.schemas.schemas import Usuario, Login
+from src.schemas.auth import Login, LoginSucesso
+from src.schemas.usuario import Usuario, UsuarioSimples
 from src.infra.sqlalchemy.config.database import get_db
 from src.infra.sqlalchemy.repositorios.usuario import RepositorioUsuario 
 from src.routers.auth_utils import obter_usuario_logado
@@ -29,6 +28,10 @@ def login(login: Login, session: Session = Depends(get_db)):
     email = login.email
     senha = login.senha
     
+    if not senha or email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Campos vazios.")
+
     usuario = RepositorioUsuario(session).buscar_por_email(email)
 
     if not usuario:

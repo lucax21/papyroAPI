@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
-from src.schemas import schemas
 from src.infra.sqlalchemy.config.database import get_db
 from src.infra.sqlalchemy.repositorios.usuario import RepositorioUsuario
 
