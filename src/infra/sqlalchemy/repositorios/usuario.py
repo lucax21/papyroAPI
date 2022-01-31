@@ -29,3 +29,9 @@ class RepositorioUsuario():
                 models.Usuario.email == email
                 )
         return self.session.execute(query).scalars().first()
+
+    def buscar_por_apelido(self, apelido) -> models.Usuario:
+        query = select(models.Usuario).where(
+                models.Usuario.apelido == apelido
+                )
+        return self.session.execute(query).scalars().first()

@@ -5,7 +5,7 @@ from datetime import datetime
 class Usuario(BaseModel):
     id: Optional[int] = None
     nome: str
-    apelido: str
+    apelido: Optional[str] = None
     email: str
     senha: str
     data_nascimento: Optional[datetime] = None
