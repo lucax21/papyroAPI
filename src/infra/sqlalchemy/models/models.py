@@ -12,6 +12,6 @@ class Usuario(Base):
     email = Column(String, unique=True)
     nome = Column(String)
     apelido = Column(String)
-    senha = (String)
-    dataNascimento = Column(DateTime)
+    senha = Column(String)
+    data_nascimento = Column(DateTime)
     foto = Column(String)

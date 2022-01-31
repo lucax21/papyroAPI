@@ -5,11 +5,19 @@ from datetime import datetime
 class Usuario(BaseModel):
     id: Optional[int] = None
     nome: str
-    apelido: str
+    apelido: Optional[str] = None
     email: str
     senha: str
-    dataNascimento: Optional[datetime] = None
+    data_nascimento: Optional[datetime] = None
     foto: str
 
+    class Config:
+        orm_mode = True
+
+class UsuarioSimples(BaseModel):
+    nome: str
+    apelido: str
+    email: str
+    
     class Config:
         orm_mode = True
