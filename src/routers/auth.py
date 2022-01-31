@@ -15,20 +15,17 @@ router = APIRouter()
 def signup(usuario: Usuario, session: Session = Depends(get_db)):
     #verifica campos vazios
     if not usuario.nome:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campo nome vazio.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
     if not usuario.apelido:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campo apelido vazio.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Apelido.")
     if not usuario.senha:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campo senha vazio.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha.")
     if not usuario.email:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campo email vazio.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o E-mail.")
+    if not usuario.data_nascimento:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
 
-    #verifica se é maior de 18 anos
-    idade = (date.today() - usuario.data_nascimento.date())
-    result_idade = (idade.days / 365.25)
-    if result_idade < 18.0:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Você deve ser maior de idade para criar um conta.")
-  
+
     #verifica senha
     """
     a expressão do regex diz:
@@ -37,7 +34,13 @@ def signup(usuario: Usuario, session: Session = Depends(get_db)):
     """
     result_senha = re.match('^(?=\\S+$).{8,20}$', usuario.senha)
     if not result_senha:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A senha fraca. Tente outra senha.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A Senha deve conter no mínimo 8 dígitos e no máximo 20 dígitos.")
+
+    #verifica se é maior de 18 anos
+    idade = (date.today() - usuario.data_nascimento.date())
+    result_idade = (idade.days / 365.25)
+    if result_idade < 18.0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Você deve ser maior de idade para criar um conta.")
 
     #verifica se o apelido já está sendo utilizado
     apelido_buscado = RepositorioUsuario(session).buscar_por_apelido(usuario.apelido)
@@ -48,6 +51,8 @@ def signup(usuario: Usuario, session: Session = Depends(get_db)):
     if email_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
     
+    #
+
     #cria o novo usuário
     usuario.senha = hash_provider.get_password_hash(usuario.senha)
     usuario_criado = RepositorioUsuario(session).criar_usuario(usuario)
@@ -55,20 +60,21 @@ def signup(usuario: Usuario, session: Session = Depends(get_db)):
 
 @router.post("/token", response_model=LoginSucesso)
 def login(login: Login, session: Session = Depends(get_db)):
-    email = login.email
-    senha = login.senha
     
-    if not senha or email:
+    if not login.email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Campos vazios.")
+                            detail="Preencha o E-mail.")
 
-    usuario = RepositorioUsuario(session).buscar_por_email(email)
+    if not login.senha:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Preencha a Senha.")
 
+    usuario = RepositorioUsuario(session).buscar_por_email(login.email)
     if not usuario:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Email inválido.")
+                            detail="Usuário não cadastrado.")
     
-    senha_valida = hash_provider.verify_password(senha, usuario.senha)
+    senha_valida = hash_provider.verify_password(login.senha, usuario.senha)
 
     if not senha_valida:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
