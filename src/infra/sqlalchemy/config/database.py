@@ -1,20 +1,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from starlette.config import Config
+from dotenv import load_dotenv
+import os
 
-config = Config(".env")
+load_dotenv()
 
-ECRET_KEY = config("SECRET_KEY", cast=Secret, default="CHANGEME")
-POSTGRES_USER = config("POSTGRES_USER", cast=str)
-POSTGRES_PASSWORD = config("POSTGRES_PASSWORD", cast=Secret)
-POSTGRES_SERVER = config("POSTGRES_SERVER", cast=str, default="db")
-POSTGRES_PORT = config("POSTGRES_PORT", cast=str, default="5432")
-POSTGRES_DB = config("POSTGRES_DB", cast=str)
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_SERVER = os.getenv("POSTGRES_SERVER")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+POSTGRES_DB = os.getenv("POSTGRES_DB")
 
 #SQLALCHEMY_DATABASE_URL = "sqlite:///./papyroAPI.db"
 #SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-SQLALCHEMY_DATABASE_URL = "postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

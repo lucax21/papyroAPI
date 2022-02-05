@@ -5,9 +5,9 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /papyroAPI
 
-COPY ./requirements.txt /papyroAPI/requirements.txt
+COPY ./requirements.txt .
 
-RUN pip install --no-cache-dir --upgrade -r /papyroAPI/requirements.txt
+RUN pip install -r requirements.txt
 
-COPY ./src /papyroAPI/src
+COPY . . 
 

@@ -1,22 +1,27 @@
-version: "3.9"
+version: "3"
 
 services:
-  web:
+  api:
     build: .
-    command: uvicorn src.main:app --reload --reload-dir=src
+    command: uvicorn src.main:app --reload --reload-dir=src --host 0.0.0.0 --port 8000
     volumes:
       - .:/papyroAPI
     ports:
       - 8000:8000
     depends_on:
       - db
+    env_file:
+      - .env
   db:
     image: postgres:14
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    ports:
+      - $POSTGRES_PORT:$POSTGRES_DOCKER_PORT
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-
+    env_file:
+      - .env
 volumes:
   postgres_data:
