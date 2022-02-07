@@ -30,7 +30,3 @@ services:
       - .env
 volumes:
   postgres_data:
-
-networks:
-  default:
-    driver: my_custom_net
