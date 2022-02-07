@@ -4,9 +4,9 @@ services:
   api:
     build: .
     container_name: papyroAPI
-    command: uvicorn src.main:app --host 0.0.0.0 --reload --reload-dir=src --proxy-headers 
+    command: uvicorn src.main:app --proxy-headers --host 0.0.0.0 --port 8000 --reload --reload-dir=src
     volumes:
-      - .:/papyroAPI
+      - .:/code
     ports:
       - $PYTHON_LOCAL_PORT:$PYTHON_DOCKER_PORT
     depends_on:
@@ -21,6 +21,7 @@ services:
     environment:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
     ports:
       - $POSTGRES_PORT:$POSTGRES_DOCKER_PORT
     volumes:
@@ -29,3 +30,7 @@ services:
       - .env
 volumes:
   postgres_data:
+
+networks:
+  default:
+    driver: my_custom_net
