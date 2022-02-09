@@ -1,4 +1,4 @@
-from src.infra.sqlalchemy.config.database import Base
+from src.infra.sqlalchemy.config.database import Base, get_url
 from src.infra.sqlalchemy.models.models import *
 
 from logging.config import fileConfig
@@ -38,12 +38,6 @@ def run_migrations_offline():
     script output.
 
     """
-    def get_url():
-        user = os.getenv("POSTGRES_USER")
-        password = os.getenv("POSTGRES_PASSWORD")
-        server = os.getenv("POSTGRES_SERVER")
-        db = os.getenv("POSTGRES_DB")
-        return f"postgresql://{user}:{password}@{server}/{db}"
 
     url = get_url()
     context.configure(
