@@ -4,7 +4,7 @@ services:
   api:
     build: .
     container_name: papyroAPI
-    command: uvicorn src.main:app --proxy-headers --host 0.0.0.0 --port 8000 --reload --reload-dir=src
+    command: uvicorn src.main:app --proxy-headers --host 0.0.0.0 --reload --reload-dir=src
     volumes:
       - .:/code
     ports:
@@ -28,5 +28,14 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - .env
+  # pgadmin4:
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: $PGADMIN_EMAIL
+  #     PGADMIN_DEFAULT_PASSWORD: $PGADMIN_PASSWORD
+  #   ports:
+  #     - "$PGADMIN_PORT:$PGADMIN_DOCKER_PORT"
+  #   depends_on:
+  #     - db
 volumes:
   postgres_data:
