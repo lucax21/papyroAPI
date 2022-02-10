@@ -7,8 +7,6 @@ import os
 
 load_dotenv()
 
-Base = declarative_base()
-
 def get_url():
     user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
@@ -25,7 +23,7 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
+Base = declarative_base()
 
 def get_db():
     db = SessionLocal()
