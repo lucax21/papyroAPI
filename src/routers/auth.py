@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from src.infra.providers import hash_provider, token_provider
+from src.core import hash_provider, token_provider
 from src.schemas.auth import Login, LoginSucesso
 from src.schemas.usuario import Usuario
-from src.infra.sqlalchemy.config.database import get_db
-from src.infra.sqlalchemy.repositorios.usuario import RepositorioUsuario 
+from src.db.database import get_db
+from src.crud.usuario import RepositorioUsuario 
 from src.routers.auth_utils import obter_usuario_logado
 from datetime import date
 import re

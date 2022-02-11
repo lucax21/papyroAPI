@@ -1,5 +1,5 @@
-from src.infra.sqlalchemy.config.database import Base, get_url
-from src.infra.sqlalchemy.models.models import *
+from src.db.config.database import Base, get_url
+from src.models.models import *
 
 from logging.config import fileConfig
 from sqlalchemy import pool, engine_from_config

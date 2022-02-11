@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from src.schemas.usuario import Usuario 
-from src.infra.sqlalchemy.models import models
+from src.models import models
 
 class RepositorioUsuario():
 

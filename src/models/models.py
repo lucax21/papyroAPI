@@ -2,7 +2,7 @@
 
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-from src.infra.sqlalchemy.config.database import Base
+from src.db.database import Base
 
 class Usuario(Base):
     __tablename__ = 'usuario'

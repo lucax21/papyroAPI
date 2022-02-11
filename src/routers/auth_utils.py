@@ -3,9 +3,9 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi import Depends, status, HTTPException
-from src.infra.sqlalchemy.repositorios.usuario import RepositorioUsuario
-from src.infra.sqlalchemy.config.database import get_db
-from src.infra.providers import token_provider 
+from src.crud.usuario import RepositorioUsuario
+from src.db.database import get_db
+from src.core import token_provider 
 from jose import JWTError
 
 oauth2_schema = OAuth2PasswordBearer(tokenUrl = 'token')
