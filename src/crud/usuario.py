@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from src.schemas.usuario import Usuario 
 from src.models import models
 
-class RepositorioUsuario():
+class CrudUsuario():
 
     def __init__(self, session: Session):
         self.session = session

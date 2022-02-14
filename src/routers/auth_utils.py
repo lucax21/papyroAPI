@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi import Depends, status, HTTPException
-from src.crud.usuario import RepositorioUsuario
+from src.crud.usuario import CrudUsuario
 from src.db.database import get_db
 from src.core import token_provider 
 from jose import JWTError
@@ -24,7 +24,7 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
     if not email:
         raise exception
     
-    usuario = RepositorioUsuario(session).buscar_por_email(email)
+    usuario = CrudUsuario(session).buscar_por_email(email)
 
     if not usuario:
         raise exception

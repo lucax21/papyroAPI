@@ -4,7 +4,7 @@ from src.core import hash_provider, token_provider
 from src.schemas.auth import Login, LoginSucesso
 from src.schemas.usuario import Usuario
 from src.db.database import get_db
-from src.crud.usuario import RepositorioUsuario 
+from src.crud.usuario import CrudUsuario 
 from src.routers.auth_utils import obter_usuario_logado
 from datetime import date
 import re
@@ -43,11 +43,11 @@ def signup(usuario: Usuario, session: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Você deve ser maior de idade para criar um conta.")
 
     #verifica se o apelido já está sendo utilizado
-    apelido_buscado = RepositorioUsuario(session).buscar_por_apelido(usuario.apelido)
+    apelido_buscado = CrudUsuario(session).buscar_por_apelido(usuario.apelido)
     if apelido_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
     #verifica se o email já está sendo utilizado
-    email_buscado = RepositorioUsuario(session).buscar_por_email(usuario.email)
+    email_buscado = CrudUsuario(session).buscar_por_email(usuario.email)
     if email_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
     
@@ -55,7 +55,7 @@ def signup(usuario: Usuario, session: Session = Depends(get_db)):
 
     #cria o novo usuário
     usuario.senha = hash_provider.get_password_hash(usuario.senha)
-    usuario_criado = RepositorioUsuario(session).criar_usuario(usuario)
+    usuario_criado = CrudUsuario(session).criar_usuario(usuario)
     return usuario_criado
 
 @router.post("/token", response_model=LoginSucesso)
@@ -69,7 +69,7 @@ def login(login: Login, session: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Preencha a Senha.")
 
-    usuario = RepositorioUsuario(session).buscar_por_email(login.email)
+    usuario = CrudUsuario(session).buscar_por_email(login.email)
     if not usuario:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Usuário não cadastrado.")

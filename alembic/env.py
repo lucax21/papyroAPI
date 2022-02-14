@@ -1,4 +1,4 @@
-from src.db.config.database import Base, get_url
+from src.db.database import Base, get_url
 from src.models.models import *
 
 from logging.config import fileConfig
