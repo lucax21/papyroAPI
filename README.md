@@ -3,7 +3,7 @@
 ### AAAAAAAAAAAAAAAAAAa
 O projeto está em docker, então a configuração dele realmente é bem fácil é apenas iniciar o projeto com:
 ```bash
-docker-compose up
+docker-compose up --build
 ```
 
 que ele já vai se encarregar de inicializar os containers. Mas para rodar o projeto é apenas fazer:

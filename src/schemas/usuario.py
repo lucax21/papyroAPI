@@ -1,8 +1,9 @@
 
-import email
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
+
+from src.schemas.genero import Genero
 
 # Propriedades compartilhadas
 class UsuarioSimples(BaseModel):
@@ -22,3 +23,6 @@ class UsuarioDb(UsuarioSimples):
 
 class Usuario(UsuarioDb):
     pass
+
+class UsuarioGeneros(UsuarioSimples):
+    generos: List[Genero]
