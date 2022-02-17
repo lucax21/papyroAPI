@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session, joinedload
 from src.schemas.usuario import Usuario, UsuarioGeneros
 from src.models import models
 
+from typing import Optional, List
+
 class CrudUsuario():
 
     def __init__(self, session: Session):
@@ -28,7 +30,7 @@ class CrudUsuario():
         generos = self.session.query(models.Usuario).options(joinedload(models.Usuario.genero)).where(models.Usuario.id == 1).one()
         return generos
 
-    def salvar_generos(self):
+    def salvar_generos(self, lista: List[int]):
         pass
 
     def buscar_por_email(self, email) -> models.Usuario:
