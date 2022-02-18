@@ -28,4 +28,4 @@ class Usuario(UsuarioDb):
     data_nascimento: date
 
 class UsuarioGeneros(UsuarioSimples):
-    generos: List[Genero]
+    generosLiterarios: List[Genero]

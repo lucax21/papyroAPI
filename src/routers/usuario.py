@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
+
 from datetime import date
 import re
 
@@ -18,20 +18,6 @@ async def dados_usuario(session: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
 
-@router.get("/meusGeneros")
-async def generos_usuario(session: Session = Depends(get_db)):
-    dado = CrudUsuario(session).listar_generos()
-    if not dado:
-        raise HTTPException(status_code=404, detail='Não encontrado')
-    return dado
-
-@router.get("/gravarGeneros")
-async def generos_usuario_gravar(generos_sele: Optional[List[int]] = Query(None), session: Session = Depends(get_db)):
-    if not generos_sele or len(generos_sele) < 3:
-        raise HTTPException(status_code=404, detail='Deve haver um mínimo de 3 gêneros literários selecionados.')
-    
-    dado = CrudUsuario(session).salvar_generos(generos_sele)
-    return dado
 
 @router.post("/",status_code=status.HTTP_201_CREATED, response_model=Usuario)
 def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
