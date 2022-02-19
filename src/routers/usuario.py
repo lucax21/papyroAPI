@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 import re
 
-from src.core import hash_provider
+from src.core import hash_provider, email_provider
 from src.db.database import get_db
 from src.crud.usuario import CrudUsuario
 from src.schemas.usuario import Usuario, UsuarioCriar
@@ -59,7 +59,8 @@ def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
     if email_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
     
-    #
+    #envia código de verificação
+    #email_provider.verificacao_email(usuario.email)
 
     #cria o novo usuário
     usuario.senha = hash_provider.get_password_hash(usuario.senha)
