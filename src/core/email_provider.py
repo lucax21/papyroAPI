@@ -1,29 +1,38 @@
 import smtplib
 import email.message
 
-from dotenv import load_dotenv
-import os
+from src.core.config import Settings
 
-load_dotenv()
+settings = Settings()
 
-def verificacao_email(user_email: str):
-    corpo_email = """
-    <p>Test1</p>
-    """
+class Mailer:
 
-    msg = email.message.Message()
-    msg['Subject'] = "Papyro verificação de conta"
-    msg['To'] = user_email
-    msg['From'] = os.getenv("PAPYRO_EMAIL_CHECKER")
-    password = os.getenv("PAPYRO_EMAIL_CHERCER_PASSWORD")
-    msg.add_header('Content-Type','text/html')
-    msg.set_payload(corpo_email)
+    @staticmethod
+    def enviar_email(content: str, subject: str, user_email: str):
+    
+        msg = email.message.Message()
+        msg.set_payload(content)
+        msg['Subject'] = subject
+        msg['To'] = user_email
+        msg['From'] = settings.EMAIL_HOST_USER
 
-    if not password:
-        password = ""
+        # msg.add_header('Content-Type','text/html')
 
-    s = smtplib.SMTP('smtp.office365.com: 587')
-    s.starttls()
-    s.login(msg['From'], password) 
-    s.sendmail(msg['From'], [msg['To']], msg.as_string().encode('utf-8'))
-    #print("Email enviado")
+        s = smtplib.SMTP('smtp.office365.com: 587')
+        s.ehlo()
+        s.starttls()
+        s.ehlo()
+        s.login(msg['From'], settings.EMAIL_HOST_PASSWORD) 
+        # s.sendmail(msg['From'], [msg['To']], msg.as_string().encode('utf-8'))
+        s.send_message(msg)
+        s.quit()
+        #print("Email enviado")
+
+    @staticmethod
+    def enviar_email_confirmacao(token: str, user_email: str):
+        confirmacao_url = f'http://{settings.PROJECT_SERVER}:{settings.PROJECT_PORT}/usuarios/verificacao/{token}'
+        
+        mensagem = '''
+        Por favor, confirme sua cadastro no papyro: {}'''.format(confirmacao_url)
+        
+        Mailer.enviar_email(mensagem, 'Confirme sua cadastro no papyro', user_email)

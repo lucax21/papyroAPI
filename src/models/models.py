@@ -1,6 +1,7 @@
 #Representação do banco de dados
-
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean
 from sqlalchemy.orm import relationship
 from src.db.database import Base
 
@@ -15,6 +16,9 @@ class Usuario(Base):
     senha = Column(String(256))
     data_nascimento = Column(DateTime)
     foto = Column(String(255), nullable=True)
+
+    ativo = Column(Boolean, default=False)
+    confirmacao = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
 
     genero = relationship('Genero', secondary='usuario_genero')
 
