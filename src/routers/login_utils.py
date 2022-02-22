@@ -17,14 +17,19 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
 
 
     try:
-        email = token_provider.check_acess_token(token)
+        payload = token_provider.check_acess_token(token)
+        username: str = payload.get("sub")
+
+        if not username:
+            raise exception
+    
     except JWTError:
         raise exception
     
-    if not email:
+    if not payload:
         raise exception
     
-    usuario = CrudUsuario(session).buscar_por_email(email)
+    usuario = CrudUsuario(session).buscar_por_email(payload)
 
     if not usuario:
         raise exception

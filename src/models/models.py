@@ -1,7 +1,7 @@
 #Representação do banco de dados
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
 from sqlalchemy.orm import relationship
 from src.db.database import Base
 
@@ -36,6 +36,7 @@ class UsuarioGenero(Base):
 
     fk_genero = Column(Integer, ForeignKey('genero.id'), primary_key=True)
     fk_usuario = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
+
 
 class Livro(Base):
     __tablename__ = 'livro'

@@ -41,5 +41,5 @@ class Usuario(UsuarioDb):
     email: Optional[EmailStr] = None
     data_nascimento: date
 
-class UsuarioGeneros(UsuarioSimples):
+class UsuarioGeneros(UsuarioDb):
     generosLiterarios: List[Genero]
