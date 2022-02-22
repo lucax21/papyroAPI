@@ -7,6 +7,7 @@ from src.crud.genero import CrudGenero
 from src.models.models import Usuario
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.genero import Genero
+from src.schemas.usuario import UsuarioGeneros
 
 router = APIRouter()
 
@@ -18,15 +19,17 @@ async def listar_generos(session: Session = Depends(get_db)):
     return dado
 
 @router.post("/")
-async def generos_usuario_gravar(lista: List[Genero],session: Session = Depends(get_db)):
+async def generos_usuario_gravar(lista: UsuarioGeneros,session: Session = Depends(get_db)):
     #, current_user: Usuario = Depends(obter_usuario_logado)
-    id_user = 1
     
-    if len(lista) < 3:
+    # lista.id = current_user.id
+    lista.id = 1
+    
+    if len(lista.generosLiterarios) < 3:
         raise HTTPException(status_code=404, detail='Deve haver um mínimo de 3 gêneros literários selecionados.')
     
-    dado = CrudGenero(session).salvar_generos_usuario(lista, id_user)
-    return dado
+    # dado = CrudGenero(session).salvar_generos_usuario(lista)
+    return "KKKKKKKKKKKKKKKKKKKKKKKKKK"
 
 @router.get("/{id}/")
 async def listar_generos_usuario():
