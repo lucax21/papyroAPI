@@ -7,7 +7,7 @@ from src.core.config import Settings
 settings = Settings()
 
 
-@staticmethod
+# @staticmethod
 def create_acess_token(data: dict, expires_delta: int):
     to_encode = data.copy()
     
@@ -18,12 +18,12 @@ def create_acess_token(data: dict, expires_delta: int):
     
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.TOKEN_ALGORITHM)
 
-@staticmethod
+# @staticmethod
 def check_acess_token(token: str):
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
     return payload.get('sub')
 
-@staticmethod
+# @staticmethod
 def get_confirmation_token(user_email: str, jti: UUID4):
     claims = {
         "sub": str(user_email),
