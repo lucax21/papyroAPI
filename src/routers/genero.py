@@ -28,8 +28,8 @@ async def generos_usuario_gravar(lista: UsuarioGeneros,session: Session = Depend
     if len(lista.generosLiterarios) < 3:
         raise HTTPException(status_code=404, detail='Deve haver um mínimo de 3 gêneros literários selecionados.')
     
-    # dado = CrudGenero(session).salvar_generos_usuario(lista)
-    return "KKKKKKKKKKKKKKKKKKKKKKKKKK"
+    dado = CrudGenero(session).salvar_generos_usuario(lista)
+    return dado
 
 @router.get("/{id}/")
 async def listar_generos_usuario():
