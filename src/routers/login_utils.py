@@ -3,9 +3,9 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi import Depends, status, HTTPException
-from src.infra.sqlalchemy.repositorios.usuario import RepositorioUsuario
-from src.infra.sqlalchemy.config.database import get_db
-from src.infra.providers import token_provider 
+from src.crud.usuario import CrudUsuario
+from src.db.database import get_db
+from src.core import token_provider 
 from jose import JWTError
 
 oauth2_schema = OAuth2PasswordBearer(tokenUrl = 'token')
@@ -17,14 +17,19 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
 
 
     try:
-        email = token_provider.check_acess_token(token)
+        payload = token_provider.check_acess_token(token)
+        username: str = payload.get("sub")
+
+        if not username:
+            raise exception
+    
     except JWTError:
         raise exception
     
-    if not email:
+    if not payload:
         raise exception
     
-    usuario = RepositorioUsuario(session).buscar_por_email(email)
+    usuario = CrudUsuario(session).buscar_por_email(payload)
 
     if not usuario:
         raise exception

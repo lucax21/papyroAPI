@@ -1,9 +1,12 @@
-from src.infra.sqlalchemy.config.database import Base, get_url
-from src.infra.sqlalchemy.models.models import *
+from src.db.database import Base
+from src.models.models import *
+from src.core.config import Settings
 
 from logging.config import fileConfig
 from sqlalchemy import pool, engine_from_config
 from alembic import context
+
+settings = Settings()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -38,14 +41,6 @@ def run_migrations_offline():
 
     """
 
-    url = get_url()
-    context.configure(
-        url=url,
-        target_metadata=target_metadata,
-        render_as_batch=True,
-        literal_binds=True
-    )
-
     with context.begin_transaction():
         context.run_migrations()
 
@@ -58,7 +53,7 @@ def run_migrations_online():
 
     """
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = get_url()
+    configuration["sqlalchemy.url"] = settings.DATABASE_URL
     connectable = engine_from_config(
         configuration, prefix="sqlalchemy.", poolclass=pool.NullPool,
     )
