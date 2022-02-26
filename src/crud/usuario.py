@@ -1,9 +1,11 @@
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from src.schemas.usuario import Usuario
-from src.models import models
+from src.db.models import models
+from typing import List
 
 from src.core import hash_provider
+
 class CrudUsuario():
 
     def __init__(self, session: Session):
@@ -22,9 +24,10 @@ class CrudUsuario():
         return db_usuario
     
     #função para testes
-    def listar(self):
-        usuario = self.session.query(models.Usuario).all()
-        return usuario
+    def listar(self) -> List[models.Usuario]:
+        aa = self.session.execute(select(models.Usuario))
+        return aa.scalars().all()
+        
 
     def buscar_por_email(self, email) -> models.Usuario:
         query = select(models.Usuario).where(
