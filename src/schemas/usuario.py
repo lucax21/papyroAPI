@@ -1,8 +1,7 @@
-
+from __future__ import annotations
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date
-from src.schemas.genero import Genero
 
 from fastapi import Form
 
@@ -41,5 +40,9 @@ class Usuario(UsuarioDb):
     email: Optional[EmailStr] = None
     data_nascimento: date
 
+from src.schemas.genero import Genero
 class UsuarioGeneros(UsuarioDb):
-    generosLiterarios: List[Genero]
+    generos: List[Genero]
+
+
+UsuarioGeneros.update_forward_refs()

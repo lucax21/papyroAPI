@@ -5,6 +5,12 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text
 from sqlalchemy.orm import relationship
 from src.db.database import Base
 
+
+usuario_genero = Table("usuario_genero", Base.metadata,
+                        Column("fk_genero", ForeignKey("genero.id"), primary_key=True),
+                        Column("fk_usuario", ForeignKey("usuario.id"), primary_key=True)
+                    )
+
 class Usuario(Base):
     __tablename__ = 'usuario'
 
@@ -20,7 +26,7 @@ class Usuario(Base):
     ativo = Column(Boolean, default=False)
     confirmacao = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
 
-    genero = relationship('Genero', secondary='usuario_genero')
+    generos = relationship('Genero', secondary=usuario_genero)
 
 class Genero(Base):
     __tablename__ = 'genero'
@@ -29,13 +35,14 @@ class Genero(Base):
 
     genero = Column(String(100))
 
-    Usuario = relationship(Usuario, secondary='usuario_genero')
+    #usuarios = relationship('Usuario', secondary='usuario_genero', back_populates='generos')
 
-class UsuarioGenero(Base):
-    __tablename__ = 'usuario_genero'
+# class UsuarioGenero(Base):
+#     __tablename__ = 'usuario_genero'
 
-    fk_genero = Column(Integer, ForeignKey('genero.id'), primary_key=True)
-    fk_usuario = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
+#     fk_genero = Column(Integer, ForeignKey('genero.id'), primary_key=True)
+#     fk_usuario = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
+
 
 
 class Livro(Base):

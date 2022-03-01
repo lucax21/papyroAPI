@@ -4,11 +4,11 @@ services:
   api:
     build: .
     container_name: papyroAPI
-    # command: uvicorn src.main:app --proxy-headers --host 0.0.0.0 --reload --reload-dir=src
-    #volumes:
-     # - .:/code
-    #ports:
-     # - $PYTHON_LOCAL_PORT:$PYTHON_DOCKER_PORT
+    command: uvicorn src.main:app --proxy-headers --host 0.0.0.0 --reload --reload-dir=src
+    volumes:
+     - .:/code
+    ports:
+     - $PYTHON_LOCAL_PORT:$PYTHON_DOCKER_PORT
     depends_on:
       - db
     environment:

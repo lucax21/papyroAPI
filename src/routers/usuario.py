@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 import re
 
+from typing import List
 from src.core.token_provider import check_acess_token, get_confirmation_token
 from src.db.database import get_db
 from src.crud.usuario import CrudUsuario
@@ -14,7 +15,7 @@ from jose import jwt
 from src.core.email_provider import Mailer
 router = APIRouter()
 
-@router.get("/usuariostest")
+@router.get("/usuariostest", response_model=List[Usuario])
 async def dados_usuario(session: Session = Depends(get_db)):
     dado = CrudUsuario(session).listar()
     if not dado:
@@ -78,7 +79,7 @@ async def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
 
     return usuario_criado
 
-@router.get("/verificacao/{token}")
+@router.get("/verificacao/{token}",status_code=status.HTTP_201_CREATED, response_model=Usuario)
 def verificar(token: str, session: Session = Depends(get_db)):
     invalid_token_error = HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Token")
