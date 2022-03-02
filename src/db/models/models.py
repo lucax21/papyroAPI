@@ -26,7 +26,7 @@ class Usuario(Base):
     ativo = Column(Boolean, default=False)
     confirmacao = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
 
-    generos = relationship('Genero', secondary=usuario_genero)
+    generos = relationship('Genero', secondary=usuario_genero, back_populates='usuarios')
 
 class Genero(Base):
     __tablename__ = 'genero'
@@ -35,7 +35,7 @@ class Genero(Base):
 
     genero = Column(String(100))
 
-    #usuarios = relationship('Usuario', secondary='usuario_genero', back_populates='generos')
+    usuarios = relationship('Usuario', secondary=usuario_genero, back_populates='generos')
 
 # class UsuarioGenero(Base):
 #     __tablename__ = 'usuario_genero'

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date
@@ -40,7 +41,9 @@ class Usuario(UsuarioDb):
     email: Optional[EmailStr] = None
     data_nascimento: date
 
-from src.schemas.genero import Genero
+
+from .genero import Genero
+
 class UsuarioGeneros(UsuarioDb):
     generos: List[Genero]
 

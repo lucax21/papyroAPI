@@ -15,7 +15,7 @@ from jose import jwt
 from src.core.email_provider import Mailer
 router = APIRouter()
 
-@router.get("/usuariostest", response_model=List[Usuario])
+@router.get("/usuariostest12", response_model=List[Usuario])
 async def dados_usuario(session: Session = Depends(get_db)):
     dado = CrudUsuario(session).listar()
     if not dado:

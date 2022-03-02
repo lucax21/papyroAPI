@@ -21,7 +21,7 @@ def create_acess_token(data: dict, expires_delta: int):
 # @staticmethod
 def check_acess_token(token: str):
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
-    return payload.get('sub')
+    return payload.get("sub")
 
 # @staticmethod
 def get_confirmation_token(user_email: str, jti: UUID4):

@@ -6,8 +6,11 @@ from fastapi import Depends, status, HTTPException
 from src.crud.usuario import CrudUsuario
 from src.db.database import get_db
 from src.core import token_provider 
-from jose import JWTError
 
+from src.core.config import Settings
+from jose import JWTError,jwt
+
+settings = Settings()
 oauth2_schema = OAuth2PasswordBearer(tokenUrl = 'token')
 
 def obter_usuario_logado(token: str = Depends(oauth2_schema),
@@ -17,8 +20,10 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
 
 
     try:
-        payload = token_provider.check_acess_token(token)
+        # payload = token_provider.check_acess_token(token)
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
         username: str = payload.get("sub")
+        # print("username is", username)
 
         if not username:
             raise exception
@@ -29,7 +34,7 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
     if not payload:
         raise exception
     
-    usuario = CrudUsuario(session).buscar_por_email(payload)
+    usuario = CrudUsuario(session).buscar_por_email(username)
 
     if not usuario:
         raise exception

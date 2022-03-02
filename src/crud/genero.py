@@ -21,4 +21,5 @@ class CrudGenero():
     def salvar_generos_usuario(self, generosUsuario: UsuarioGeneros):
         self.session.add(generosUsuario)
         return self.session.commit()
+        # return generosUsuario
         # pass

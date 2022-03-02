@@ -7,7 +7,7 @@ settings = Settings()
 
 class Mailer:
 
-    @staticmethod
+    # @staticmethod
     def enviar_email(content: str, subject: str, user_email: str):
     
         msg = email.message.Message()
@@ -28,10 +28,16 @@ class Mailer:
         s.quit()
         #print("Email enviado")
 
-    @staticmethod
+    # @staticmethod
     def enviar_email_confirmacao(token: str, user_email: str):
-        confirmacao_url = f'http://{settings.PROJECT_SERVER}:{settings.PROJECT_PORT}/usuarios/verificacao/{token}'
-        
+
+        # para rodar no docker
+        #confirmacao_url = f'http://{settings.PROJECT_SERVER}:{settings.PROJECT_PORT}/usuarios/verificacao/{token}'
+
+        # para rodar no gcloud
+        confirmacao_url = f'http://{settings.PROJECT_SERVER}/usuarios/verificacao/{token}'
+
+
         mensagem = '''
         Por favor, confirme sua cadastro no papyro: {}'''.format(confirmacao_url)
         

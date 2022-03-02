@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.post("/")
-def login(login: Login = Depends(), session: Session = Depends(get_db)):
+def login(login: Login, session: Session = Depends(get_db)):
     
     if not login.email:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
