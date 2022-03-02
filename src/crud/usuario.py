@@ -28,6 +28,9 @@ class CrudUsuario():
         aa = self.session.execute(select(models.Usuario))
         return aa.scalars().all()
         
+    def buscar_por_nome(self, nome) -> List[models.Usuario]:
+
+        return self.session.query(models.Usuario).filter(models.Usuario.nome.like(nome+'%')).all()
 
     def buscar_por_email(self, email) -> models.Usuario:
         query = select(models.Usuario).where(
