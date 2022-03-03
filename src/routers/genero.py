@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from typing import Optional, List
+from typing import List
 from src.db.database import get_db
 from src.crud.genero import CrudGenero
 from src.db.models.models import Usuario

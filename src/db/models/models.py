@@ -86,3 +86,28 @@ class LivroISBN(Base):
 
     fk_livro = Column(Integer, ForeignKey('livro.id'))
 
+class Grupo(Base):
+    __tablename__ = 'grupo'
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    nome = Column(String(100))
+    foto = Column(String(255))
+    descricao = Column(String(1023))
+
+    fk_cargo = Column(Integer, ForeignKey('cargo.id'))
+
+class Cargo(Base):
+    __tablename__ = 'cargo'
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    cargo = Column(String(127))
+
+class UsuarioGrupo(Base):
+    __tablename__ = 'usuario_grupo'
+    fk_grupo = Column(ForeignKey("grupo.id"), primary_key=True)
+    fk_usuario = Column(ForeignKey("usuario.id"), primary_key=True)
+    fk_cargo = Column(ForeignKey("cargo.id"))
+    data_entrada = Column(Date)
+                    
