@@ -44,6 +44,12 @@ class CrudUsuario():
                 )
         return self.session.execute(query).scalars().first()
 
+    def buscar_por_id(self, id) -> models.Usuario:
+        query = select(models.Usuario).where(
+                models.Usuario.id == id
+                )
+        return self.session.execute(query).scalars().first()
+
     def ativar_conta(self, instancia_usu):
         update_stmt = update(models.Usuario).where(
             models.Usuario.id == instancia_usu.id).values(ativo=instancia_usu.ativo, confirmacao=instancia_usu.confirmacao)

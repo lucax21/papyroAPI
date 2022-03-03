@@ -126,12 +126,22 @@ def conversas(session: Session = Depends(get_db)
             , current_user: Usuario = Depends(obter_usuario_logado)):
     pass
 
-@router.get("/{termo}",response_model=List[Usuario])
+@router.get("/buscarUsuarios{termo}",response_model=List[Usuario])
 def buscar_usuario(termo: str,session: Session = Depends(get_db)):
     if not termo:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
 
     dado = CrudUsuario(session).buscar_por_nome(termo)
+    if not dado:
+        raise HTTPException(status_code=404, detail='Não encontrado')
+    return dado
+
+@router.get("/{id}",response_model=Usuario)
+def buscar_por_id(id: int,session: Session = Depends(get_db)):
+    if not id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
+
+    dado = CrudUsuario(session).buscar_por_id(id)
     if not dado:
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado

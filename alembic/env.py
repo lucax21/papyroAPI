@@ -1,5 +1,5 @@
 from src.db.database import Base
-from src.models.models import *
+from src.db.models.models import *
 from src.core.config import Settings
 
 from logging.config import fileConfig
