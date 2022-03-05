@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from src.crud.livro import CrudLivro
 from src.db.database import get_db
-from src.schemas.livro import Livro
+from src.schemas.livro import Livro, LivroCriar
 
 router = APIRouter()
 
@@ -33,3 +33,7 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
     if not dado:
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
+
+@router.post("/",status_code=status.HTTP_201_CREATED)
+def gravar_livro(livro: LivroCriar, session: Session = Depends(get_db)):
+    return "KKKK"
