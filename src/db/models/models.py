@@ -82,7 +82,7 @@ class LivroAutores(Base):
 class LivroISBN(Base):
     __tablename__ = 'livro_isbn'
 
-    isbn = Column(String(10), primary_key=True)
+    isbn = Column(String(13), primary_key=True)
 
     fk_livro = Column(Integer, ForeignKey('livro.id'))
 
