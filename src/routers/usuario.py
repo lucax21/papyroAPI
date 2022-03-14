@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 
 from datetime import date
@@ -136,7 +136,7 @@ def buscar_usuario(termo: str,session: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
 
-@router.get("/{id}",response_model=Usuario)
+@router.get("/get/{id}",response_model=Usuario)
 def buscar_por_id(id: int,session: Session = Depends(get_db)):
     if not id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
@@ -145,3 +145,79 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
     if not dado:
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
+
+@router.get("/meusDados",response_model=Usuario)
+def meus_dados(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+    return CrudUsuario(session).buscar_por_id(current_user.id)
+
+@router.put("/atualizarDados")
+def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db), current_user: Usuario = Depends(obter_usuario_logado)):
+    #verifica campos vazios
+    if not usuario.nome:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
+    elif not usuario.apelido:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Apelido.")
+    elif not usuario.senha:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha.")
+    elif not usuario.senha_confirmacao:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha de Confirmação.")
+    elif not usuario.email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o E-mail.")
+    elif not usuario.data_nascimento:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
+
+
+    #verifica senha
+    """
+    a expressão do regex diz:
+    - senha deve ter de 8 a 20 digitos
+    - espaços em branco não são permitidos
+    """
+    result_senha = re.match('^(?=\\S+$).{8,20}$', usuario.senha)
+    if not result_senha:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A Senha deve conter no mínimo 8 dígitos e no máximo 20 dígitos.")
+
+    #verifica se é maior de 18 anos
+    idade = (date.today() - usuario.data_nascimento)
+    result_idade = (idade.days / 365.25)
+    if result_idade < 18.0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Você deve ser maior de idade para criar um conta.")
+
+    if not usuario.senha == usuario.senha_confirmacao:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Senhas incompatíveis. Confirme novamente.")
+
+    usuario_db = CrudUsuario(session).buscar_por_id(current_user.id)
+
+    if not usuario.apelido == usuario_db.apelido:     
+        #verifica se o apelido já está sendo utilizado
+        apelido_buscado = CrudUsuario(session).buscar_por_apelido(usuario.apelido)
+        if apelido_buscado:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
+
+
+    if not usuario.email == usuario_db.email:
+        #verifica se o email já está sendo utilizado
+        email_buscado = CrudUsuario(session).buscar_por_email(usuario.email)
+        if email_buscado:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
+        
+        # desabilitar confirmação de conta
+        CrudUsuario(session).desabilitar_confirmação(current_user.id)
+
+        token_confirmacao = get_confirmation_token(usuario_db.email, usuario_db.confirmacao)
+
+        try:
+            Mailer.enviar_email_confirmacao(token_confirmacao["token"], usuario_db.email)
+        except ConnectionRefusedError:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Email não poderia ser enviado. Por favor, tente de novo."
+            )
+   
+    return CrudUsuario(session).atualizar_usuario(current_user.id, usuario)
+
+@router.post("/testFOTO")
+def test(file: UploadFile = File(...)):
+    if not file:
+        raise HTTPException(status_code=404, detail='Não encontrado')
+    return {"file_name": file.filename}

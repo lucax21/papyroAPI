@@ -1,4 +1,5 @@
 from __future__ import annotations
+from lib2to3.pgen2.token import OP
 
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
@@ -26,9 +27,11 @@ class UsuarioSimples(BaseModel):
 class UsuarioCriar(UsuarioSimples):
     email: EmailStr
     senha: str
+    senha_confirmacao: Optional[str] = None
     data_nascimento: date
+    descricao: Optional[str] = None
     
-    class Config():
+    class Config:
         orm_mode = True
 
 class UsuarioDb(UsuarioSimples):
@@ -38,14 +41,18 @@ class UsuarioDb(UsuarioSimples):
         orm_mode = True
 
 class Usuario(UsuarioDb):
+    descricao: Optional[str] = None
     email: Optional[EmailStr] = None
     data_nascimento: date
 
 
-from .genero import Genero
+from src.schemas.genero import Genero
 
-class UsuarioGeneros(UsuarioDb):
-    generos: List[Genero]
+class UsuarioGeneros(UsuarioSimples):
+    generos: List[Genero] = []
 
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed  =  True
 
 UsuarioGeneros.update_forward_refs()
