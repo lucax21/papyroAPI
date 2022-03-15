@@ -44,3 +44,7 @@ uvicorn==0.15.0
 uvloop==0.16.0
 watchgod==0.7
 websockets==10.1
+
+firebase-admin==5.2.0
+firebase==3.0.1
+pyrebase
