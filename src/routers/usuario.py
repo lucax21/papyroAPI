@@ -150,8 +150,13 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
     return dado
 
 @router.get("/meusDados",response_model=Usuario)
-def meus_dados(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+def dados_usuarios(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     return CrudUsuario(session).buscar_por_id(current_user.id)
+
+@router.get("/meuPerfil",response_model=Usuario)
+def dados_perfil(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+    return CrudUsuario(session).buscar_por_id(current_user.id)
+
 
 @router.put("/atualizarDados")
 def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db), current_user: Usuario = Depends(obter_usuario_logado)):
