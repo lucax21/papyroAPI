@@ -220,20 +220,20 @@ def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db), curr
     return CrudUsuario(session).atualizar_usuario(current_user.id, usuario)
 
 @router.post("/testFOTO")
-def test(file: UploadFile = File(...)):
-    if not file:
-        raise HTTPException(status_code=404, detail='Não encontrado')
+def test(file: UploadFile):
+    
+
+    # SOMENTE UM TESTE
+
+
+
+    # contents = file.read()
 
     print(file.filename)
     print(file.content_type)
 
-    import firebase
-    from google.cloud import storage
-    from google.cloud.storage import client
 
-    import firebase_admin
-    from firebase_admin import credentials
-    from firebase_admin import storage
+    from firebase_admin import credentials, initialize_app, storage
 
     # import pyrebase
     aa = {
@@ -250,13 +250,28 @@ def test(file: UploadFile = File(...)):
     }
     cred = credentials.Certificate(aa)
 
-    firebase_admin.initialize_app(cred, {
-        'storageBucket': 'auburnfirebase.appspot.com'
-    })
+    # initialize firebase
+    initialize_app(cred,{'storageBucket': 'ethereal-shape-340121.appspot.com'})
     
-    bucket = storage.bucket()
-    print(bucket)
-    
-    # bucket.child(file.filename).put(file.filename)
+    fileName = "/home/lucas/Downloads/Kati-Horna.jpeg"
 
-    return {"file_name": file.filename}
+    bucket = storage.bucket()
+    blob = bucket.blob(file)
+
+    from uuid import uuid4
+    # Create new token
+    new_token = uuid4()
+
+    # Create new dictionary with the metadata
+    metadata  = {"firebaseStorageDownloadTokens": new_token}
+
+    # Set metadata to blob
+    blob.metadata = metadata
+    blob.upload_from_filename(file)
+
+    # Opt : if you want to make public access from the URL
+    blob.make_public()
+
+    print("your file url", blob.public_url)
+
+    return "KKK rodou"

@@ -47,4 +47,4 @@ websockets==10.1
 
 firebase-admin==5.2.0
 firebase==3.0.1
-pyrebase
+google-cloud-storage

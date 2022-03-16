@@ -28,7 +28,6 @@ def generos_usuario_gravar(lista: List[GeneroUsuarioCriar], session: Session = D
     
     
     return CrudGenero(session).salvar_generos_usuario(lista, current_user.id)
-    # return lista
 
 @router.get("/usuarioGeneros", response_model=UsuarioGeneros)
 async def listar_generos_usuario(session: Session = Depends(get_db)
