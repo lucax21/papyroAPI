@@ -56,3 +56,18 @@ class UsuarioGeneros(UsuarioSimples):
         arbitrary_types_allowed  =  True
 
 UsuarioGeneros.update_forward_refs()
+
+
+from src.schemas.grupo import Grupo
+from src.schemas.livro import Livro
+
+class UsuarioPerfil(Usuario):
+    grupos: List[Grupo] = []
+    livros_lendo: List[Livro] = []
+    livros_lerei: List[Livro] = []
+    livros_lidos: List[Livro] = []
+    
+    class Config:
+        orm_mode = True
+
+UsuarioPerfil.update_forward_refs()

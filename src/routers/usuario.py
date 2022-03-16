@@ -9,7 +9,7 @@ from src.core.token_provider import check_acess_token, get_confirmation_token
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import Usuario, UsuarioCriar
+from src.schemas.usuario import Usuario, UsuarioCriar, UsuarioPerfil
 
 from jose import jwt
 
@@ -153,9 +153,11 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
 def dados_usuarios(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     return CrudUsuario(session).buscar_por_id(current_user.id)
 
-@router.get("/meuPerfil",response_model=Usuario)
-def dados_perfil(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
-    return CrudUsuario(session).buscar_por_id(current_user.id)
+@router.get("/meuPerfil",response_model=UsuarioPerfil)
+def dados_perfil(session: Session = Depends(get_db)
+    # ,current_user: Usuario = Depends(obter_usuario_logado)
+    ):  
+    return CrudUsuario(session).buscar_por_id(24)
 
 
 @router.put("/atualizarDados")
