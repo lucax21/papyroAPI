@@ -18,7 +18,6 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
     
     exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token inválido.")
 
-
     try:
         # payload = token_provider.check_acess_token(token)
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.TOKEN_ALGORITHM])
@@ -38,5 +37,5 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
 
     if not usuario:
         raise exception
-
+    
     return usuario

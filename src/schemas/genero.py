@@ -12,10 +12,17 @@ class Genero(GeneroSimples):
     id: Optional[int] = None
 
     class Config:
-        orm_mode = True 
+        orm_mode = True
 
-class Test(Genero):
-    usuarios: List[Usuario]
+class GeneroUsuarioCriar(BaseModel):
+    idGenero: int
+    
 
-from src.schemas.usuario import Usuario
-Usuario.update_forward_refs()
+# class GeneroUsuarios(Genero):
+#     usuarios: List[Usuario] = []
+
+#     class Config:
+#         orm_mode = True 
+
+# from .usuario import Usuario
+# Usuario.update_forward_refs()

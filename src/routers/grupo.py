@@ -23,7 +23,7 @@ def buscar_grupos(termo: str,session: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail='Grupo não encontrado')
     return dado
 
-@router.get("/{id}",response_model=Grupo)
+@router.get("/get/{id}",response_model=Grupo)
 def buscar_por_id(id: int,session: Session = Depends(get_db)):
     if not id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")

@@ -1,6 +1,7 @@
+import email
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
-from src.schemas.usuario import Usuario
+from src.schemas.usuario import Usuario, UsuarioCriar
 from src.db.models import models
 from typing import List
 
@@ -54,4 +55,21 @@ class CrudUsuario():
         update_stmt = update(models.Usuario).where(
             models.Usuario.id == instancia_usu.id).values(ativo=instancia_usu.ativo, confirmacao=instancia_usu.confirmacao)
         self.session.execute(update_stmt)
+        self.session.commit()
+
+    def atualizar_usuario(self, user_id: int, usuario: UsuarioCriar):
+        atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(nome=usuario.nome,
+                                                        apelido=usuario.apelido,
+                                                        foto=usuario.foto,
+                                                        email=usuario.email,
+                                                        descricao=usuario.descricao,
+                                                        senha=hash_provider.get_password_hash(usuario.senha),
+                                                        data_nascimento=usuario.data_nascimento)
+        self.session.execute(atualizar_stmt)
+        self.session.commit()
+        # self.session.refresh(usuario)
+
+    def desabilitar_confirmação(self, user_id: int):
+        atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(ativo=False)
+        self.session.execute(atualizar_stmt)
         self.session.commit()

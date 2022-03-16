@@ -11,6 +11,18 @@ usuario_genero = Table("usuario_genero", Base.metadata,
                         Column("fk_usuario", ForeignKey("usuario.id"), primary_key=True)
                     )
 
+
+# class UsuarioGenero(Base):
+#     __tablename__ = 'usuario_genero'
+
+#     fk_genero = Column('fk_genero',ForeignKey('genero.id'), primary_key=True)
+#     fk_usuario = Column('fk_usuario',ForeignKey('usuario.id'), primary_key=True)
+   
+#     # genero = relationship('Genero')
+#     genero = relationship('Genero', back_populates='usuarios')
+#     usuario = relationship('Usuario', back_populates='generos')
+
+
 class Usuario(Base):
     __tablename__ = 'usuario'
 
@@ -19,6 +31,7 @@ class Usuario(Base):
     email = Column(String(255), unique=True)
     nome = Column(String(255))
     apelido = Column(String(30), unique=True)
+    descricao = Column(Text)
     senha = Column(String(256))
     data_nascimento = Column(DateTime)
     foto = Column(String(255), nullable=True)
@@ -26,7 +39,10 @@ class Usuario(Base):
     ativo = Column(Boolean, default=False)
     confirmacao = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
 
-    generos = relationship('Genero', secondary=usuario_genero, back_populates='usuarios')
+    # generos = relationship('UsuarioGenero', back_populates="usuario")
+    # generos = relationship('UsuarioGenero')
+
+    generos = relationship("Genero", secondary=usuario_genero, back_populates='usuarios')
 
 class Genero(Base):
     __tablename__ = 'genero'
@@ -35,14 +51,10 @@ class Genero(Base):
 
     genero = Column(String(100))
 
-    usuarios = relationship('Usuario', secondary=usuario_genero, back_populates='generos')
+    # usuarios = relationship("UsuarioGenero", secondary="usuario_genero")
+    # usuarios = relationship("UsuarioGenero", back_populates="genero")
 
-# class UsuarioGenero(Base):
-#     __tablename__ = 'usuario_genero'
-
-#     fk_genero = Column(Integer, ForeignKey('genero.id'), primary_key=True)
-#     fk_usuario = Column(Integer, ForeignKey('usuario.id'), primary_key=True)
-
+    usuarios = relationship("Usuario", secondary=usuario_genero, back_populates="generos")
 
 
 class Livro(Base):

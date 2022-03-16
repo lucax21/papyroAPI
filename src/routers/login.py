@@ -31,7 +31,7 @@ def login(login: Login, session: Session = Depends(get_db)):
     
     if usuario.ativo == False:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Please, activate your Account")
+                    detail="Por favor, ative sua conta.")
 
     senha_valida = hash_provider.verify_password(login.senha, usuario.senha)
 
