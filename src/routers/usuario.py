@@ -153,11 +153,12 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
 def dados_usuarios(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     return CrudUsuario(session).buscar_por_id(current_user.id)
 
-@router.get("/meuPerfil",response_model=UsuarioPerfil)
+#,response_model=UsuarioPerfil
+@router.get("/meuPerfil")
 def dados_perfil(session: Session = Depends(get_db)
     # ,current_user: Usuario = Depends(obter_usuario_logado)
     ):  
-    return CrudUsuario(session).buscar_por_id(24)
+    return CrudUsuario(session).perfil_usuario(24)
 
 
 @router.put("/atualizarDados")

@@ -69,5 +69,6 @@ class UsuarioPerfil(Usuario):
     
     class Config:
         orm_mode = True
+        arbitrary_types_allowed  =  True
 
 UsuarioPerfil.update_forward_refs()

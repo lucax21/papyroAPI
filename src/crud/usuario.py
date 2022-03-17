@@ -1,7 +1,6 @@
-import email
 from sqlalchemy import select, update
-from sqlalchemy.orm import Session
-from src.schemas.usuario import Usuario, UsuarioCriar
+from sqlalchemy.orm import Session, joinedload
+from src.schemas.usuario import Usuario, UsuarioCriar, UsuarioPerfil
 from src.db.models import models
 from typing import List
 
@@ -73,3 +72,9 @@ class CrudUsuario():
         atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(ativo=False)
         self.session.execute(atualizar_stmt)
         self.session.commit()
+
+    def perfil_usuario(self, user_id: int) -> UsuarioPerfil:
+        dado = self.session.query(models.Usuario).options(joinedload(models.Usuario.grupos),joinedload(models.Usuario.livros_lidos)).where(models.Usuario.id == user_id and models.Livro.fk_genero==models.StatusUsuarioLivro.id).one()
+        # print(UsuarioPerfil.from_orm(dado))
+
+        return dado
