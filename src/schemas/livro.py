@@ -6,7 +6,7 @@ from datetime import date
 
 class LivroSimples(BaseModel):
     nome: str
-    capa: str
+    capa: Optional[str] = None
     nota: int
 
 class Livro(LivroSimples):

@@ -43,6 +43,36 @@ class Usuario(Base):
     # generos = relationship('UsuarioGenero')
 
     generos = relationship("Genero", secondary=usuario_genero, back_populates='usuarios')
+    # grupos = relationship("UsuarioGrupo", back_populates='usuario')
+    grupos = relationship("Grupo", secondary='usuario_grupo', back_populates='usuarios')
+
+    livros_lidos = relationship("Livro", 
+                                                    secondary='join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # ,
+                                                    ,primaryjoin="and_(StatusUsuarioLivro.status=='Lido(s)')"
+                                                    # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
+                                                    ,uselist=True,
+                                                    viewonly=True
+                                                    )
+    livros_lerei = relationship("Livro", 
+                                                    secondary='join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # ,
+                                                    ,primaryjoin="and_(StatusUsuarioLivro.status=='Lerei')"
+                                                    # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
+                                                    ,uselist=True,
+                                                    viewonly=True
+                                                    )
+    livros_lendo = relationship("Livro", 
+                                                    secondary='join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # ,
+                                                    ,primaryjoin="and_(StatusUsuarioLivro.status=='Lendo')"
+                                                    # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
+                                                    ,uselist=True,
+                                                    viewonly=True
+                                                    )
 
 class Genero(Base):
     __tablename__ = 'genero'
@@ -69,6 +99,9 @@ class Livro(Base):
     capa = Column(String(255), nullable=True)
 
     fk_genero = Column(Integer, ForeignKey('genero.id'))
+
+    # usuarios = relationship("Usuario", secondary='usuario_livro', back_populates="livros_lidos")
+
 
 class Autor(Base):
     __tablename__ = 'autor'
@@ -107,7 +140,9 @@ class Grupo(Base):
     foto = Column(String(255))
     descricao = Column(String(1023))
 
-    fk_cargo = Column(Integer, ForeignKey('cargo.id'))
+    # usuarios = relationship("UsuarioGrupo", back_populates="grupo")
+    usuarios = relationship("Usuario",secondary="usuario_grupo", back_populates="grupos")
+
 
 class Cargo(Base):
     __tablename__ = 'cargo'
@@ -118,8 +153,31 @@ class Cargo(Base):
 
 class UsuarioGrupo(Base):
     __tablename__ = 'usuario_grupo'
+
     fk_grupo = Column(ForeignKey("grupo.id"), primary_key=True)
     fk_usuario = Column(ForeignKey("usuario.id"), primary_key=True)
     fk_cargo = Column(ForeignKey("cargo.id"))
     data_entrada = Column(Date)
-                    
+
+    # grupos = relationship("Grupo", back_populates="usuarios")
+    # usuarios = relationship("Usuario", back_populates="grupos")
+
+class StatusUsuarioLivro(Base):
+    __tablename__= 'status_usuario_livro'
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    status = Column(String(100))
+
+    # stat = relationship('UsuarioLivro', back_populates="status")
+    
+class UsuarioLivro(Base):
+    __tablename__ = 'usuario_livro'
+
+    fk_livro = Column(ForeignKey("livro.id"), primary_key=True)
+    fk_usuario = Column(ForeignKey("usuario.id"), primary_key=True)
+    fk_status = Column(ForeignKey("status_usuario_livro.id"))
+    data_entrada = Column(Date)
+
+    # status = relationship("StatusUsuarioLivro", back_populates="stat")
+    

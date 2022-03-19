@@ -26,7 +26,7 @@ class UsuarioSimples(BaseModel):
 @form_body
 class UsuarioCriar(UsuarioSimples):
     email: EmailStr
-    senha: str
+    senha: Optional[str] = None
     senha_confirmacao: Optional[str] = None
     data_nascimento: date
     descricao: Optional[str] = None
@@ -56,3 +56,20 @@ class UsuarioGeneros(UsuarioSimples):
         arbitrary_types_allowed  =  True
 
 UsuarioGeneros.update_forward_refs()
+
+
+from src.schemas.grupo import Grupo
+from src.schemas.livro import Livro
+
+class UsuarioPerfil(UsuarioSimples):
+    descricao: Optional[str] = None
+    grupos: List[Grupo] = []
+    livros_lendo: List[Livro] = []
+    livros_lerei: List[Livro] = []
+    livros_lidos: List[Livro] = []
+    
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed  =  True
+
+UsuarioPerfil.update_forward_refs()
