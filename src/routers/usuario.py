@@ -154,11 +154,9 @@ def dados_usuarios(session: Session = Depends(get_db),current_user: Usuario = De
     return CrudUsuario(session).buscar_por_id(current_user.id)
 
 #,response_model=UsuarioPerfil
-@router.get("/meuPerfil")
-def dados_perfil(session: Session = Depends(get_db)
-    # ,current_user: Usuario = Depends(obter_usuario_logado)
-    ):  
-    return CrudUsuario(session).perfil_usuario(24)
+@router.get("/visualizarPerfil/{id}", response_model=UsuarioPerfil)
+def dados_perfil(id:int, session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+    return CrudUsuario(session).perfil_usuario(id)
 
 
 @router.put("/atualizarDados")
@@ -168,25 +166,26 @@ def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db), curr
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
     elif not usuario.apelido:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Apelido.")
-    elif not usuario.senha:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha.")
-    elif not usuario.senha_confirmacao:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha de Confirmação.")
+    # elif not usuario.senha:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha.")
+    # elif not usuario.senha_confirmacao:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha de Confirmação.")
     elif not usuario.email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o E-mail.")
     elif not usuario.data_nascimento:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
 
 
-    #verifica senha
-    """
-    a expressão do regex diz:
-    - senha deve ter de 8 a 20 digitos
-    - espaços em branco não são permitidos
-    """
-    result_senha = re.match('^(?=\\S+$).{8,20}$', usuario.senha)
-    if not result_senha:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A Senha deve conter no mínimo 8 dígitos e no máximo 20 dígitos.")
+    if(usuario.senha):
+        #verifica senha
+        """
+        a expressão do regex diz:
+        - senha deve ter de 8 a 20 digitos
+        - espaços em branco não são permitidos
+        """
+        result_senha = re.match('^(?=\\S+$).{8,20}$', usuario.senha)
+        if not result_senha:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A Senha deve conter no mínimo 8 dígitos e no máximo 20 dígitos.")
 
     #verifica se é maior de 18 anos
     idade = (date.today() - usuario.data_nascimento)
