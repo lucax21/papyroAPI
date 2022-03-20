@@ -179,5 +179,5 @@ class UsuarioLivro(Base):
     fk_status = Column(ForeignKey("status_usuario_livro.id"))
     data_entrada = Column(Date)
 
-    # status = relationship("StatusUsuarioLivro", back_populates="stat")
+    livros_lendo = relationship("Livro")
     

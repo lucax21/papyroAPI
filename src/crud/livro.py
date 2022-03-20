@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
 from src.db.models import models
 from typing import List
@@ -20,3 +20,11 @@ class CrudLivro():
                 models.Livro.id == id
                 )
         return self.session.execute(query).scalars().first()
+
+    def livros_estou_lendo(self, user_id: int) -> List[models.Livro]:
+        dado = self.session.query(models.UsuarioLivro.livros_lendo).options(
+                joinedload(models.UsuarioLivro.livros_lendo)
+                ).where(
+                    models.UsuarioLivro.id == user_id
+                ).one()
+        return dado
