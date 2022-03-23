@@ -38,6 +38,6 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
 def gravar_livro(livro: LivroCriar, session: Session = Depends(get_db)):
     return "Falta implementar"
 
-@router.get("/livrosEstouLendo")
-def livros_estou_lendo(session: Session = Depends(get_db)):
-    return CrudLivro(session).livros_estou_lendo(24)
+@router.get("/livrosSeraoLidos/{id}")
+def livros_estou_lendo(id: int, session: Session = Depends(get_db)):
+    return CrudLivro(session).livros_serao_lidos(id)

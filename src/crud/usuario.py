@@ -105,3 +105,39 @@ class CrudUsuario():
         #             models.Usuario.id == user_id
         #         ).group_by(models.Usuario.id, models.Usuario.apelido).one()
         return dado
+    
+    def livros_serao_lidos(self, user_id: int):
+        # dado = self.session.query(models.Livro).options(
+        #             joinedload(models.Livro.livros_lendo)
+        #         ).where(models.UsuarioLivro.fk_status == 1 and models.UsuarioLivro.fk_usuario == user_id
+        #         ).all()
+        dado = self.session.query(models.StatusUsuarioLivro).options(
+                    joinedload(models.StatusUsuarioLivro.livros
+                )
+                ).filter(models.UsuarioLivro.fk_usuario == user_id, models.StatusUsuarioLivro.id == 3).all()
+        # dado = self.session.query(models.Livro).select_from(models.Livro).join(models.Livro.).filter(models.UsuarioLivro.fk_usuario == user_id)
+        return dado
+
+    def livros_estou_lendo(self, user_id: int):
+        # dado = self.session.query(models.Livro).options(
+        #             joinedload(models.Livro.livros_lendo)
+        #         ).where(models.UsuarioLivro.fk_status == 1 and models.UsuarioLivro.fk_usuario == user_id
+        #         ).all()
+        dado = self.session.query(models.StatusUsuarioLivro).options(
+                    joinedload(models.StatusUsuarioLivro.livros
+                )
+                ).filter(models.UsuarioLivro.fk_usuario == user_id, models.StatusUsuarioLivro.id == 2).all()
+        # dado = self.session.query(models.Livro).select_from(models.Livro).join(models.Livro.).filter(models.UsuarioLivro.fk_usuario == user_id)
+        return dado
+
+    def livros_lidos(self, user_id: int):
+        # dado = self.session.query(models.Livro).options(
+        #             joinedload(models.Livro.livros_lendo)
+        #         ).where(models.UsuarioLivro.fk_status == 1 and models.UsuarioLivro.fk_usuario == user_id
+        #         ).all()
+        dado = self.session.query(models.StatusUsuarioLivro).options(
+                    joinedload(models.StatusUsuarioLivro.livros
+                )
+                ).filter(models.UsuarioLivro.fk_usuario == user_id, models.StatusUsuarioLivro.id == 1).all()
+        # dado = self.session.query(models.Livro).select_from(models.Livro).join(models.Livro.).filter(models.UsuarioLivro.fk_usuario == user_id)
+        return dado

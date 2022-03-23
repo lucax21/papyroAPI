@@ -73,3 +73,4 @@ class UsuarioPerfil(UsuarioSimples):
         arbitrary_types_allowed  =  True
 
 UsuarioPerfil.update_forward_refs()
+

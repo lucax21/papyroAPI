@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
 from sqlalchemy.orm import relationship
 from src.db.database import Base
-
+from sqlalchemy.ext.associationproxy import association_proxy
 
 usuario_genero = Table("usuario_genero", Base.metadata,
                         Column("fk_genero", ForeignKey("genero.id"), primary_key=True),
@@ -46,6 +46,7 @@ class Usuario(Base):
     # grupos = relationship("UsuarioGrupo", back_populates='usuario')
     grupos = relationship("Grupo", secondary='usuario_grupo', back_populates='usuarios')
 
+    lendoss = relationship("UsuarioLivro", back_populates='usuario')
     livros_lidos = relationship("Livro", 
                                                     secondary='join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
                                                     # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
@@ -100,8 +101,17 @@ class Livro(Base):
 
     fk_genero = Column(Integer, ForeignKey('genero.id'))
 
-    # usuarios = relationship("Usuario", secondary='usuario_livro', back_populates="livros_lidos")
-
+    livros_lendo = relationship("UsuarioLivro", back_populates="livro_lendo")
+    status_usuario_livro = relationship("StatusUsuarioLivro", 
+                                        secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_status == Livro.id)'
+                                        # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                        # ,
+                                        # ,primaryjoin="and_(UsuarioLivro.fk_status==1)"
+                                        # ,primaryjoin="and_(Livro.id == UsuarioLivro.fk_livro, UsuarioLivro.fk_usuario==Usuario.id)"
+                                        ,secondaryjoin="UsuarioLivro.fk_status == StatusUsuarioLivro.id"
+                                        ,uselist=True,
+                                        viewonly=True
+                                        )
 
 class Autor(Base):
     __tablename__ = 'autor'
@@ -169,8 +179,20 @@ class StatusUsuarioLivro(Base):
 
     status = Column(String(100))
 
-    # stat = relationship('UsuarioLivro', back_populates="status")
+    # livro_status = relationship('UsuarioLivro', back_populates="status")
     
+    livros = relationship("Livro", 
+                                        secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_livro == Livro.id)'
+                                        # '.join(UsuarioLivro, Usuario, Usuario.id == UsuarioLivro.fk_usuario)'
+                                        # ,
+                                        # ,primaryjoin="and_(UsuarioLivro.fk_status==1)"
+                                        # ,primaryjoin="and_(Usuario.id == UsuarioLivro.fk_livro, UsuarioLivro.fk_usuario==Usuario.id)"
+                                        # ,secondaryjoin="UsuarioLivro.fk_usuario == Usuario.id"
+                                        
+                                        ,uselist=True,
+                                        viewonly=True
+                                        )
+
 class UsuarioLivro(Base):
     __tablename__ = 'usuario_livro'
 
@@ -179,5 +201,5 @@ class UsuarioLivro(Base):
     fk_status = Column(ForeignKey("status_usuario_livro.id"))
     data_entrada = Column(Date)
 
-    livros_lendo = relationship("Livro")
-    
+    livro_lendo = relationship("Livro", back_populates="livros_lendo")
+    usuario = relationship("Usuario", back_populates="lendoss")
