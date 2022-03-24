@@ -12,6 +12,7 @@ from src.db.models.models import Livro
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
 from src.schemas.usuario import Usuario, UsuarioCriar, UsuarioPerfil
+from src.schemas.livro import Livro
 from jose import jwt
 
 from src.core.email_provider import Mailer
@@ -284,10 +285,12 @@ def test(file: UploadFile):
 
     return "KKK rodou"
 
-@router.get("/{id}/livrosSeraoLidos/")
+@router.get("/{id}/livrosSeraoLidos/"
+# , response_model=List[Livro]
+)
 def livros_estou_lendo(id: int, session: Session = Depends(get_db)):
     return CrudUsuario(session).livros_serao_lidos(id)
 
 @router.get("/{id}/livrosLidos/")
-def livros_lidos(id: int, session: Session = Depends(get_db)):
+def livros_lidos(id: int, session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):
     return CrudUsuario(session).livros_lidos(id)

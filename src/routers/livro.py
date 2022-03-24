@@ -37,7 +37,3 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
 @router.post("/",status_code=status.HTTP_201_CREATED)
 def gravar_livro(livro: LivroCriar, session: Session = Depends(get_db)):
     return "Falta implementar"
-
-@router.get("/livrosSeraoLidos/{id}")
-def livros_estou_lendo(id: int, session: Session = Depends(get_db)):
-    return CrudLivro(session).livros_serao_lidos(id)

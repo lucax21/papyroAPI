@@ -101,6 +101,7 @@ class Livro(Base):
 
     fk_genero = Column(Integer, ForeignKey('genero.id'))
 
+    autores = relationship("LivroAutores", back_populates="livro")
     livros_lendo = relationship("UsuarioLivro", back_populates="livro_lendo")
     status_usuario_livro = relationship("StatusUsuarioLivro", 
                                         secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_status == Livro.id)'
@@ -112,6 +113,7 @@ class Livro(Base):
                                         ,uselist=True,
                                         viewonly=True
                                         )
+    test = relationship("UsuarioLivro", back_populates="test1")
 
 class Autor(Base):
     __tablename__ = 'autor'
@@ -119,6 +121,8 @@ class Autor(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     nome = Column(String(255))
+
+    livros = relationship("LivroAutores", back_populates="autor")
 
 class Papel(Base):
     __tablename__ = 'papel'
@@ -133,6 +137,10 @@ class LivroAutores(Base):
     fk_autor = Column(Integer, ForeignKey('autor.id'), primary_key=True)
     fk_livro = Column(Integer, ForeignKey('livro.id'), primary_key=True)
     fk_papel = Column(Integer, ForeignKey('papel.id'))
+
+    livro = relationship("Livro", back_populates="autores")
+    autor = relationship("Autor", back_populates="livros")
+
 
 class LivroISBN(Base):
     __tablename__ = 'livro_isbn'
@@ -180,18 +188,18 @@ class StatusUsuarioLivro(Base):
     status = Column(String(100))
 
     # livro_status = relationship('UsuarioLivro', back_populates="status")
-    
-    livros = relationship("Livro", 
-                                        secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_livro == Livro.id)'
-                                        # '.join(UsuarioLivro, Usuario, Usuario.id == UsuarioLivro.fk_usuario)'
-                                        # ,
-                                        # ,primaryjoin="and_(UsuarioLivro.fk_status==1)"
-                                        # ,primaryjoin="and_(Usuario.id == UsuarioLivro.fk_livro, UsuarioLivro.fk_usuario==Usuario.id)"
-                                        # ,secondaryjoin="UsuarioLivro.fk_usuario == Usuario.id"
+
+    livros = relationship("UsuarioLivro", back_populates="statuss")  
+    # livros = relationship("Livro", 
+    #                                     secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_livro == Livro.id).join(UsuarioLivro, Usuario, Usuario.id == UsuarioLivro.fk_usuario).join(UsuarioLivro, StatusUsuarioLivro, UsuarioLivro.fk_status==StatusUsuarioLivro.id)'
+    #                                     # ,
+    #                                     ,primaryjoin="and_(UsuarioLivro.fk_livro==Livro.id)"
+    #                                     # ,primaryjoin="and_(Usuario.id == UsuarioLivro.fk_livro, UsuarioLivro.fk_usuario==Usuario.id)"
+    #                                     # ,secondaryjoin="UsuarioLivro.fk_usuario == Usuario.id"
                                         
-                                        ,uselist=True,
-                                        viewonly=True
-                                        )
+    #                                     ,uselist=True,
+    #                                     viewonly=True
+    #                                     )
 
 class UsuarioLivro(Base):
     __tablename__ = 'usuario_livro'
@@ -203,3 +211,6 @@ class UsuarioLivro(Base):
 
     livro_lendo = relationship("Livro", back_populates="livros_lendo")
     usuario = relationship("Usuario", back_populates="lendoss")
+
+    statuss = relationship("StatusUsuarioLivro", back_populates="livros")
+    test1 = relationship("Livro", back_populates="test")
