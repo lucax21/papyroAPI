@@ -18,9 +18,10 @@ def form_body(cls):
 
 # Propriedades compartilhadas
 class UsuarioSimples(BaseModel):
-    nome: str
-    apelido: str
+    nome: Optional[str] = None
+    apelido: Optional[str] = None
     foto: Optional[str] = None
+    descricao: Optional[str] = None
 
 # Propriedades a receber via API na criação
 @form_body
@@ -29,7 +30,6 @@ class UsuarioCriar(UsuarioSimples):
     senha: Optional[str] = None
     senha_confirmacao: Optional[str] = None
     data_nascimento: date
-    descricao: Optional[str] = None
     
     class Config:
         orm_mode = True
@@ -73,3 +73,4 @@ class UsuarioPerfil(UsuarioSimples):
         arbitrary_types_allowed  =  True
 
 UsuarioPerfil.update_forward_refs()
+

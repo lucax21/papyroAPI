@@ -94,14 +94,20 @@ class CrudUsuario():
                 ).where(
                     models.Usuario.id == user_id
                 ).one()
-      
-      # tentativa de fazer um count dos livros lidos 
-        # dado = self.session.query(func.count(models.UsuarioLivro.fk_status).label('lidos'),models.Usuario).options(
-        #         joinedload(models.Usuario.grupos),
-        #         joinedload(models.Usuario.livros_lidos),
-        #         joinedload(models.Usuario.livros_lerei),
-        #         joinedload(models.Usuario.livros_lendo)
-        #         ).where(
-        #             models.Usuario.id == user_id
-        #         ).group_by(models.Usuario.id, models.Usuario.apelido).one()
+
         return dado
+    
+    def livros_serao_lidos(self, user_id: int):
+        query = self.session.query(models.Livro).options(
+            joinedload(models.Livro.test2)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==3).where(models.UsuarioLivro.fk_usuario == user_id)
+        return query.all()
+
+    def livros_lendo(self, user_id: int):
+        query = self.session.query(models.Livro).options(
+            joinedload(models.Livro.test2)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==2).where(models.UsuarioLivro.fk_usuario == user_id)
+        return query.all()
+
+    def livros_lidos(self, user_id: int) -> models.Livro:
+        query = self.session.query(models.Livro).options(
+            joinedload(models.Livro.test2)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==1).where(models.UsuarioLivro.fk_usuario == user_id)
+        return query.all()

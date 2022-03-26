@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 from src.schemas.usuario import UsuarioSimples
 
@@ -7,5 +8,6 @@ class Login(BaseModel):
     email: str
 
 class LoginSucesso(BaseModel):
-    usuario: UsuarioSimples
-    access_token: str
+    usuario: Optional[UsuarioSimples] = None
+    access_token: Optional[str] = None
+    token_type: Optional[str] = None

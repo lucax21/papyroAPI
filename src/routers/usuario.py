@@ -1,3 +1,4 @@
+from urllib import response
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 
@@ -7,10 +8,11 @@ import re
 from typing import List, Optional
 from src.core.token_provider import check_acess_token, get_confirmation_token
 from src.db.database import get_db
+from src.db.models.models import Livro
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
 from src.schemas.usuario import Usuario, UsuarioCriar, UsuarioPerfil
-
+from src.schemas.livro import Livro, LivroSimples
 from jose import jwt
 
 from src.core.email_provider import Mailer
@@ -290,3 +292,27 @@ def test(file: UploadFile):
     print("your file url", blob.public_url)
 
     return "KKK rodou"
+
+@router.get("/{id}/livrosSeraoLidos/"
+# , response_model=List[Livro]
+)
+def livros_lerei(id: int, session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
+    return CrudUsuario(session).livros_serao_lidos(id)
+
+@router.get("/{id}/livrosLidos/"
+# , response_model=List[LivroSimples]
+)
+def livros_lidos(id: int, session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
+    return CrudUsuario(session).livros_lidos(id)
+
+@router.get("/{id}/livrosLendo/"
+# , response_model=List[LivroSimples]
+)
+def livros_lendo(id: int, session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
+    return CrudUsuario(session).livros_lendo(id)

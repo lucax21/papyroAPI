@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select
 from src.db.models import models
 from typing import List
@@ -20,3 +20,4 @@ class CrudLivro():
                 models.Livro.id == id
                 )
         return self.session.execute(query).scalars().first()
+
