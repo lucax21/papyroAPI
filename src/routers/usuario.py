@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from datetime import date
 import re
 
-from typing import List
+from typing import List, Optional
 from src.core.token_provider import check_acess_token, get_confirmation_token
 from src.db.database import get_db
 from src.db.models.models import Livro
@@ -148,17 +148,25 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
 
     dado = CrudUsuario(session).buscar_por_id(id)
     if not dado:
-        raise HTTPException(status_code=404, detail='Não encontrado')
+        CrudUsuario(session).perfil_usuario(id)
     return dado
 
 @router.get("/meusDados",response_model=Usuario)
 def dados_usuarios(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     return CrudUsuario(session).buscar_por_id(current_user.id)
 
-#,response_model=UsuarioPerfil
-@router.get("/visualizarPerfil/{id}")
-def dados_perfil(id:int, session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
-    return CrudUsuario(session).perfil_usuario(id)
+@router.get("/visualizarPerfil/{id}", response_model=UsuarioPerfil)
+def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+    
+    try:
+        if id:
+            dado = CrudUsuario(session).perfil_usuario(id)
+        else:
+            dado = CrudUsuario(session).perfil_usuario(current_user.id)
+        
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
+    return dado
 
 
 @router.put("/atualizarDados")
