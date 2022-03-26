@@ -21,3 +21,7 @@ class CrudLivro():
                 )
         return self.session.execute(query).scalars().first()
 
+    def pessoas_livro(self, id):
+        query = self.session.query(models.Livro).options(joinedload(models.Livro.usuario)).where(models.Livro.id == id)
+
+        return query.one()

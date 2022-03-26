@@ -123,7 +123,16 @@ class Livro(Base):
                                                     ,uselist=True,
                                                     viewonly=True
                                                     )
-
+    usuario = relationship("Usuario", 
+                                                    secondary='join(UsuarioLivro, Usuario, Usuario.id == UsuarioLivro.fk_usuario)'
+                                                    # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # ,
+                                                    # ,primaryjoin="and_(StatusUsuarioLivro.status=='Lendo')"
+                                                    # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
+                                                    ,uselist=True,
+                                                    viewonly=True
+                                                    )
+                                
 class Autor(Base):
     __tablename__ = 'autor'
 
