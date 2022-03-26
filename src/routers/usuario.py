@@ -155,7 +155,9 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
 def dados_usuarios(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     return CrudUsuario(session).buscar_por_id(current_user.id)
 
-@router.get("/visualizarPerfil/{id}", response_model=UsuarioPerfil)
+@router.get("/visualizarPerfil/{id}"
+# , response_model=UsuarioPerfil
+)
 def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     
     try:

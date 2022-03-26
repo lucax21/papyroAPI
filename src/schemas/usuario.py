@@ -62,7 +62,7 @@ from src.schemas.grupo import Grupo
 from src.schemas.livro import Livro
 
 class UsuarioPerfil(UsuarioSimples):
-    descricao: Optional[str] = None
+    # descricao: Optional[str] = None
     grupos: List[Grupo] = []
     livros_lendo: List[Livro] = []
     livros_lerei: List[Livro] = []
