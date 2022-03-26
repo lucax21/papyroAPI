@@ -16,10 +16,14 @@ class CrudLivro():
         return self.session.query(models.Livro).filter(models.Livro.nome.like(termo+'%')).all()
     
     def buscar_por_id(self, id) -> models.Livro:
-        query = select(models.Livro).where(
-                models.Livro.id == id
-                )
-        return self.session.execute(query).scalars().first()
+        # query = select(models.Livro).where(
+        #         models.Livro.id == id
+        #         )
+        # return self.session.execute(query).scalars().first()
+        query = self.session.query(models.Livro).options(joinedload(models.Livro.avaliacoes), joinedload(models.Avaliacao.usuario)).where(models.Livro.id == id).where(models.Livro.id == models.Avaliacao.fk_livro)
+
+        return query.all()
+
 
     def pessoas_livro(self, id):
         query = self.session.query(models.Livro).options(joinedload(models.Livro.usuario)).where(models.Livro.id == id)

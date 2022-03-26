@@ -111,5 +111,5 @@ class CrudUsuario():
         query = self.session.query(models.Livro).options(
             joinedload(models.Livro.test2)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==1).where(models.UsuarioLivro.fk_usuario == user_id)
         
-        # testar iss-> p = db.query(Profile).options(joinedload('*')).filter_by(id=p.id).limit(1).one()
+        # testar iss-> p = db.query(Profile).options(joinedload('*')).filter_by(id=p.id).limit(1).one()'
         return query.all()

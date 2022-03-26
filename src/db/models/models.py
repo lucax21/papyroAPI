@@ -1,4 +1,5 @@
 #Representação do banco de dados
+from turtle import back
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
@@ -75,6 +76,8 @@ class Usuario(Base):
                                                     viewonly=True
                                                     )
 
+    usuario_avaliacao = relationship("Avaliacao", back_populates="usuario")
+
 class Genero(Base):
     __tablename__ = 'genero'
 
@@ -86,7 +89,7 @@ class Genero(Base):
     # usuarios = relationship("UsuarioGenero", back_populates="genero")
 
     usuarios = relationship("Usuario", secondary=usuario_genero, back_populates="generos")
-
+    generos = relationship("Livro", back_populates="genero")
 
 class Livro(Base):
     __tablename__ = 'livro'
@@ -132,7 +135,10 @@ class Livro(Base):
                                                     ,uselist=True,
                                                     viewonly=True
                                                     )
-                                
+    
+    genero = relationship("Genero", back_populates="generos")
+    avaliacoes = relationship("Avaliacao", back_populates="avaliacao")
+
 class Autor(Base):
     __tablename__ = 'autor'
 
@@ -232,3 +238,19 @@ class UsuarioLivro(Base):
 
     statuss = relationship("StatusUsuarioLivro", back_populates="livros")
     test1 = relationship("Livro", back_populates="test")
+
+class Avaliacao(Base):
+        __tablename__ = 'avaliacao'
+
+        id = Column(Integer, primary_key=True, index=True)
+
+        texto = Column(String(255))
+        data_criacao = Column(DateTime)
+        nota = Column(Integer)
+        likes = Column(Integer)
+
+        fk_usuario = Column(ForeignKey("usuario.id"))
+        fk_livro = Column(ForeignKey("livro.id"))
+
+        avaliacao = relationship("Livro", back_populates="avaliacoes")
+        usuario = relationship("Usuario", back_populates="usuario_avaliacao")

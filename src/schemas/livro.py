@@ -29,3 +29,4 @@ class Livro(LivroSimples):
 
 class LivroCriar(Livro):
     pass
+
