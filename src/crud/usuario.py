@@ -94,20 +94,20 @@ class CrudUsuario():
                 ).where(
                     models.Usuario.id == user_id
                 ).one()
-      
+
         return dado
     
     def livros_serao_lidos(self, user_id: int):
-        query = self.session.execute(select(models.Livro,models.Autor
-              ).join(models.Livro.test).join(models.UsuarioLivro.statuss).join(models.Livro.autores).where(models.StatusUsuarioLivro.id==3).where(models.UsuarioLivro.fk_usuario == user_id))
+        query = self.session.query(models.Livro).options(
+            joinedload(models.Livro.test2)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==3).where(models.UsuarioLivro.fk_usuario == user_id)
         return query.all()
 
-    def livros_estou_lendo(self, user_id: int):
-        query = self.session.execute(select(models.Livro
-              ).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==2).where(models.UsuarioLivro.fk_usuario == user_id))
-        return query.scalars().all()
+    def livros_lendo(self, user_id: int):
+        query = self.session.query(models.Livro).options(
+            joinedload(models.Livro.test2)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==2).where(models.UsuarioLivro.fk_usuario == user_id)
+        return query.all()
 
-    def livros_lidos(self, user_id: int):
-        query = self.session.execute(select(models.Livro
-              ).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==1).where(models.UsuarioLivro.fk_usuario == user_id))
-        return query.scalars().all()
+    def livros_lidos(self, user_id: int) -> models.Livro:
+        query = self.session.query(models.Livro).options(
+            joinedload(models.Livro.test2)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.StatusUsuarioLivro.id==1).where(models.UsuarioLivro.fk_usuario == user_id)
+        return query.all()

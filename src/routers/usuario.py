@@ -12,7 +12,7 @@ from src.db.models.models import Livro
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
 from src.schemas.usuario import Usuario, UsuarioCriar, UsuarioPerfil
-from src.schemas.livro import Livro
+from src.schemas.livro import Livro, LivroSimples
 from jose import jwt
 
 from src.core.email_provider import Mailer
@@ -156,7 +156,7 @@ def dados_usuarios(session: Session = Depends(get_db),current_user: Usuario = De
     return CrudUsuario(session).buscar_por_id(current_user.id)
 
 #,response_model=UsuarioPerfil
-@router.get("/visualizarPerfil/{id}", response_model=UsuarioPerfil)
+@router.get("/visualizarPerfil/{id}")
 def dados_perfil(id:int, session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     return CrudUsuario(session).perfil_usuario(id)
 
@@ -288,9 +288,23 @@ def test(file: UploadFile):
 @router.get("/{id}/livrosSeraoLidos/"
 # , response_model=List[Livro]
 )
-def livros_estou_lendo(id: int, session: Session = Depends(get_db)):
+def livros_lerei(id: int, session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
     return CrudUsuario(session).livros_serao_lidos(id)
 
-@router.get("/{id}/livrosLidos/")
-def livros_lidos(id: int, session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):
+@router.get("/{id}/livrosLidos/"
+# , response_model=List[LivroSimples]
+)
+def livros_lidos(id: int, session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
     return CrudUsuario(session).livros_lidos(id)
+
+@router.get("/{id}/livrosLendo/"
+# , response_model=List[LivroSimples]
+)
+def livros_lendo(id: int, session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
+    return CrudUsuario(session).livros_lendo(id)

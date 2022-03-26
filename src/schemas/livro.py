@@ -10,11 +10,14 @@ class LivroSimples(BaseModel):
     nome: str
     capa: Optional[str] = None
     nota: int
+    autores: List[Autor] = []
+
+    class Config:
+        orm_mode = True
 
 class Livro(LivroSimples):
     id: Optional[int] = None
     ano: date
-    autor: List[Autor]
     #isbn10: str
     #isbn13: str
     sinopse: str

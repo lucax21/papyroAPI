@@ -114,6 +114,15 @@ class Livro(Base):
                                         viewonly=True
                                         )
     test = relationship("UsuarioLivro", back_populates="test1")
+    test2 = relationship("Autor", 
+                                                    secondary='join(LivroAutores, Autor, Autor.id == LivroAutores.fk_autor)'
+                                                    # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
+                                                    # ,
+                                                    # ,primaryjoin="and_(StatusUsuarioLivro.status=='Lendo')"
+                                                    # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
+                                                    ,uselist=True,
+                                                    viewonly=True
+                                                    )
 
 class Autor(Base):
     __tablename__ = 'autor'
