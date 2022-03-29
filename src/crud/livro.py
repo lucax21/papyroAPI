@@ -20,7 +20,10 @@ class CrudLivro():
         #         models.Livro.id == id
         #         )
         # return self.session.execute(query).scalars().first()
-        query = self.session.query(models.Livro).options(joinedload(models.Livro.avaliacoes), joinedload(models.Avaliacao.usuario)).where(models.Livro.id == id).where(models.Livro.id == models.Avaliacao.fk_livro)
+        
+        query = self.session.query(models.Livro).options(joinedload(models.Livro.avaliacoes).options(joinedload(models.Avaliacao.usuario)
+        # ,joinedload(models.Likes.comentario)
+        )).where(models.Livro.id == id).where(models.Livro.id == models.Avaliacao.fk_livro)
 
         return query.all()
 

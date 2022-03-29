@@ -214,16 +214,7 @@ class StatusUsuarioLivro(Base):
     # livro_status = relationship('UsuarioLivro', back_populates="status")
 
     livros = relationship("UsuarioLivro", back_populates="statuss")  
-    # livros = relationship("Livro", 
-    #                                     secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_livro == Livro.id).join(UsuarioLivro, Usuario, Usuario.id == UsuarioLivro.fk_usuario).join(UsuarioLivro, StatusUsuarioLivro, UsuarioLivro.fk_status==StatusUsuarioLivro.id)'
-    #                                     # ,
-    #                                     ,primaryjoin="and_(UsuarioLivro.fk_livro==Livro.id)"
-    #                                     # ,primaryjoin="and_(Usuario.id == UsuarioLivro.fk_livro, UsuarioLivro.fk_usuario==Usuario.id)"
-    #                                     # ,secondaryjoin="UsuarioLivro.fk_usuario == Usuario.id"
-                                        
-    #                                     ,uselist=True,
-    #                                     viewonly=True
-    #                                     )
+
 
 class UsuarioLivro(Base):
     __tablename__ = 'usuario_livro'
@@ -240,17 +231,46 @@ class UsuarioLivro(Base):
     test1 = relationship("Livro", back_populates="test")
 
 class Avaliacao(Base):
-        __tablename__ = 'avaliacao'
+    __tablename__ = 'avaliacao'
 
-        id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
 
-        texto = Column(String(255))
-        data_criacao = Column(DateTime)
-        nota = Column(Integer)
-        likes = Column(Integer)
+    texto = Column(String(255))
+    data_criacao = Column(DateTime)
+    nota = Column(Integer)
+    likes = Column(Integer)
 
-        fk_usuario = Column(ForeignKey("usuario.id"))
-        fk_livro = Column(ForeignKey("livro.id"))
+    fk_usuario = Column(ForeignKey("usuario.id"))
+    fk_livro = Column(ForeignKey("livro.id"))
 
-        avaliacao = relationship("Livro", back_populates="avaliacoes")
-        usuario = relationship("Usuario", back_populates="usuario_avaliacao")
+    avaliacao = relationship("Livro", back_populates="avaliacoes")
+    usuario = relationship("Usuario", back_populates="usuario_avaliacao")
+    comentarios = relationship("Likes", back_populates="avaliacao1")
+
+
+class Comentario(Base):
+    __tablename__ = 'comentario'
+
+    id = Column(Integer, primary_key=True, index=True)    
+
+    nota = Column(Integer)
+    texto = Column(String(255))
+    data_criacao = Column(DateTime)
+    likes = Column(Integer)
+
+    fk_usuario = Column(ForeignKey("usuario.id"))
+    fk_livro = Column(ForeignKey("livro.id"))
+
+    avaliacoes = relationship("Likes", back_populates="comentario")
+
+class Likes(Base):
+    __tablename__ = 'likes'
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    fk_comentario = Column(ForeignKey("comentario.id"))
+    fk_avaliacao = Column(ForeignKey("avaliacao.id"))
+    fk_usuario = Column(ForeignKey("usuario.id"))
+
+    avaliacao1 = relationship("Avaliacao", back_populates="comentarios")
+    comentario = relationship("Comentario", back_populates="avaliacoes")
