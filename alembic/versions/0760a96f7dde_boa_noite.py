@@ -1,8 +1,8 @@
-"""Nova coluna blablabla
+"""boa noite
 
-Revision ID: 28ee19003458
-Revises: 12a8b4e169e2
-Create Date: 2022-03-19 18:51:19.640765
+Revision ID: 0760a96f7dde
+Revises: cda71427f81d
+Create Date: 2022-03-29 01:45:10.393166
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '28ee19003458'
-down_revision = '12a8b4e169e2'
+revision = '0760a96f7dde'
+down_revision = 'cda71427f81d'
 branch_labels = None
 depends_on = None
 

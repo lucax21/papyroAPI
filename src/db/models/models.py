@@ -1,4 +1,5 @@
 #Representação do banco de dados
+from turtle import back
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
@@ -75,6 +76,8 @@ class Usuario(Base):
                                                     viewonly=True
                                                     )
 
+    usuario_avaliacao = relationship("Avaliacao", back_populates="usuario")
+
 class Genero(Base):
     __tablename__ = 'genero'
 
@@ -86,7 +89,7 @@ class Genero(Base):
     # usuarios = relationship("UsuarioGenero", back_populates="genero")
 
     usuarios = relationship("Usuario", secondary=usuario_genero, back_populates="generos")
-
+    generos = relationship("Livro", back_populates="genero")
 
 class Livro(Base):
     __tablename__ = 'livro'
@@ -132,7 +135,10 @@ class Livro(Base):
                                                     ,uselist=True,
                                                     viewonly=True
                                                     )
-                                
+    
+    genero = relationship("Genero", back_populates="generos")
+    avaliacoes = relationship("Avaliacao", back_populates="avaliacao")
+
 class Autor(Base):
     __tablename__ = 'autor'
 
@@ -208,16 +214,7 @@ class StatusUsuarioLivro(Base):
     # livro_status = relationship('UsuarioLivro', back_populates="status")
 
     livros = relationship("UsuarioLivro", back_populates="statuss")  
-    # livros = relationship("Livro", 
-    #                                     secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_livro == Livro.id).join(UsuarioLivro, Usuario, Usuario.id == UsuarioLivro.fk_usuario).join(UsuarioLivro, StatusUsuarioLivro, UsuarioLivro.fk_status==StatusUsuarioLivro.id)'
-    #                                     # ,
-    #                                     ,primaryjoin="and_(UsuarioLivro.fk_livro==Livro.id)"
-    #                                     # ,primaryjoin="and_(Usuario.id == UsuarioLivro.fk_livro, UsuarioLivro.fk_usuario==Usuario.id)"
-    #                                     # ,secondaryjoin="UsuarioLivro.fk_usuario == Usuario.id"
-                                        
-    #                                     ,uselist=True,
-    #                                     viewonly=True
-    #                                     )
+
 
 class UsuarioLivro(Base):
     __tablename__ = 'usuario_livro'
@@ -232,3 +229,48 @@ class UsuarioLivro(Base):
 
     statuss = relationship("StatusUsuarioLivro", back_populates="livros")
     test1 = relationship("Livro", back_populates="test")
+
+class Avaliacao(Base):
+    __tablename__ = 'avaliacao'
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    texto = Column(String(255))
+    data_criacao = Column(DateTime)
+    nota = Column(Integer)
+    likes = Column(Integer)
+
+    fk_usuario = Column(ForeignKey("usuario.id"))
+    fk_livro = Column(ForeignKey("livro.id"))
+
+    avaliacao = relationship("Livro", back_populates="avaliacoes")
+    usuario = relationship("Usuario", back_populates="usuario_avaliacao")
+    comentarios = relationship("Likes", back_populates="avaliacao1")
+
+
+class Comentario(Base):
+    __tablename__ = 'comentario'
+
+    id = Column(Integer, primary_key=True, index=True)    
+
+    nota = Column(Integer)
+    texto = Column(String(255))
+    data_criacao = Column(DateTime)
+    likes = Column(Integer)
+
+    fk_usuario = Column(ForeignKey("usuario.id"))
+    fk_livro = Column(ForeignKey("livro.id"))
+
+    avaliacoes = relationship("Likes", back_populates="comentario")
+
+class Likes(Base):
+    __tablename__ = 'likes'
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    fk_comentario = Column(ForeignKey("comentario.id"))
+    fk_avaliacao = Column(ForeignKey("avaliacao.id"))
+    fk_usuario = Column(ForeignKey("usuario.id"))
+
+    avaliacao1 = relationship("Avaliacao", back_populates="comentarios")
+    comentario = relationship("Comentario", back_populates="avaliacoes")

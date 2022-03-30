@@ -1,17 +1,15 @@
-"""agora vai funcionar 1
-
-Revision ID: 0ae4879a3c01
-Revises: 354365d081c1
-Create Date: 2022-02-24 02:42:17.850947
-
+"""aa
+Revision ID: eb308846c911
+Revises: 4bb6305d3c9e
+Create Date: 2022-03-26 23:19:11.981366
 """
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0ae4879a3c01'
-down_revision = '354365d081c1'
+revision = 'eb308846c911'
+down_revision = None
 branch_labels = None
 depends_on = None
 
