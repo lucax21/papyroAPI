@@ -1,7 +1,10 @@
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import select
+from sqlalchemy.sql.functions import func
+from sqlalchemy import insert
 from src.db.models import models
 from typing import List
+
+from src.schemas.livro import LivroAvaliar
 
 class CrudLivro():
     def __init__(self, session: Session):
@@ -31,3 +34,15 @@ class CrudLivro():
         query = self.session.query(models.Livro).options(joinedload(models.Livro.usuario)).where(models.Livro.id == id)
 
         return query.one()
+
+    def avaliar_livro(self, id_user, ava: LivroAvaliar):
+        stmt = insert(models.Avaliacao).values(fk_livro=ava.id_livro,
+                                                            fk_usuario=id_user,
+                                                            nota=ava.nota,
+                                                            texto=ava.texto,
+                                                            likes=0,
+                                                            data_criacao=func.now()
+                                                            )
+        self.session.execute(stmt)
+        self.session.commit()
+        return 1
