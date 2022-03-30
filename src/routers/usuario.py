@@ -11,7 +11,7 @@ from src.db.database import get_db
 from src.db.models.models import Livro
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import Usuario, UsuarioCriar, UsuarioPerfil
+from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
 from src.schemas.livro import Livro, LivroSimples
 from jose import jwt
 
@@ -318,3 +318,9 @@ def livros_lendo(id: int, session: Session = Depends(get_db)
 ,current_user: Usuario = Depends(obter_usuario_logado)
 ):
     return CrudUsuario(session).livros_lendo(id)
+
+@router.post("/addLivroBiblioteca/")
+def add_livro_biblioteca(addLivro: UsuarioAddLivroBiblioteca,session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
+    return CrudUsuario(session).add_livro_biblioteca(current_user.id, addLivro)

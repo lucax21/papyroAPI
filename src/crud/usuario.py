@@ -1,7 +1,7 @@
-from sqlalchemy import select, update, text
+from sqlalchemy import select, update, insert
 from sqlalchemy.sql.functions import func
 from sqlalchemy.orm import Session, joinedload, subqueryload,lazyload
-from src.schemas.usuario import Usuario, UsuarioCriar, UsuarioPerfil
+from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
 from src.db.models import models
 from typing import List
 
@@ -113,3 +113,28 @@ class CrudUsuario():
         
         # testar iss-> p = db.query(Profile).options(joinedload('*')).filter_by(id=p.id).limit(1).one()'
         return query.all()
+
+    def add_livro_biblioteca(self, id_user: int, dado: UsuarioAddLivroBiblioteca):
+        query = self.session.query(models.UsuarioLivro).where(models.UsuarioLivro.fk_usuario==id_user).where(models.UsuarioLivro.fk_livro == dado.id_livro).first()
+        
+        # update
+        if query:
+            stmt = update(models.UsuarioLivro).where(models.UsuarioLivro.fk_usuario == id_user).where(models.UsuarioLivro.fk_livro == dado.id_livro).values(fk_livro=dado.id_livro,
+                                                            fk_usuario=id_user,
+                                                            fk_status=dado.id_status,
+                                                            data_entrada=func.now()
+                                                            )
+            self.session.execute(stmt)
+            self.session.commit()
+            # return self.session.refresh(dado)
+        #insert
+        else:
+            # self.session.execute(models.UsuarioLivro.insert().values(fk_usuario=id_user,fk_livro=dado.id_livro, fk_status=dado.id_status))
+            stmt = insert(models.UsuarioLivro).values(fk_livro=dado.id_livro,
+                                                            fk_usuario=id_user,
+                                                            fk_status=dado.id_status,
+                                                            data_entrada=func.now()
+                                                            )
+            self.session.execute(stmt)
+            self.session.commit()
+            # return self.session.refresh(dado)

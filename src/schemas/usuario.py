@@ -45,6 +45,13 @@ class Usuario(UsuarioDb):
     email: Optional[EmailStr] = None
     data_nascimento: date
 
+class UsuarioAddLivroBiblioteca(BaseModel):
+    # id_usuario: int
+    id_livro: int
+    id_status: int
+
+    class Config:
+        orm_mode = True
 
 from src.schemas.genero import Genero
 
