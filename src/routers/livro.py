@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from src.crud.livro import CrudLivro
 from src.db.database import get_db
-from src.schemas.livro import Livro, LivroCriar
+from src.schemas.livro import Livro, LivroAvaliar, LivroCriar
 
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.usuario import Usuario
@@ -52,3 +52,9 @@ def pessoas_livro(id:int,session: Session = Depends(get_db)
 ,current_user: Usuario = Depends(obter_usuario_logado)
 ):
     return CrudLivro(session).pessoas_livro(id)
+
+@router.post("/avaliar", status_code=status.HTTP_201_CREATED)
+def avaliar_livro(ava: LivroAvaliar ,session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
+    return CrudLivro(session).avaliar_livro(current_user.id,ava)

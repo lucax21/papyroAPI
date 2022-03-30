@@ -30,3 +30,7 @@ class Livro(LivroSimples):
 class LivroCriar(Livro):
     pass
 
+class LivroAvaliar(BaseModel):
+    id_livro: int
+    nota: int
+    texto: str
