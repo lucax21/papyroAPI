@@ -58,22 +58,12 @@ class CrudUsuario():
         self.session.commit()
 
     def atualizar_usuario(self, user_id: int, usuario: UsuarioCriar):
-        if usuario.senha and usuario.senha_confirmacao:
-            atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(nome=usuario.nome,
+  
+
+        atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(nome=usuario.nome,
                                                             apelido=usuario.apelido,
-                                                            foto=usuario.foto,
-                                                            email=usuario.email,
-                                                            descricao=usuario.descricao
-                                                            ,
-                                                            senha=hash_provider.get_password_hash(usuario.senha),
+                                                            descricao=usuario.descricao,
                                                             data_nascimento=usuario.data_nascimento
-                                                            )
-        else:
-            atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(nome=usuario.nome,
-                                                            apelido=usuario.apelido,
-                                                            foto=usuario.foto,
-                                                            email=usuario.email,
-                                                            descricao=usuario.descricao
                                                             )
         self.session.execute(atualizar_stmt)
         self.session.commit()

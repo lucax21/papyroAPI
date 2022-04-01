@@ -178,35 +178,14 @@ def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db), curr
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
     elif not usuario.apelido:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Apelido.")
-    # elif not usuario.senha:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha.")
-    # elif not usuario.senha_confirmacao:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha de Confirmação.")
-    elif not usuario.email:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o E-mail.")
     elif not usuario.data_nascimento:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
-
-
-    if(usuario.senha):
-        #verifica senha
-        """
-        a expressão do regex diz:
-        - senha deve ter de 8 a 20 digitos
-        - espaços em branco não são permitidos
-        """
-        result_senha = re.match('^(?=\\S+$).{8,20}$', usuario.senha)
-        if not result_senha:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A Senha deve conter no mínimo 8 dígitos e no máximo 20 dígitos.")
 
     #verifica se é maior de 18 anos
     idade = (date.today() - usuario.data_nascimento)
     result_idade = (idade.days / 365.25)
     if result_idade < 18.0:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Você deve ser maior de idade para criar um conta.")
-
-    if not usuario.senha == usuario.senha_confirmacao:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Senhas incompatíveis. Confirme novamente.")
 
     usuario_db = CrudUsuario(session).buscar_por_id(current_user.id)
 
@@ -216,25 +195,6 @@ def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db), curr
         if apelido_buscado:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
 
-
-    if not usuario.email == usuario_db.email:
-        #verifica se o email já está sendo utilizado
-        email_buscado = CrudUsuario(session).buscar_por_email(usuario.email)
-        if email_buscado:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
-        
-        # desabilitar confirmação de conta
-        CrudUsuario(session).desabilitar_confirmação(current_user.id)
-
-        token_confirmacao = get_confirmation_token(usuario_db.email, usuario_db.confirmacao)
-
-        try:
-            Mailer.enviar_email_confirmacao(token_confirmacao["token"], usuario_db.email)
-        except ConnectionRefusedError:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Email não poderia ser enviado. Por favor, tente de novo."
-            )
    
     return CrudUsuario(session).atualizar_usuario(current_user.id, usuario)
 
