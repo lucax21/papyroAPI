@@ -245,7 +245,7 @@ class Avaliacao(Base):
 
     avaliacao = relationship("Livro", back_populates="avaliacoes")
     usuario = relationship("Usuario", back_populates="usuario_avaliacao")
-    comentarios = relationship("Likes", back_populates="avaliacao1")
+    comentarios = relationship("Likes", back_populates="avaliacao")
 
 
 class Comentario(Base):
@@ -263,7 +263,7 @@ class Comentario(Base):
 
     avaliacoes = relationship("Likes", back_populates="comentario")
 
-class Likes(Base):
+class   Likes(Base):
     __tablename__ = 'likes'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -272,5 +272,5 @@ class Likes(Base):
     fk_avaliacao = Column(ForeignKey("avaliacao.id"))
     fk_usuario = Column(ForeignKey("usuario.id"))
 
-    avaliacao1 = relationship("Avaliacao", back_populates="comentarios")
+    avaliacao = relationship("Avaliacao", back_populates="comentarios")
     comentario = relationship("Comentario", back_populates="avaliacoes")

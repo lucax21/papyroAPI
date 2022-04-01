@@ -27,7 +27,7 @@ class CrudLivro():
         query = self.session.query(models.Livro).options(joinedload(models.Livro.test2)).options(joinedload(models.Livro.avaliacoes).options(joinedload(models.Avaliacao.usuario)
         )).options(joinedload(models.Livro.genero)).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.Livro.id == id).where(models.Livro.id == models.Avaliacao.fk_livro)
 
-        return query.all()
+        return query.first()
 
 
     def pessoas_livro(self, id):
