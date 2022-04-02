@@ -77,6 +77,7 @@ class Usuario(Base):
                                                     )
 
     usuario_avaliacao = relationship("Avaliacao", back_populates="usuario")
+    amigos_origem = relationship("Amigo", back_populates="usuario_origem")
 
 class Genero(Base):
     __tablename__ = 'genero'
@@ -274,3 +275,15 @@ class   Likes(Base):
 
     avaliacao = relationship("Avaliacao", back_populates="comentarios")
     comentario = relationship("Comentario", back_populates="avaliacoes")
+
+class Amigo(Base):
+    __tablename__ = 'amigo'
+
+    fk_origem = Column(ForeignKey("usuario.id"), primary_key=True)
+    fk_destino = Column(ForeignKey("usuario.id"), primary_key=True)
+
+    pendente = Column(Boolean)
+    ignorado = Column(Boolean)
+
+    usuario_origem = relationship("Usuario", back_populates="amigos_origem")
+    # usuario_destino
