@@ -11,7 +11,7 @@ from src.db.database import get_db
 from src.db.models.models import Livro
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
+from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
 from src.schemas.livro import Livro, LivroSimples
 from jose import jwt
 
@@ -198,62 +198,12 @@ def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db), curr
    
     return CrudUsuario(session).atualizar_usuario(current_user.id, usuario)
 
-@router.post("/testFOTO")
-def test(file: UploadFile):
-    
+@router.post("/atualizarFoto")
+def atualizar_foto(link: AtualizarFoto,session: Session = Depends(get_db)
+,current_user: Usuario = Depends(obter_usuario_logado)
+):
 
-    # SOMENTE UM TESTE
-
-
-
-    # contents = file.read()
-
-    print(file.filename)
-    print(file.content_type)
-
-
-    from firebase_admin import credentials, initialize_app, storage
-
-    # import pyrebase
-    aa = {
-        "type": "service_account",
-        "project_id": "ethereal-shape-340121",
-        "private_key_id": "7c01291e2904884a0493c3e2fa6015f3909ce18d",
-        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCaeM3jSjZAuJMk\nT3v/adWPIW+ZSSpz9yywcq/cMh2hnzWYExYt5Lw8U+hDByx9Mws0nIkL1gOnzyAi\nmZSxODotb9jnlq5r6pmCcrxJk2AeBDQK855yARFgVtI7+t2qBcwQdOMf/2nM+TgZ\ndKDa9tLh3n0YSG23BbOxqxy8mTfuJES+0cenjqS6Kf9IY2AgNBRZUO33/HhyVEwo\nuR9rcWaeHKmYSK+NmMzgp9Lrgh1MQ5HXJjduXz1H1K7gVcxauJ0dakCn7XZ06rTE\nT7cTTvePEkTYl3hCMUZwL0vH+qb3Z/X3dOxS3yqW2cB9TTme+lujc99Bnp7u2du/\n8VI/x7GrAgMBAAECggEAAyrl5CVkqBPEanD57Z/hoDYUweAJqH0cSu7fH6ayi747\nezlmTkEPSN+h007udkiO5Xz1JLKoOohc5cb1kQ4Xx8ITuZQDxEoUs440wY3txPp4\na57ZReuky+hi+iQdIRUVILjRVGD6Uabs3MtvV6cDZgb7m7X6SRbV1+y6Oq7xM+Ov\nBADQpT6dFxYr0o+srhs7OBWMXTJJfUJ4LFY8v3K4brDSaNdkzmhfW0yXFWUY7pVw\n+9zxaa8DMRGUejE18mWqQuRQLFRNrE3QReuSAuWbe+ZqqkontZjEheZomwHgIRWi\naKHGCcca/ihaHjodL6/ys6fiCOKN+wgFE059SlW/UQKBgQDHtV0zXMUztAtSyXa5\nxZhAyU+ohU/56nZO9879bECFMURMwpbbOJ4t/4NevFIJgEWMGYTjjnvHZ3dgGr/G\ncucPrEyqYPKxh3ChnMUUPLeFuifvB4EBBrgHMTJJqD4vo6Q0aYRH3WyLjAU7tLgl\nUtcryyWtnF/EXyCByjf0ds+g4wKBgQDGAz5l+FbUHZs7A3nCJN1Ql5WUQSCw0oFp\ngxYpolUIhlKY1yEJuopm+s4xpFkj4Uxwds1icblthYsXUY0bYPtbQe73tTnXwVv+\ngUsGWvixO3uCZ80VjqYd6OYjO4/tsZ3L6tKxM41wjfMtfc1CWYKBxLi3eoFh2OTe\neuW4z2VumQKBgAlh7PIHzsACGnIWQvyxWtjYXGS3dq1wJYTKQbBIULOxP9s3XS0J\neO0CTyK5SEVoAFx3qnWicRBKPSKHvzDMnyxuVN/AVEag7Vq6acvsmlavC0dAm//3\nV9gGqK0rOVi1oHZR6sQRlBLuTiSi9e/S94b4MVn5ucoZCgbvADf9CP4vAoGAOcHA\ndaXWTdDE8pW08jgmhddxPekxS+Ja9RfTYxmCjBYCCarWbCwJKriFZF130storHU6\nuzhIyfVl+MtEyXOkXZ4BwicOVCyGVNoJtDTczXV4NTVp0JvnQFoqpqQ8+ywPxucb\nxawv2WDOSbqkIHJTat6isoH9Mzk8qNhYIWv9PiECgYEAgZvSdFOSSqY46l0q8t90\ns2Vad0V2xhYHLzUpDhGlPgbxktJq2pFD1e7df0f+ZwQUUT4xhmc8ekz07QDWF1ID\nFuDlRFMLwKiPeDShW9Bq+oFalmVc66KYMPr1Mz9cl98eyghKXt/AlBOlM/MAHjBJ\nQ33H5Xs5ptg193Pb4YcqGsU=\n-----END PRIVATE KEY-----\n",
-        "client_email": "firebase-adminsdk-hxill@ethereal-shape-340121.iam.gserviceaccount.com",
-        "client_id": "113178869994544661187",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-hxill%40ethereal-shape-340121.iam.gserviceaccount.com"
-    }
-    cred = credentials.Certificate(aa)
-
-    # initialize firebase
-    initialize_app(cred,{'storageBucket': 'ethereal-shape-340121.appspot.com'})
-    
-    fileName = "/home/lucas/Downloads/Kati-Horna.jpeg"
-
-    bucket = storage.bucket()
-    blob = bucket.blob(file)
-
-    from uuid import uuid4
-    # Create new token
-    new_token = uuid4()
-
-    # Create new dictionary with the metadata
-    metadata  = {"firebaseStorageDownloadTokens": new_token}
-
-    # Set metadata to blob
-    blob.metadata = metadata
-    blob.upload_from_filename(file)
-
-    # Opt : if you want to make public access from the URL
-    blob.make_public()
-
-    print("your file url", blob.public_url)
-
-    return "KKK rodou"
+    return CrudUsuario(session).atualizar_foto(current_user.id,link)
 
 @router.get("/{id}/livrosSeraoLidos/"
 # , response_model=List[Livro]

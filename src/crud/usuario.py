@@ -1,7 +1,7 @@
 from sqlalchemy import select, update, insert
 from sqlalchemy.sql.functions import func
 from sqlalchemy.orm import Session, joinedload, subqueryload,lazyload
-from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
+from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
 from src.db.models import models
 from typing import List
 
@@ -128,3 +128,9 @@ class CrudUsuario():
             self.session.execute(stmt)
             self.session.commit()
             # return self.session.refresh(dado)
+
+    def atualizar_foto(self, id_user: int, dado: AtualizarFoto):
+
+        stmt = update(models.Usuario).where(models.Usuario.id == id_user).values(foto=dado.link)
+        self.session.execute(stmt)
+        self.session.commit()
