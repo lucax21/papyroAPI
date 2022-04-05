@@ -5,6 +5,8 @@ from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBibliotec
 from src.db.models import models
 from typing import List
 
+from fastapi import HTTPException, status
+
 from src.core import hash_provider
 
 class CrudUsuario():
@@ -13,16 +15,20 @@ class CrudUsuario():
         self.session = session
 
     def criar_usuario(self, usuario: Usuario):
-        db_usuario = models.Usuario(nome=usuario.nome,
-                email=usuario.email,
-                apelido=usuario.apelido,
-                senha=hash_provider.get_password_hash(usuario.senha),
-                data_nascimento=usuario.data_nascimento,
-                ativo=False)
-        self.session.add(db_usuario)
-        self.session.commit()
-        self.session.refresh(db_usuario)
-        return db_usuario
+        try:
+            db_usuario = models.Usuario(nome=usuario.nome,
+                    email=usuario.email,
+                    apelido=usuario.apelido,
+                    senha=hash_provider.get_password_hash(usuario.senha),
+                    data_nascimento=usuario.data_nascimento,
+                    ativo=False)
+            self.session.add(db_usuario)
+            self.session.commit()
+            self.session.refresh(db_usuario)
+            return db_usuario
+        except Exception as error:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     #função para testes
     def listar(self) -> List[models.Usuario]:
@@ -52,27 +58,39 @@ class CrudUsuario():
         return self.session.execute(query).scalars().first()
 
     def ativar_conta(self, instancia_usu):
-        update_stmt = update(models.Usuario).where(
-            models.Usuario.id == instancia_usu.id).values(ativo=instancia_usu.ativo, confirmacao=instancia_usu.confirmacao)
-        self.session.execute(update_stmt)
-        self.session.commit()
+        try:
+            update_stmt = update(models.Usuario).where(
+                models.Usuario.id == instancia_usu.id).values(ativo=instancia_usu.ativo, confirmacao=instancia_usu.confirmacao)
+            self.session.execute(update_stmt)
+            self.session.commit()
+        except Exception as error:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def atualizar_usuario(self, user_id: int, usuario: UsuarioCriar):
   
 
-        atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(nome=usuario.nome,
-                                                            apelido=usuario.apelido,
-                                                            descricao=usuario.descricao,
-                                                            data_nascimento=usuario.data_nascimento
-                                                            )
-        self.session.execute(atualizar_stmt)
-        self.session.commit()
+        try:
+            atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(nome=usuario.nome,
+                                                                apelido=usuario.apelido,
+                                                                descricao=usuario.descricao,
+                                                                data_nascimento=usuario.data_nascimento
+                                                                )
+            self.session.execute(atualizar_stmt)
+            self.session.commit()
         # self.session.refresh(usuario)
+        except Exception as error:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def desabilitar_confirmação(self, user_id: int):
-        atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(ativo=False)
-        self.session.execute(atualizar_stmt)
-        self.session.commit()
+        try:
+            atualizar_stmt = update(models.Usuario).where(models.Usuario.id == user_id).values(ativo=False)
+            self.session.execute(atualizar_stmt)
+            self.session.commit()
+        except Exception as error:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def perfil_usuario(self, user_id: int) -> UsuarioPerfil:
        
@@ -114,9 +132,12 @@ class CrudUsuario():
                                                             fk_status=dado.id_status,
                                                             data_entrada=func.now()
                                                             )
-            self.session.execute(stmt)
-            self.session.commit()
-            # return self.session.refresh(dado)
+            try:
+                self.session.execute(stmt)
+                self.session.commit()
+            except Exception as error:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         #insert
         else:
             # self.session.execute(models.UsuarioLivro.insert().values(fk_usuario=id_user,fk_livro=dado.id_livro, fk_status=dado.id_status))
@@ -125,12 +146,20 @@ class CrudUsuario():
                                                             fk_status=dado.id_status,
                                                             data_entrada=func.now()
                                                             )
-            self.session.execute(stmt)
-            self.session.commit()
-            # return self.session.refresh(dado)
+            try:
+                self.session.execute(stmt)
+                self.session.commit()
+            except Exception as error:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     def atualizar_foto(self, id_user: int, dado: AtualizarFoto):
 
-        stmt = update(models.Usuario).where(models.Usuario.id == id_user).values(foto=dado.link)
-        self.session.execute(stmt)
-        self.session.commit()
+        try:
+            stmt = update(models.Usuario).where(models.Usuario.id == id_user).values(foto=dado.link)
+            self.session.execute(stmt)
+            self.session.commit()
+        except Exception as error:
+            self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

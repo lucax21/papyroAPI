@@ -4,6 +4,8 @@ from sqlalchemy import insert
 from src.db.models import models
 from typing import List
 
+from fastapi import HTTPException, status
+
 from src.schemas.livro import LivroAvaliar
 
 class CrudLivro():
@@ -34,13 +36,17 @@ class CrudLivro():
         return query.one()
 
     def avaliar_livro(self, id_user, ava: LivroAvaliar):
-        stmt = insert(models.Avaliacao).values(fk_livro=ava.id_livro,
-                                                            fk_usuario=id_user,
-                                                            nota=ava.nota,
-                                                            texto=ava.texto,
-                                                            likes=0,
-                                                            data_criacao=func.now()
-                                                            )
-        self.session.execute(stmt)
-        self.session.commit()
-        return 1
+        try:
+            stmt = insert(models.Avaliacao).values(fk_livro=ava.id_livro,
+                                                                fk_usuario=id_user,
+                                                                nota=ava.nota,
+                                                                texto=ava.texto,
+                                                                likes=0,
+                                                                data_criacao=func.now()
+                                                                )
+            self.session.execute(stmt)
+            self.session.commit()
+            return 1
+        except Exception as error:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
