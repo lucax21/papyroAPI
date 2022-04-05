@@ -32,13 +32,13 @@ def buscar_livro_nome(termo: str,session: Session = Depends(get_db)):
 # ,response_model=Livro
 )
 def buscar_por_id(id: int,session: Session = Depends(get_db)):
-    if not id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
+    # if not id:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
 
-    dado = CrudLivro(session).buscar_por_id(id)
-    if not dado:
-        raise HTTPException(status_code=404, detail='Não encontrado')
-    return dado
+    # dado = CrudLivro(session).buscar_por_id(id)
+    # if not dado:
+    #     raise HTTPException(status_code=404, detail='Não encontrado')
+    return CrudLivro(session).buscar_por_id(id)
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
 def gravar_livro(livro: LivroCriar, session: Session = Depends(get_db)):

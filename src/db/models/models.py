@@ -77,6 +77,9 @@ class Usuario(Base):
                                                     )
 
     usuario_avaliacao = relationship("Avaliacao", back_populates="usuario")
+    # amigos = relationship("Amigo", back_populates="usuario_origem")
+    amigos = relationship('Amigo', backref='Amigo.fk_destino',primaryjoin='Usuario.id==Amigo.fk_origem', lazy='dynamic')
+    mensagens = relationship('Mensagem', backref='Mensagem.fk_destino',primaryjoin='Usuario.id==Mensagem.fk_origem', lazy='dynamic')
 
 class Genero(Base):
     __tablename__ = 'genero'
@@ -84,9 +87,6 @@ class Genero(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     genero = Column(String(100))
-
-    # usuarios = relationship("UsuarioGenero", secondary="usuario_genero")
-    # usuarios = relationship("UsuarioGenero", back_populates="genero")
 
     usuarios = relationship("Usuario", secondary=usuario_genero, back_populates="generos")
     generos = relationship("Livro", back_populates="genero")
@@ -274,3 +274,29 @@ class   Likes(Base):
 
     avaliacao = relationship("Avaliacao", back_populates="comentarios")
     comentario = relationship("Comentario", back_populates="avaliacoes")
+
+class Amigo(Base):
+    __tablename__ = 'amigo'
+
+    fk_origem = Column(ForeignKey("usuario.id"), primary_key=True)
+    fk_destino = Column(ForeignKey("usuario.id"), primary_key=True)
+
+    pendente = Column(Boolean)
+    ignorado = Column(Boolean)
+
+    usuario_origem = relationship("Usuario", foreign_keys='Amigo.fk_origem')
+    usuario_destino = relationship("Usuario", foreign_keys='Amigo.fk_destino')
+
+class Mensagem(Base):
+    __tablename__ = 'mensagem'
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    texto = Column(String(255), nullable=False)
+    data_criacao = Column(DateTime)
+
+    fk_origem = Column(ForeignKey("usuario.id"))
+    fk_destino = Column(ForeignKey("usuario.id"))
+
+    usuario_origem = relationship("Usuario", foreign_keys='Mensagem.fk_origem')
+    usuario_destino = relationship("Usuario", foreign_keys='Mensagem.fk_destino')

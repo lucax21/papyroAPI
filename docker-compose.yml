@@ -10,7 +10,7 @@ services:
     ports:
      - $PYTHON_LOCAL_PORT:$PYTHON_DOCKER_PORT
     # depends_on:
-    #   - db
+      # - db
     environment:
       DB_UPSTREAM: http://host.docker.internal:8000
     env_file:

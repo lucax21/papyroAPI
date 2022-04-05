@@ -78,9 +78,9 @@ class CrudUsuario():
        
         dado = self.session.query(models.Usuario).options(
                 joinedload(models.Usuario.grupos),
-                joinedload(models.Usuario.livros_lidos),
-                joinedload(models.Usuario.livros_lerei),
-                joinedload(models.Usuario.livros_lendo)
+                joinedload(models.Usuario.livros_lidos).options(joinedload(models.Livro.test2)),
+                joinedload(models.Usuario.livros_lerei).options(joinedload(models.Livro.test2)),
+                joinedload(models.Usuario.livros_lendo).options(joinedload(models.Livro.test2))
                 ).where(
                     models.Usuario.id == user_id
                 ).one()
