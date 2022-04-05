@@ -62,6 +62,11 @@ class UsuarioGeneros(UsuarioSimples):
         orm_mode = True
         arbitrary_types_allowed  =  True
 
+
+class AtualizarFoto(BaseModel):
+    link: str
+
+
 UsuarioGeneros.update_forward_refs()
 
 
