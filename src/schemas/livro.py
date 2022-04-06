@@ -9,6 +9,7 @@ from .autor import Autor
 class LivroSimples(BaseModel):
     nome: str
     capa: Optional[str] = None
+    chave: Optional[str] = None
     nota: int
     autores: List[Autor] = []
 

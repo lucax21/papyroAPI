@@ -101,6 +101,7 @@ class Livro(Base):
     nota = Column(Integer)
     sinopse = Column(Text)
     capa = Column(String(255), nullable=True)
+    chave = Column(String(50))
 
     fk_genero = Column(Integer, ForeignKey('genero.id'))
 
@@ -145,6 +146,7 @@ class Autor(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     nome = Column(String(255))
+    chave = Column(String(50))
 
     livros = relationship("LivroAutores", back_populates="autor")
 
