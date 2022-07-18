@@ -1,10 +1,10 @@
-version: "3.7"
+version: "3.8"
 
 services:
   api:
     build: .
     container_name: papyroAPI
-    command: uvicorn src.main:app --proxy-headers --host 0.0.0.0 --reload --reload-dir=src
+    command: sh -c 'uvicorn src.main:app --proxy-headers --host 0.0.0.0 --reload --reload-dir=src'
     volumes:
      - .:/code
     ports:
