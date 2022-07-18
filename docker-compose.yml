@@ -8,34 +8,20 @@ services:
     volumes:
      - .:/code
     ports:
-     - $PYTHON_LOCAL_PORT:$PYTHON_DOCKER_PORT
-    # depends_on:
-      # - db
-    environment:
-      DB_UPSTREAM: http://host.docker.internal:8000
+      - $PYTHON_LOCAL_PORT:$PYTHON_DOCKER_PORT
+    depends_on:
+       - db
     env_file:
       - .env
-#   db:
-#     image: postgres:14
-#     restart: always
-#     environment:
-#       - POSTGRES_USER=$POSTGRES_USER
-#       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-#       - POSTGRES_DB=$POSTGRES_DB
-#     ports:
-#       - $POSTGRES_PORT:$POSTGRES_DOCKER_PORT
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data/
-#     env_file:
-#       - .env
-#   # pgadmin4:
-#   #   image: dpage/pgadmin4
-#   #   environment:
-#   #     PGADMIN_DEFAULT_EMAIL: $PGADMIN_EMAIL
-#   #     PGADMIN_DEFAULT_PASSWORD: $PGADMIN_PASSWORD
-#   #   ports:
-#   #     - "$PGADMIN_PORT:$PGADMIN_DOCKER_PORT"
-#   #   depends_on:
-#   #     - db
-# volumes:
-#   postgres_data:
+
+  db:
+     image: postgres:14
+     restart: always
+     environment:
+       - POSTGRES_USER=$POSTGRES_USER
+       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+       - POSTGRES_DB=$POSTGRES_DB
+     ports:
+      - $POSTGRES_PORT:$POSTGRES_DOCKER_PORT
+     env_file:
+      - .env
