@@ -12,7 +12,7 @@ from src.schemas.usuario import UsuarioGeneros
 router = APIRouter()
 
 @router.get("/"
-, response_model=List[Genero]
+# , response_model=List[Genero]
 )
 async def listar_generos(session: Session = Depends(get_db)):
     dado = CrudGenero(session).listar_generos()

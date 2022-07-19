@@ -64,14 +64,12 @@ class User(Base):
 
 
 class Genre(Base):
-    __tablename__ = 'genre'
-
-    id = Column(Integer, primary_key=True, index=True)
-
-    name = Column(String(100))
-
-    users = relationship("User", secondary=user_genre, back_populates="genres")
-    # generos = relationship("Livro", back_populates="genero")
+	__tablename__ = 'genre'
+	id = Column(Integer, primary_key=True, index=True)
+	name = Column(String(100))
+	description = Column(Text)
+	users = relationship("User", secondary=user_genre, back_populates="genres")
+	# generos = relationship("Livro", back_populates="genero")
 
 
 class Book(Base):
@@ -130,7 +128,7 @@ class Rate(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    text = Column(String(255))
+    text = Column(Text)
     date = Column(DateTime)
     rate = Column(Integer)
     likes = Column(Integer)
@@ -148,7 +146,7 @@ class Comment(Base):
 
     id = Column(Integer, primary_key=True, index=True)    
 
-    text = Column(String(255))
+    text = Column(Text)
     date = Column(DateTime)
     likes = Column(Integer)
 
@@ -189,7 +187,7 @@ class Like(Base):
 
 #     id = Column(Integer, primary_key=True, index=True)
 
-#     text = Column(String(255), nullable=False)
+#     text = Column(T, nullable=False)
 #     date = Column(DateTime)
 
 #     # fk_origin = Column(ForeignKey("user.id"))

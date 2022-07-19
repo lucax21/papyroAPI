@@ -7,6 +7,7 @@ from typing import Optional, List
 
 class GeneroSimples(BaseModel):
     name: str
+    description: str
 
 class Genero(GeneroSimples):
     id: int
