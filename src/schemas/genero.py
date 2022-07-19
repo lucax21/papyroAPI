@@ -6,10 +6,10 @@ from typing import Optional, List
 # 
 
 class GeneroSimples(BaseModel):
-    genero: str
+    name: str
 
 class Genero(GeneroSimples):
-    id: Optional[int] = None
+    id: int
 
     class Config:
         orm_mode = True
