@@ -8,7 +8,7 @@ import re
 from typing import List, Optional
 from src.core.token_provider import check_acess_token, get_confirmation_token
 from src.db.database import get_db
-from src.db.models.models import Livro
+from src.db.models.models import Book
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
 from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
@@ -21,7 +21,9 @@ from src.core.email_provider import Mailer
 router = APIRouter()
 
 
-@router.get("/usuariostest12", response_model=List[Usuario])
+@router.get("/usuariostest12"
+# , response_model=List[Usuario]
+)
 async def dados_usuario(session: Session = Depends(get_db)):
     dado = CrudUsuario(session).listar()
     if not dado:

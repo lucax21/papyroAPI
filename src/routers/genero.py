@@ -4,14 +4,16 @@ from sqlalchemy.orm import Session
 from typing import List
 from src.db.database import get_db
 from src.crud.genero import CrudGenero
-from src.db.models.models import Usuario
+from src.db.models.models import User
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.genero import Genero, GeneroUsuarioCriar
 from src.schemas.usuario import UsuarioGeneros
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Genero])
+@router.get("/"
+# , response_model=List[Genero]
+)
 async def listar_generos(session: Session = Depends(get_db)):
     dado = CrudGenero(session).listar_generos()
     if not dado:
@@ -20,7 +22,7 @@ async def listar_generos(session: Session = Depends(get_db)):
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
 def generos_usuario_gravar(lista: List[GeneroUsuarioCriar], session: Session = Depends(get_db)
-                                    , current_user: Usuario = Depends(obter_usuario_logado)
+                                    , current_user: User = Depends(obter_usuario_logado)
                                     ):
  
     if len(lista) < 3:
@@ -31,7 +33,7 @@ def generos_usuario_gravar(lista: List[GeneroUsuarioCriar], session: Session = D
 
 @router.get("/usuarioGeneros", response_model=UsuarioGeneros)
 async def listar_generos_usuario(session: Session = Depends(get_db)
-, current_user: Usuario = Depends(obter_usuario_logado)
+, current_user: User = Depends(obter_usuario_logado)
 ):
     
     return CrudGenero(session).listar_generos_usuario(current_user.id)

@@ -12,26 +12,26 @@ class CrudLivro():
     def __init__(self, session: Session):
         self.session = session
 
-    def listar_livros(self) -> List[models.Livro]:
+    def listar_livros(self) -> List[models.Book]:
         
-        return self.session.query(models.Livro).all()
+        return self.session.query(models.Book).all()
     
-    def buscar_por_nome(self, termo) -> List[models.Livro]:
+    def buscar_por_nome(self, termo) -> List[models.Book]:
 
-        return self.session.query(models.Livro).filter(models.Livro.nome.like(termo+'%')).all()
+        return self.session.query(models.Book).filter(models.Book.nome.like(termo+'%')).all()
     
-    def buscar_por_id(self, id) -> models.Livro:
+    def buscar_por_id(self, id) -> models.Book:
         
-        # query = self.session.query(models.Livro).options(joinedload(models.Livro.test2)).options(joinedload(models.Livro.genero)).options(joinedload(models.Livro.avaliacoes).options(joinedload(models.Avaliacao.usuario)
-        # )).join(models.Livro.test).join(models.UsuarioLivro.statuss).where(models.Livro.id == id).where(models.Livro.id == models.Avaliacao.fk_livro)
-        query = self.session.query(models.Livro).options(joinedload(models.Livro.test2)).options(joinedload(models.Livro.genero)).options(joinedload(models.Livro.avaliacoes).options(joinedload(models.Avaliacao.usuario)
-        )).where(models.Livro.id == id)
+        # query = self.session.query(models.Book).options(joinedload(models.Book.test2)).options(joinedload(models.Book.genero)).options(joinedload(models.Book.avaliacoes).options(joinedload(models.Avaliacao.usuario)
+        # )).join(models.Book.test).join(models.UsuarioLivro.statuss).where(models.Book.id == id).where(models.Book.id == models.Avaliacao.fk_livro)
+        query = self.session.query(models.Book).options(joinedload(models.Book.test2)).options(joinedload(models.Book.genero)).options(joinedload(models.Book.avaliacoes).options(joinedload(models.Avaliacao.usuario)
+        )).where(models.Book.id == id)
         
         return query.first()
 
 
     def pessoas_livro(self, id):
-        query = self.session.query(models.Livro).options(joinedload(models.Livro.usuario)).where(models.Livro.id == id)
+        query = self.session.query(models.Book).options(joinedload(models.Book.usuario)).where(models.Book.id == id)
 
         return query.one()
 
