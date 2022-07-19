@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from src.crud.comentario import CrudComentario
 from src.db.database import get_db
-from src.db.models.models import Comentario
+from src.db.models.models import Comment
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.comentario import ComentarioSalvar
 

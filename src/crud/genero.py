@@ -13,8 +13,8 @@ class CrudGenero():
     def __init__(self, session: Session):
         self.session = session
 
-    def listar_generos(self) -> List[models.Genero]:
-        return self.session.query(models.Genero).all()
+    def listar_generos(self) -> List[models.Genre]:
+        return self.session.query(models.Genre).all()
         
 
     def listar_generos_usuario(self, user_id) -> UsuarioGeneros:
