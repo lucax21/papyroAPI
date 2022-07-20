@@ -13,7 +13,7 @@ import sqlalchemy as sa
 revision = 'c320c38372b8'
 down_revision = '56bf60983987'
 branch_labels = None
-depends_on = None
+depends_on = ('1f12dc06fe1e', '992c5f113503', '7188fb201201')
 
 
 def upgrade():
