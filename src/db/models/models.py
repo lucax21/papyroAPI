@@ -23,7 +23,7 @@ class User(Base):
     nickname = Column(String(30), unique=True)
     description = Column(Text)
     password = Column(String(256))
-    date = Column(DateTime)
+    birthday = Column(Date)
     photo = Column(String(255), nullable=True)
     active = Column(Boolean, default=False)
     confirmation = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
@@ -68,6 +68,8 @@ class Genre(Base):
 	id = Column(Integer, primary_key=True, index=True)
 	name = Column(String(100))
 	description = Column(Text)
+	english_name = Column(String(100))
+
 	users = relationship("User", secondary=user_genre, back_populates="genres")
 	# generos = relationship("Livro", back_populates="genero")
 
@@ -115,7 +117,7 @@ class UserBook(Base):
     fk_book = Column(ForeignKey("book.id"), primary_key=True)
     fk_user = Column(ForeignKey("user.id"), primary_key=True)
     fk_status = Column(ForeignKey("status.id"))
-    date = Column(Date)
+    date = Column(DateTime)
 
     # livro_lendo = relationship("Livro", back_populates="livros_lendo")
     # usuario = relationship("Usuario", back_populates="lendoss")
