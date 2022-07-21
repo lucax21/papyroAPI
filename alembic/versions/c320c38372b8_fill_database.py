@@ -1,7 +1,7 @@
 """fill database
 
 Revision ID: c320c38372b8
-Revises: 56bf60983987
+Revises: ee17e3f862d5
 Create Date: 2022-07-19 21:51:56.602478
 
 """
@@ -11,9 +11,9 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'c320c38372b8'
-down_revision = '56bf60983987'
+down_revision = 'ee17e3f862d5'
 branch_labels = None
-depends_on = ('1f12dc06fe1e', '992c5f113503', '7188fb201201')
+depends_on = ('1f12dc06fe1e', '992c5f113503', '7188fb201201','ee17e3f862d5')
 
 
 def upgrade():
