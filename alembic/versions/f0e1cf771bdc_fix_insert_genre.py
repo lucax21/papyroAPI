@@ -1,8 +1,8 @@
-"""fill database
+"""fix insert genre
 
-Revision ID: c320c38372b8
-Revises: ee17e3f862d5
-Create Date: 2022-07-19 21:51:56.602478
+Revision ID: f0e1cf771bdc
+Revises: 8b7cec397250
+Create Date: 2022-07-22 19:37:25.614168
 
 """
 from alembic import op
@@ -10,11 +10,10 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c320c38372b8'
-down_revision = 'ee17e3f862d5'
+revision = 'f0e1cf771bdc'
+down_revision = '8b7cec397250'
 branch_labels = None
 depends_on = ('1f12dc06fe1e', '992c5f113503', '7188fb201201','ee17e3f862d5')
-
 
 def upgrade():
     op.execute('''
@@ -72,4 +71,5 @@ def upgrade():
 
 def downgrade():
     op.execute('DELETE FROM genre WHERE 1=1')
-    op.execute('DELETE FROM user WHERE 1=1')
+    op.execute('DELETE FROM "user" WHERE 1=1')
+
