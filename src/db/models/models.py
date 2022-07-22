@@ -68,7 +68,6 @@ class Genre(Base):
 	id = Column(Integer, primary_key=True, index=True)
 	name = Column(String(100))
 	description = Column(Text)
-	english_name = Column(String(100))
 
 	users = relationship("User", secondary=user_genre, back_populates="genres")
 	# generos = relationship("Livro", back_populates="genero")
@@ -171,14 +170,13 @@ class Like(Base):
     # comentario = relationship("Comentario", back_populates="avaliacoes")
 
 
-# class Friend(Base):
-#     __tablename__ = 'friend'
+class Friend(Base):
+    __tablename__ = 'friend'
 
-#     pending = Column(Boolean)
-#     ignored = Column(Boolean)
-
-# 	# fk_origin = Column(ForeignKey("user.id"), primary_key=True)
-#     # fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
+    pending = Column(Boolean)
+    ignored = Column(Boolean)
+    fk_origin = Column(ForeignKey("user.id"), primary_key=True)
+    fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
 
 #     # usuario_origem = relationship("Usuario", foreign_keys='Amigo.fk_origem')
 #     # usuario_destino = relationship("Usuario", foreign_keys='Amigo.fk_destino')
