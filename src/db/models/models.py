@@ -78,6 +78,8 @@ class Book(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
+    identified = Column(String(25))
+
     # livros_lendo = relationship("UsuarioLivro", back_populates="livro_lendo")
     # status_usuario_livro = relationship("StatusUsuarioLivro", 
     #                                     secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_status == Livro.id)'
@@ -153,6 +155,7 @@ class Comment(Base):
 
     fk_user = Column(ForeignKey("user.id"))
     fk_book = Column(ForeignKey("book.id"))
+    fk_rate = Column(ForeignKey("rate.id"))
 
     # avaliacoes = relationship("Likes", back_populates="comentario")
 
