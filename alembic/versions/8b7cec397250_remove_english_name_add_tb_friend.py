@@ -1,7 +1,7 @@
 """remove english_name, add tb friend
 
 Revision ID: 8b7cec397250
-Revises: c320c38372b8
+Revises: ee17e3f862d5
 Create Date: 2022-07-21 01:06:51.345189
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '8b7cec397250'
-down_revision = 'c320c38372b8'
+down_revision = 'ee17e3f862d5'
 branch_labels = None
 depends_on = None
 
