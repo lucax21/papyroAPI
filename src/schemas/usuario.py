@@ -5,31 +5,18 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date
 
-from fastapi import Form
 
-def form_body(cls):
-    cls.__signature__ = cls.__signature__.replace(
-        parameters=[
-            arg.replace(default=Form(...))
-            for arg in cls.__signature__.parameters.values()
-        ]
-    )
-    return cls
-
-# Propriedades compartilhadas
 class UsuarioSimples(BaseModel):
-    nome: Optional[str] = None
-    apelido: Optional[str] = None
-    foto: Optional[str] = None
-    descricao: Optional[str] = None
+    name: Optional[str] = None
+    nickname: Optional[str] = None
+    photo: Optional[str] = None
+    description: Optional[str] = None
 
-# Propriedades a receber via API na criação
-@form_body
 class UsuarioCriar(UsuarioSimples):
     email: EmailStr
-    senha: Optional[str] = None
-    senha_confirmacao: Optional[str] = None
-    data_nascimento: date
+    password: Optional[str] = None
+    confirm_password: Optional[str] = None
+    birthday: date
     
     class Config:
         orm_mode = True
@@ -41,9 +28,9 @@ class UsuarioDb(UsuarioSimples):
         orm_mode = True
 
 class Usuario(UsuarioDb):
-    descricao: Optional[str] = None
+    descripition: Optional[str] = None
     email: Optional[EmailStr] = None
-    data_nascimento: date
+    birthday: date
 
 class UsuarioAddLivroBiblioteca(BaseModel):
     # id_usuario: int
