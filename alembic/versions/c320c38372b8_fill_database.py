@@ -1,8 +1,8 @@
 """fill database
 
 Revision ID: c320c38372b8
-Revises: ee17e3f862d5
-Create Date: 2022-07-19 21:51:56.602478
+Revises: 8b7cec397250
+Create Date: 2022-07-21 21:51:56.602478
 
 """
 from alembic import op
@@ -11,9 +11,8 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'c320c38372b8'
-down_revision = 'ee17e3f862d5'
+down_revision = '8b7cec397250'
 branch_labels = None
-depends_on = ('ee17e3f862d5')
 
 
 def upgrade():

@@ -12,7 +12,7 @@ from src.db.models.models import Book
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
 from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
-from src.schemas.livro import Livro, LivroSimples
+from src.schemas.livro import LivroId, LivroSimples
 from jose import jwt
 
 from src.core.email_provider import Mailer
