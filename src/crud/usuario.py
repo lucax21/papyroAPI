@@ -1,4 +1,6 @@
-from sqlalchemy import select, update, insert
+from operator import mod
+from pyexpat import model
+from sqlalchemy import select, update, insert, func
 from sqlalchemy.sql.functions import func
 from sqlalchemy.orm import Session, joinedload, subqueryload,lazyload
 from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
@@ -51,11 +53,12 @@ class CrudUsuario():
                 )
         return self.session.execute(query).scalars().first()
 
-    def buscar_por_id(self, id) -> models.User:
-        query = select(models.User).where(
-                models.User.id == id
-                )
-        return self.session.execute(query).scalars().first()
+    def get_by_id(self, id) -> models.User:
+        query = self.session.query(models.User.id, models.User.name, models.User.formatted_birthday, models.User.nickname, models.User.photo, models.User.description, models.User.email)\
+            .join(models.Friend)\
+            .filter(models.User.id == id).first()
+
+        return query
 
     def ativar_conta(self, instancia_usu):
         try:

@@ -28,7 +28,7 @@ class UsuarioDb(UsuarioSimples):
         orm_mode = True
 
 class Usuario(UsuarioDb):
-    descripition: Optional[str] = None
+    description: Optional[str] = None
     email: Optional[EmailStr] = None
     birthday: date
 
