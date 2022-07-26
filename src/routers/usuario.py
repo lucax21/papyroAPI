@@ -140,17 +140,12 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
         CrudUsuario(session).perfil_usuario(id)
     return dado
 
-@router.get("/myProfile"
-,response_model=Usuario
-)
-def get_my_profile(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
-    return CrudUsuario(session).get_by_id(current_user.id)
-
 @router.get("/visualizarPerfil/{id}"
 ,response_model=Usuario
 )
 def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
-    
+    if id == 0:
+        id = current_user.id
     return CrudUsuario(session).get_by_id(id)
 
 
