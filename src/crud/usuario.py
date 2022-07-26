@@ -1,7 +1,8 @@
+from pyexpat import model
 from sqlalchemy import select, update, insert, and_
 from sqlalchemy.sql.functions import func
 from sqlalchemy.orm import Session, joinedload
-from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
+from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UserUpdate, UsuarioPerfil
 from src.db.models import models
 from typing import List
 
@@ -84,12 +85,18 @@ class CrudUsuario():
         )
         return self.session.execute(query).scalars().first()
 
-    def buscar_por_apelido(self, apelido) -> models.User:
-        query = select(models.User).where(
-            models.User.apelido == apelido
-        )
-        return self.session.execute(query).scalars().first()
+    def buscar_por_apelido(self, nickname):
+        return self.session.query(models.User.nickname).filter(models.User.nickname == nickname).first()
+    
 
+    def get_user(self, id) -> models.User:
+        query = self.session.query(models.User).filter(models.User.id == id).first() 
+
+        return {  'name': query.name, 
+                'nickname': query.nickname,
+                'photo': query.photo,
+                'description': query.description,
+                'birthday': query.formatted_birthday,}
 
     def get_by_id(self, id) -> models.User:
         query = self.session.query(models.User.id, 
@@ -179,17 +186,18 @@ class CrudUsuario():
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def atualizar_usuario(self, user_id: int, usuario: UsuarioCriar):
+    def atualizar_usuario(self, user_id: int, usuario: UserUpdate):
 
         try:
-            atualizar_stmt = update(models.User).where(models.User.id == user_id).values(nome=usuario.nome,
-                                                                                         apelido=usuario.apelido,
-                                                                                         descricao=usuario.descricao,
-                                                                                         data_nascimento=usuario.data_nascimento
+            atualizar_stmt = update(models.User).where(models.User.id == user_id).values(name=usuario.name,
+                                                                                         nickname=usuario.nickname,
+                                                                                         description=usuario.description,
+                                                                                         birthday=usuario.birthday
                                                                                          )
             self.session.execute(atualizar_stmt)
             self.session.commit()
-        # self.session.refresh(usuario)
+            # self.session.refresh(usuario)
+            # return usuario
         except Exception as error:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -274,10 +282,10 @@ class CrudUsuario():
                 self.session.rollback()
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def atualizar_foto(self, id_user: int, dado: AtualizarFoto):
+    def atualizar_foto(self, id_user: int, dado: str):
 
         try:
-            stmt = update(models.User).where(models.User.id == id_user).values(foto=dado.link)
+            stmt = update(models.User).where(models.User.id == id_user).values(photo=dado.photo)
             self.session.execute(stmt)
             self.session.commit()
         except Exception as error:
