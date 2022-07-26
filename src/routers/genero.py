@@ -12,13 +12,16 @@ from src.schemas.usuario import UsuarioGeneros
 router = APIRouter()
 
 @router.get("/"
-# , response_model=List[Genero]
+, response_model=List[Genero]
 )
-async def listar_generos(session: Session = Depends(get_db)):
+async def listar_generos(session: Session = Depends(get_db)
+# , current_user: User = Depends(obter_usuario_logado)
+):
     dado = CrudGenero(session).listar_generos()
     if not dado:
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
+
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
 def generos_usuario_gravar(lista: List[GeneroUsuarioCriar], session: Session = Depends(get_db)
@@ -30,6 +33,7 @@ def generos_usuario_gravar(lista: List[GeneroUsuarioCriar], session: Session = D
     
     
     return CrudGenero(session).salvar_generos_usuario(lista, current_user.id)
+
 
 @router.get("/usuarioGeneros", response_model=UsuarioGeneros)
 async def listar_generos_usuario(session: Session = Depends(get_db)
