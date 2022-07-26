@@ -8,11 +8,11 @@ from .autor import Autor
 
 
 class LivroSimples(BaseModel):
-    nome: str
-    capa: Optional[str] = None
-    chave: Optional[str] = None
-    nota: int
-    autores: List[Autor] = []
+    id: Optional[int] = None
+    cover: Optional[str] = None
+    book_title: Optional[str] = None
+    author: Optional[List[str]] = None
+    count: Optional[int] = None
 
     class Config:
         orm_mode = True

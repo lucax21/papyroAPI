@@ -2,10 +2,12 @@
 from turtle import back
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
+from sqlalchemy import func, Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
 from sqlalchemy.orm import relationship
 from src.db.database import Base
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from sqlalchemy.orm import column_property
 
 user_genre = Table("user_genre", Base.metadata,
                    Column("fk_genre", ForeignKey("genre.id"), primary_key=True),
@@ -27,7 +29,8 @@ class User(Base):
     photo = Column(String(255), nullable=True)
     active = Column(Boolean, default=False)
     confirmation = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
-
+    formatted_birthday = column_property(func.to_char(birthday, 'DD/MM/YYYY'))
+    
     genres = relationship("Genre", secondary=user_genre, back_populates='users')
     # lendoss = relationship("UsuarioLivro", back_populates='usuario')
     # livros_lidos = relationship("Livro", 
@@ -58,8 +61,8 @@ class User(Base):
     #                                                 viewonly=True
     #                                                 )
     # usuario_avaliacao = relationship("Avaliacao", back_populates="usuario")
-    # amigos = relationship("Amigo", back_populates="usuario_origem")
-    # amigos = relationship('Amigo', backref='Amigo.fk_destino',primaryjoin='Usuario.id==Amigo.fk_origem', lazy='dynamic')
+    # friends = relationship("Friend", back_populates="user_origin")
+    # friends = relationship('Friend', backref='Friend.fk_destino',primaryjoin='User.id==Friend.fk_origin', lazy='dynamic')
     # mensagens = relationship('Mensagem', backref='Mensagem.fk_destino',primaryjoin='Usuario.id==Mensagem.fk_origem', lazy='dynamic')
 
 
@@ -70,13 +73,16 @@ class Genre(Base):
     description = Column(Text)
 
     users = relationship("User", secondary=user_genre, back_populates="genres")
-# generos = relationship("Livro", back_populates="genero")
+
+    # generos = relationship("Livro", back_populates="genero")
+
 
 
 class Book(Base):
     __tablename__ = 'book'
 
     id = Column(Integer, primary_key=True, index=True)
+    
     identifier = Column(String(25))
 
 
@@ -112,6 +118,7 @@ class Rate(Base):
 
     fk_user = Column(ForeignKey("user.id"))
     fk_book = Column(ForeignKey("book.id"))
+    fk_like = Column(ForeignKey("like.id"))
 
     # avaliacao = relationship("Livro", back_populates="avaliacoes")
     # usuario = relationship("Usuario", back_populates="usuario_avaliacao")
@@ -155,8 +162,8 @@ class Friend(Base):
     fk_origin = Column(ForeignKey("user.id"), primary_key=True)
     fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
 
-#     # usuario_origem = relationship("Usuario", foreign_keys='Amigo.fk_origem')
-#     # usuario_destino = relationship("Usuario", foreign_keys='Amigo.fk_destino')
+    # user_origin = relationship("User", foreign_keys='Friend.fk_origin')
+    # user_destiny = relationship("User", foreign_keys='Friend.fk_destiny')
 
 
 # class Message(Base):

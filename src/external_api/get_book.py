@@ -35,3 +35,4 @@ def get_information(url, params=None, retry=0):
 
     else:
         return response.json()
+

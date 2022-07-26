@@ -7,11 +7,10 @@ import re
 from typing import List, Optional
 from src.core.token_provider import check_access_token, get_confirmation_token
 from src.db.database import get_db
-from src.schemas.livro import LivroId
-from src.utils.enum.reading_type import ReadingTypes
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar
+from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
+
 from jose import jwt
 
 from src.core.email_provider import Mailer
@@ -19,17 +18,7 @@ from src.core.email_provider import Mailer
 router = APIRouter()
 
 
-@router.get("/usuariostest12"
-            # , response_model=List[Usuario]
-            )
-async def dados_usuario(session: Session = Depends(get_db)):
-    dado = CrudUsuario(session).listar()
-    if not dado:
-        raise HTTPException(status_code=404, detail='Não encontrado')
-    return dado
-
-
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Usuario)
+@router.post("/",status_code=status.HTTP_201_CREATED, response_model=Usuario)
 async def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
     # verifica campos vazios
     if not usuario.nome:
@@ -155,25 +144,13 @@ def buscar_por_id(id: int, session: Session = Depends(get_db)):
     return dado
 
 
-@router.get("/meusDados", response_model=Usuario)
-def dados_usuarios(session: Session = Depends(get_db), current_user: Usuario = Depends(obter_usuario_logado)):
-    return CrudUsuario(session).buscar_por_id(current_user.id)
-
-
 @router.get("/visualizarPerfil/{id}"
-            # , response_model=UsuarioPerfil
-            )
-def dados_perfil(id: Optional[int], session: Session = Depends(get_db),
-                 current_user: Usuario = Depends(obter_usuario_logado)):
-    try:
-        if id:
-            dado = CrudUsuario(session).perfil_usuario(id)
-        else:
-            dado = CrudUsuario(session).perfil_usuario(current_user.id)
-
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
-    return dado
+,response_model=Usuario
+)
+def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+    if id == 0:
+        id = current_user.id
+    return CrudUsuario(session).get_by_id(id)
 
 
 @router.put("/atualizarDados")
