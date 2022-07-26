@@ -2,31 +2,19 @@ from __future__ import annotations
 
 from pydantic import BaseModel
 from typing import Optional,List
-from datetime import date
-
-from .autor import Autor
 
 class LivroSimples(BaseModel):
-    nome: str
-    capa: Optional[str] = None
-    chave: Optional[str] = None
-    nota: int
-    autores: List[Autor] = []
+    id: Optional[int] = None
+    cover: Optional[str] = None
+    book_title: Optional[str] = None
+    author: Optional[List[str]] = None
+    count: Optional[int] = None
 
     class Config:
         orm_mode = True
 
 class Livro(LivroSimples):
-    id: Optional[int] = None
-    ano: date
-    #isbn10: str
-    #isbn13: str
-    sinopse: str
-    # autor
-    # generos: List[]
-
-    class Config:
-        orm_mode = True
+    pass
 
 class LivroCriar(Livro):
     pass

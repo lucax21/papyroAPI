@@ -141,25 +141,17 @@ def buscar_por_id(id: int,session: Session = Depends(get_db)):
     return dado
 
 @router.get("/myProfile"
-# ,response_model=Usuario
+,response_model=Usuario
 )
-def get_my_pofile(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+def get_my_profile(session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     return CrudUsuario(session).get_by_id(current_user.id)
 
 @router.get("/visualizarPerfil/{id}"
-# , response_model=UsuarioPerfil
+,response_model=Usuario
 )
 def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
     
-    try:
-        if id:
-            dado = CrudUsuario(session).perfil_usuario(id)
-        else:
-            dado = CrudUsuario(session).perfil_usuario(current_user.id)
-        
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
-    return dado
+    return CrudUsuario(session).get_by_id(id)
 
 
 @router.put("/atualizarDados")

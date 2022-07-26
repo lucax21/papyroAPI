@@ -5,10 +5,11 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date
 
+from .livro import LivroSimples
 
 class UsuarioSimples(BaseModel):
-    name: Optional[str] = None
-    nickname: Optional[str] = None
+    name: str
+    nickname: str
     photo: Optional[str] = None
     description: Optional[str] = None
 
@@ -29,8 +30,12 @@ class UsuarioDb(UsuarioSimples):
 
 class Usuario(UsuarioDb):
     description: Optional[str] = None
-    email: Optional[EmailStr] = None
-    birthday: date
+    birthday: Optional[str] = None
+    booksQt: Optional[int] = None
+    followers: Optional[int] = None
+    books_reading: Optional[List[LivroSimples]] = None
+    books_read: Optional[List[LivroSimples]] = None
+    books_to_read: Optional[List[LivroSimples]] = None
 
 class UsuarioAddLivroBiblioteca(BaseModel):
     # id_usuario: int

@@ -61,7 +61,7 @@ class User(Base):
     #                                                 viewonly=True
     #                                                 )
     # usuario_avaliacao = relationship("Avaliacao", back_populates="usuario")
-    friends = relationship("Friend", back_populates="user_origin")
+    # friends = relationship("Friend", back_populates="user_origin")
     # friends = relationship('Friend', backref='Friend.fk_destino',primaryjoin='User.id==Friend.fk_origin', lazy='dynamic')
     # mensagens = relationship('Mensagem', backref='Mensagem.fk_destino',primaryjoin='Usuario.id==Mensagem.fk_origem', lazy='dynamic')
 
@@ -81,7 +81,7 @@ class Book(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    identified = Column(String(25))
+    identifier = Column(String(25))
 
     # livros_lendo = relationship("UsuarioLivro", back_populates="livro_lendo")
     # status_usuario_livro = relationship("StatusUsuarioLivro", 
