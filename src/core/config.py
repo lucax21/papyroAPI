@@ -18,7 +18,7 @@ class Settings:
     POSTGRES_DB: str = os.getenv("POSTGRES_DB")
     DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASS}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
-
+    GOOGLE_API = os.getenv('GOOGLE_API')
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     REFRESH_SECRET_KEY: str = os.getenv("REFRESH_SECRET_KEY")
     TOKEN_ALGORITHM: str = os.getenv("TOKEN_ALGORITHM")

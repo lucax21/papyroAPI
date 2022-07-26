@@ -69,13 +69,13 @@ class AtualizarFoto(BaseModel):
 
 UsuarioGeneros.update_forward_refs()
 
-from src.schemas.livro import Livro
+from src.schemas.livro import LivroId
 
 class UsuarioPerfil(UsuarioSimples):
     # descricao: Optional[str] = None
-    livros_lendo: List[Livro] = []
-    livros_lerei: List[Livro] = []
-    livros_lidos: List[Livro] = []
+    livros_lendo: List[LivroId] = []
+    livros_lerei: List[LivroId] = []
+    livros_lidos: List[LivroId] = []
     
     class Config:
         orm_mode = True
