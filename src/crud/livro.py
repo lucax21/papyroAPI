@@ -8,6 +8,7 @@ from fastapi import HTTPException, status
 
 from src.external_api.get_book import get_by_identifier
 from src.schemas.livro import LivroAvaliar
+from src.utils.format_book_output import format_book_output
 
 
 class CrudLivro():
@@ -31,7 +32,7 @@ class CrudLivro():
             .join(models.Rate, models.Rate.fk_book == models.Book.id, isouter=True) \
             .group_by(models.Book).first()
 
-        rates = None
+        rating_new_format = []
         if data.count > 0:
             rates = self.session.query(models.Rate.text,
                                        models.Rate.date,
@@ -48,7 +49,6 @@ class CrudLivro():
                                         models.Like.fk_user == user_id,
                                         user_id is not None), isouter=True).limit(20).offset(page * 20).all()
 
-            rating_new_format = []
             for rate in rates:
                 rating_new_format.append({
                     'date': rate.date,
@@ -73,21 +73,20 @@ class CrudLivro():
         if "volumeInfo" not in book:
             raise HTTPException(status_code=404, detail='Não encontrado')
 
+        book = format_book_output(book)
+
         if isinstance(book, str):
             raise HTTPException(status_code=400, detail=book)
 
-        return {
+        book.update({
             'id': id,
-            'cover': book['volumeInfo']['imageLinks']['thumbnail'],
-            'book_title': book['volumeInfo']['title'],
-            'description': book['volumeInfo']['description'],
-            'author': book['volumeInfo']['authors'],
-            'genre': book['volumeInfo']['categories'],
             'book_status_user': user.fk_status if user else None,
             'rate': data.sum / data.count if data.count > 0 else None,
             'raters': data.count,
             'reviews': rating_new_format
-        }
+        })
+
+        return book
 
     def pessoas_livro(self, id):
         query = self.session.query(models.Book).options(joinedload(models.Book.usuario)).where(models.Book.id == id)

@@ -30,7 +30,7 @@ def buscar_livro_nome(termo: str, session: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail='Livro não encontrado')
     return dado
 
-#
+
 @router.get("/{id}", response_model=LivroId)
 async def buscar_por_id(id: int, page: int = 0, session: Session = Depends(get_db)):
 
