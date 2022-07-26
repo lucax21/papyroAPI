@@ -5,7 +5,7 @@ from datetime import date
 import re
 
 from typing import List, Optional
-from src.core.token_provider import check_acess_token, get_confirmation_token
+from src.core.token_provider import check_access_token, get_confirmation_token
 from src.db.database import get_db
 from src.schemas.livro import LivroId
 from src.utils.enum.reading_type import ReadingTypes
@@ -93,7 +93,7 @@ def verificar(token: str, session: Session = Depends(get_db)):
 
     # Trying decode token
     try:
-        payload = check_acess_token(token)
+        payload = check_access_token(token)
         # print("##############")
         # print(payload)
         # # print(payload['scope'])

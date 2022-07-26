@@ -129,6 +129,7 @@ class Comment(Base):
 
     fk_user = Column(ForeignKey("user.id"))
     fk_book = Column(ForeignKey("book.id"))
+    fk_rate = Column(ForeignKey("rate.id"))
 
     # avaliacoes = relationship("Likes", back_populates="comentario")
 

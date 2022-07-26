@@ -20,10 +20,11 @@ class Settings:
 
     GOOGLE_API = os.getenv('GOOGLE_API')
     SECRET_KEY: str = os.getenv("SECRET_KEY")
+    REFRESH_SECRET_KEY: str = os.getenv("REFRESH_SECRET_KEY")
     TOKEN_ALGORITHM: str = os.getenv("TOKEN_ALGORITHM")
     REGISTRATION_TOKEN_LIFETIME = 60 * 60
-    USER_TOKEN_LIFETIME = 30 * 60
-
+    USER_TOKEN_LIFETIME = 30 
+    REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 
 
     EMAIL_HOST = ('smtp.office365.com', 587)
     SSL = True
