@@ -1,4 +1,4 @@
-#Representação do banco de dados
+# Representação do banco de dados
 from turtle import back
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
@@ -10,16 +10,16 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import column_property
 
 user_genre = Table("user_genre", Base.metadata,
-                        Column("fk_genre", ForeignKey("genre.id"), primary_key=True),
-                        Column("fk_user", ForeignKey("user.id"), primary_key=True)
-                    )
+                   Column("fk_genre", ForeignKey("genre.id"), primary_key=True),
+                   Column("fk_user", ForeignKey("user.id"), primary_key=True)
+                   )
 
 
 class User(Base):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True, index=True)
-    
+
     email = Column(String(255), unique=True)
     name = Column(String(255))
     nickname = Column(String(30), unique=True)
@@ -73,39 +73,21 @@ class Genre(Base):
     description = Column(Text)
 
     users = relationship("User", secondary=user_genre, back_populates="genres")
+
     # generos = relationship("Livro", back_populates="genero")
+
 
 
 class Book(Base):
     __tablename__ = 'book'
 
     id = Column(Integer, primary_key=True, index=True)
-
+    
     identifier = Column(String(25))
-
-    # livros_lendo = relationship("UsuarioLivro", back_populates="livro_lendo")
-    # status_usuario_livro = relationship("StatusUsuarioLivro", 
-    #                                     secondary='join(UsuarioLivro, Livro, UsuarioLivro.fk_status == Livro.id)'
-    #                                     ,secondaryjoin="UsuarioLivro.fk_status == StatusUsuarioLivro.id"
-    #                                     ,uselist=True,
-    #                                     viewonly=True
-    #                                     )
-    # test = relationship("UsuarioLivro", back_populates="test1")
-    # test2 = relationship("Autor", 
-    #                                                 secondary='join(LivroAutores, Autor, Autor.id == LivroAutores.fk_autor)'
-    #                                                 ,uselist=True,
-    #                                                 viewonly=True
-    #                                                 )
-    # usuario = relationship("Usuario", 
-    #                                                 secondary='join(UsuarioLivro, Usuario, Usuario.id == UsuarioLivro.fk_usuario)'
-    #                                                 ,uselist=True,
-    #                                                 viewonly=True
-    #                                                 )   
-    # avaliacoes = relationship("Avaliacao", back_populates="avaliacao")
 
 
 class Status(Base):
-    __tablename__= 'status'
+    __tablename__ = 'status'
 
     id = Column(Integer, primary_key=True, index=True)
 
@@ -122,11 +104,6 @@ class UserBook(Base):
     fk_user = Column(ForeignKey("user.id"), primary_key=True)
     fk_status = Column(ForeignKey("status.id"))
     date = Column(DateTime)
-
-    # livro_lendo = relationship("Livro", back_populates="livros_lendo")
-    # usuario = relationship("Usuario", back_populates="lendoss")
-    # statuss = relationship("StatusUsuarioLivro", back_populates="livros")
-    # test1 = relationship("Livro", back_populates="test")
 
 
 class Rate(Base):
@@ -151,7 +128,7 @@ class Rate(Base):
 class Comment(Base):
     __tablename__ = 'comment'
 
-    id = Column(Integer, primary_key=True, index=True)    
+    id = Column(Integer, primary_key=True, index=True)
 
     text = Column(Text)
     date = Column(DateTime)

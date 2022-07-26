@@ -1,8 +1,8 @@
 """fill database
 
 Revision ID: c320c38372b8
-Revises: ee17e3f862d5
-Create Date: 2022-07-19 21:51:56.602478
+Revises: 8b7cec397250
+Create Date: 2022-07-21 21:51:56.602478
 
 """
 from alembic import op
@@ -11,9 +11,8 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'c320c38372b8'
-down_revision = 'ee17e3f862d5'
+down_revision = '8b7cec397250'
 branch_labels = None
-depends_on = ('1f12dc06fe1e', '992c5f113503', '7188fb201201','ee17e3f862d5')
 
 
 def upgrade():
@@ -21,16 +20,16 @@ def upgrade():
         INSERT INTO
             "genre"(id, name, description)
         VALUES
-             (1, 'Romance', 'Aqui você vai encontrar '),
-             (2, 'Fantasia', 'Caracterizado por elementos fantásticos, como magia ou sobrenatural.'),
-             (3, 'Ficção Científica', 'As histórias normalmente se passam em um futuro distante, na exploração especial e em viagens no tempo e espaço.'),
+             (1, 'Romance', 'Aqui você vai encontrar histórias de amor e românticas'),
+             (2, 'Fantasy', 'Caracterizado por elementos fantásticos, como magia ou sobrenatural.'),
+             (3, 'Science Fiction', 'As histórias normalmente se passam em um futuro distante, na exploração especial e em viagens no tempo e espaço.'),
              (4, 'Horror', 'Esse gênero consiste na passagem de sentimentos de pavor e tensão ao leitor.'),
-             (5, 'Policial', 'As histórias que envolvem um crime ou mistério, como o nome indica e que deve ser solucionado pelo protagonista através de pistas.'),
+             (5, 'Mystery and detective', 'As histórias que envolvem um crime ou mistério, como o nome indica e que deve ser solucionado pelo protagonista através de pistas.'),
              (6, 'Distopia', 'As distopias imaginam uma sociedade decadente, muitas vezes após um desastre ecológico ou social, enfrentando governos opressores e desastres ambientais.'),
-             (7, 'Thriller e Suspense', 'O nome pode até indicar histórias de terror, mas o suspense trabalha exclusivamente em como empregar o medo psicológico e criar um suspense.'),
-             (8, 'Jovem Adulto', 'A ficção para jovens adultos, ou YA, tem como público leitores de 12 a 18 anos e reflete nos personagens os desafios únicos da adolescência.'),
-             (9, 'Clássicos', 'Consistem principalmente em livros escritos entre os séculos XVI e XVIII.'),
-             (10, 'NÃO FICÇÃO', 'São histórias onde há uma descrição ou representação de um assunto que é apresentado como fato, sendo real ou não.')
+             (7, 'Thriller', 'O nome pode até indicar histórias de terror, mas o suspense trabalha exclusivamente em como empregar o medo psicológico e criar um suspense.'),
+             (8, 'Young Adult', 'A ficção para jovens adultos, ou YA, tem como público leitores de 12 a 18 anos e reflete nos personagens os desafios únicos da adolescência.'),
+             (9, 'Literature', 'Consistem principalmente em livros escritos entre os séculos XVI e XVIII.'),
+             (10, 'Nonfiction', 'São histórias onde há uma descrição ou representação de um assunto que é apresentado como fato, sendo real ou não.')
     ''')
 
     op.execute('''
@@ -69,7 +68,64 @@ def upgrade():
          '478fdae1-70d8-4b4c-a45f-954cdcc4ebf0')
     ''')
 
+    op.execute('''
+    INSERT INTO user_genre(fk_genre, fk_user)
+    VALUES (1, 1), (3, 1), (5, 1), (2, 2), (6, 2), (1, 3), (6, 3)
+    ''')
+
+    op.execute('''
+    INSERT INTO friend(pending, ignored, fk_origin, fk_destiny)
+    VALUES(true, false, 1, 2), (false, false, 1, 3), (false, true, 2, 3)
+    ''')
+
+    op.execute('''
+    INSERT INTO 
+        book(id, identifier) 
+    VALUES
+         (1, 'aSchEAAAQBAJ'),
+         (2, 'R2YizwEACAAJ'),
+         (3, 'Bh-zDwAAQBAJ'),
+         (4, 'tqONDwAAQBAJ'),
+         (5, 'AawwzwEACAAJ'),
+         (6, '7NQ9vAEACAAJ'),
+         (7, '1pm2DwAAQBAJ'),
+         (8, 'g9tyJp6IJH4C')
+    ''')
+
+    op.execute('''
+        INSERT INTO
+            status(id, status)
+        VALUES
+            (1, 'Lendo'),
+            (2, 'Lido'),
+            (3, 'Quero Ler')
+    ''')
+
+    op.execute('''
+        INSERT INTO
+            user_book(fk_book, fk_user, fk_status, date)
+        VALUES
+            (1, 1, 1, '2022-07-01'),
+            (2, 1, 2, '2022-03-01'),
+            (3, 1, 3, '2022-01-01'),
+            (4, 2, 1, '2022-07-01'),
+            (5, 2, 1, '2022-06-02'),
+            (6, 2, 3, '2022-07-22'),
+            (7, 3, 1, '2022-02-02'),
+            (7, 1, 2, '2022-03-05'),
+            (7, 2, 3, '2021-01-02')
+    ''')
+
 
 def downgrade():
-    op.execute('DELETE FROM genre WHERE 1=1')
+    op.execute('DELETE FROM user_book WHERE 1=1')
+
+    op.execute('DELETE FROM status WHERE 1=1')
+    op.execute('DELETE FROM book WHERE 1=1')
+    op.execute('DELETE FROM user_genre WHERE 1=1')
+
+    op.execute('DELETE FROM friend WHERE 1=1')
     op.execute('DELETE FROM user WHERE 1=1')
+    op.execute('DELETE FROM genre WHERE 1=1')
+
+
