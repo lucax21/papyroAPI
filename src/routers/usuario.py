@@ -10,6 +10,7 @@ from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
 from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
+from src.schemas.livro import LivroId
 
 from jose import jwt
 
