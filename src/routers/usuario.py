@@ -15,6 +15,7 @@ from src.schemas.livro import LivroId
 from jose import jwt
 
 from src.core.email_provider import Mailer
+from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
 
@@ -196,6 +197,7 @@ def get_user_books(reading_type: str,
                    page: int = 0,
                    current_user: Usuario = Depends(obter_usuario_logado),
                    session: Session = Depends(get_db)):
+
     if not user_id:
         user_id = current_user.id
 
