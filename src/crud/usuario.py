@@ -13,6 +13,7 @@ from src.core import hash_provider
 from src.utils.format_book_output import format_book_output
 
 
+# Apagar
 def get_book_simple_infos(data):
     if data:
         book = get_by_identifier(data.identifier)
@@ -50,9 +51,10 @@ def get_list_book_simple_infos(data):
                           'author': book['volumeInfo']['authors']})
 
     return books
+#######################33
 
 
-class CrudUsuario():
+class CrudUsuario:
 
     def __init__(self, session: Session):
         self.session = session
@@ -69,7 +71,7 @@ class CrudUsuario():
             self.session.commit()
             self.session.refresh(db_usuario)
             return db_usuario
-        except Exception as error:
+        except Exception:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -228,7 +230,7 @@ class CrudUsuario():
                                         models.UserBook.fk_status == reading_type)) \
             .join(models.Rate, models.Book.id == models.Rate.fk_book, isouter=True) \
             .group_by(models.Book.identifier) \
-            .limit(20).offset(page * 20) \
+            .offset(page * 20).limit(20) \
             .all()
 
         def arrange_book(x):

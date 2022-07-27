@@ -47,7 +47,7 @@ class CrudLivro():
                 .join(models.User, models.Rate.fk_user == models.User.id)\
                 .join(models.Like, and_(models.Like.fk_rate == models.Rate.id,
                                         models.Like.fk_user == user_id,
-                                        user_id is not None), isouter=True).limit(20).offset(page * 20).all()
+                                        user_id is not None), isouter=True).offset(page * 20).limit(20).all()
 
             for rate in rates:
                 rating_new_format.append({
