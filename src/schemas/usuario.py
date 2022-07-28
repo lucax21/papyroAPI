@@ -6,7 +6,7 @@ from typing import Optional, List
 from fastapi import HTTPException, status
 from pydantic import BaseModel, EmailStr, validator, HttpUrl
 
-from .livro import LivroSimples
+from .book import BookBase
 
 
 class UsuarioSimples(BaseModel):
@@ -70,9 +70,9 @@ class Usuario(UsuarioDb):
     birthday: Optional[str] = None
     booksQt: Optional[int] = None
     followers: Optional[int] = None
-    books_reading: Optional[List[LivroSimples]] = None
-    books_read: Optional[List[LivroSimples]] = None
-    books_to_read: Optional[List[LivroSimples]] = None
+    books_reading: Optional[List[BookBase]] = None
+    books_read: Optional[List[BookBase]] = None
+    books_to_read: Optional[List[BookBase]] = None
 
 
 class UsuarioAddLivroBiblioteca(BaseModel):
@@ -97,14 +97,14 @@ class UsuarioGeneros(UsuarioSimples):
 
 UsuarioGeneros.update_forward_refs()
 
-from src.schemas.livro import LivroId
+from src.schemas.book import BookByID
 
 
 class UsuarioPerfil(UsuarioSimples):
     # descricao: Optional[str] = None
-    livros_lendo: List[LivroId] = []
-    livros_lerei: List[LivroId] = []
-    livros_lidos: List[LivroId] = []
+    livros_lendo: List[BookByID] = []
+    livros_lerei: List[BookByID] = []
+    livros_lidos: List[BookByID] = []
 
     class Config:
         orm_mode = True
