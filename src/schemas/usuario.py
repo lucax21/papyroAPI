@@ -1,26 +1,55 @@
 from __future__ import annotations
-from lib2to3.pgen2.token import OP
-
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List
 from datetime import date
+from fastapi import HTTPException, status
+from pydantic import BaseModel, EmailStr, validator, HttpUrl
+from typing import Optional, List
 
 from .livro import LivroSimples
 
 class UsuarioSimples(BaseModel):
-    name: str
-    nickname: str
+    name: Optional[str] = None
+    nickname: Optional[str] = None
     photo: Optional[str] = None
     description: Optional[str] = None
+    birthday: Optional[str] = None
 
 class UsuarioCriar(UsuarioSimples):
     email: EmailStr
     password: Optional[str] = None
     confirm_password: Optional[str] = None
-    birthday: date
     
     class Config:
         orm_mode = True
+
+class UserPhoto(BaseModel):
+    photo: HttpUrl
+
+    class Config:
+        orm_mode = True
+
+class UserUpdate(BaseModel):
+    name: str
+    nickname: str
+    photo: Optional[str] = None
+    description: Optional[str] = None
+    birthday: date
+
+    @validator('birthday')
+    def vl_birthday(cls, value):
+        # verifica se é maior de 18 anos
+        idade = (date.today() - value)     
+        if (idade.days / 365.25) < 18.0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail="Você deve ser maior de idade para criar um conta.")
+        return value
+    
+    @validator('nickname')
+    def username_alphanumeric(cls, v):
+        assert v.isalnum(), 'deve ser alfanumérico'
+        return v
+
+    # class Config:
+    #     orm_mode = True
 
 class UsuarioDb(UsuarioSimples):
     id: Optional[int] = None
@@ -54,9 +83,6 @@ class UsuarioGeneros(UsuarioSimples):
         orm_mode = True
         arbitrary_types_allowed  =  True
 
-
-class AtualizarFoto(BaseModel):
-    link: str
 
 
 UsuarioGeneros.update_forward_refs()

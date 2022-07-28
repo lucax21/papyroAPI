@@ -15,7 +15,9 @@ settings = Settings()
 router = APIRouter()
 
 
-@router.post("/", response_model=LoginSucesso)
+@router.post("/"
+, response_model=LoginSucesso
+)
 def login(login: Login, session: Session = Depends(get_db)):
 	try:
 		if not login.email:
@@ -48,10 +50,10 @@ def login(login: Login, session: Session = Depends(get_db)):
 		refresh_token = token_provider.create_refresh_token({'sub': user.email}, expires_delta=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
 
 		us = UsuarioSimples()
-		us.nome=user.name
-		us.apelido=user.nickname
-		us.foto=user.photo
-		us.descricao=user.description
+		us.name=user.name
+		us.nickname=user.nickname
+		us.photo=user.photo
+		us.description=user.description
 		
 		lo = LoginSucesso()
 		lo.user=us

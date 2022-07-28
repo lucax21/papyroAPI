@@ -9,9 +9,9 @@ from src.core.token_provider import check_access_token, get_confirmation_token
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
+from src.schemas.usuario import UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil, UsuarioSimples
 from src.schemas.livro import LivroId
-
+from src.utils.enum.reading_type import ReadingTypes
 from jose import jwt
 
 from src.core.email_provider import Mailer
@@ -155,40 +155,39 @@ def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_us
     return CrudUsuario(session).get_by_id(id)
 
 
-@router.put("/atualizarDados")
-def editar_dados(usuario: UsuarioCriar, session: Session = Depends(get_db),
+@router.put("/atualizarDados", status_code=status.HTTP_200_OK)
+async def editar_dados(usuario: UserUpdate, session: Session = Depends(get_db),
                  current_user: Usuario = Depends(obter_usuario_logado)):
     # verifica campos vazios
-    if not usuario.nome:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
-    elif not usuario.apelido:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Apelido.")
-    elif not usuario.data_nascimento:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
+    # if not usuario.name:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
+    # elif not usuario.nickname:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Apelido.")
+    # elif not usuario.birthday:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
 
-    # verifica se é maior de 18 anos
-    idade = (date.today() - usuario.data_nascimento)
-    result_idade = (idade.days / 365.25)
-    if result_idade < 18.0:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Você deve ser maior de idade para criar um conta.")
-
-    usuario_db = CrudUsuario(session).buscar_por_id(current_user.id)
-
-    if not usuario.apelido == usuario_db.apelido:
+    # verifica se o usuário vai trocar de nickname
+    usuario_db = CrudUsuario(session).get_user(current_user.id)
+    if not usuario_db['nickname'] == usuario.nickname:
         # verifica se o apelido já está sendo utilizado
-        apelido_buscado = CrudUsuario(session).buscar_por_apelido(usuario.apelido)
+        apelido_buscado = CrudUsuario(session).buscar_por_apelido(usuario.nickname)
         if apelido_buscado:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
 
-    return CrudUsuario(session).atualizar_usuario(current_user.id, usuario)
+    CrudUsuario(session).atualizar_usuario(current_user.id, usuario)
+    # return usuario_db['nickname']
 
+@router.get("/editProfile", response_model=UsuarioSimples)
+async def edit_profile(session: Session = Depends(get_db)
+                   , current_user: Usuario = Depends(obter_usuario_logado)):
+    return CrudUsuario(session).get_user(current_user.id)
 
-@router.post("/atualizarFoto")
-def atualizar_foto(link: AtualizarFoto, session: Session = Depends(get_db)
+@router.put("/atualizarFoto", status_code=status.HTTP_200_OK)
+def atualizar_foto(link: UserPhoto, session: Session = Depends(get_db)
                    , current_user: Usuario = Depends(obter_usuario_logado)
                    ):
-    return CrudUsuario(session).atualizar_foto(current_user.id, link)
+    CrudUsuario(session).atualizar_foto(current_user.id, link)
+    # return link
 
 
 @router.get("/books/{reading_type}", response_model=List[LivroId])
