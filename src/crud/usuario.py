@@ -222,21 +222,22 @@ class CrudUsuario:
         return dado
 
     def user_books(self, user_id: int, reading_type: int, page: int):
-        data = self.session.query(models.Book.identifier,
+        data = self.session.query(models.Book.id, models.Book.identifier,
                                   func.count(models.Rate.id).label('count'),
                                   func.sum(models.Rate.rate).label('sum')) \
             .join(models.UserBook, and_(models.UserBook.fk_book == models.Book.id,
                                         models.UserBook.fk_user == user_id,
                                         models.UserBook.fk_status == reading_type)) \
             .join(models.Rate, models.Book.id == models.Rate.fk_book, isouter=True) \
-            .group_by(models.Book.identifier) \
+            .group_by(models.Book.id, models.Book.identifier) \
             .offset(page * 20).limit(20) \
             .all()
 
         def arrange_book(x):
             book = format_book_output(get_by_identifier(x['identifier']))
             book.update({
-                'rate': x['sum'] / x['count'] if x['count'] > 0 else None
+                'rate': x['sum'] / x['count'] if x['count'] > 0 else None,
+                'id': x['id']
             })
             return book
 

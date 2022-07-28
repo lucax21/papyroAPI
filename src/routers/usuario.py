@@ -1,26 +1,24 @@
+import re
+from datetime import date
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from jose import jwt
 from sqlalchemy.orm import Session
 
-from datetime import date
-import re
-
-from typing import List, Optional
+from src.core.email_provider import Mailer
 from src.core.token_provider import check_access_token, get_confirmation_token
+from src.crud.usuario import CrudUsuario
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
-from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil
-from src.schemas.livro import LivroId
-
-from jose import jwt
-
-from src.core.email_provider import Mailer
+from src.schemas.book import BookByID, BookByType
+from src.schemas.usuario import AtualizarFoto, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
 
 
-@router.post("/",status_code=status.HTTP_201_CREATED, response_model=Usuario)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Usuario)
 async def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
     # verifica campos vazios
     if not usuario.nome:
@@ -147,9 +145,10 @@ def buscar_por_id(id: int, session: Session = Depends(get_db)):
 
 
 @router.get("/visualizarPerfil/{id}"
-,response_model=Usuario
-)
-def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+    , response_model=Usuario
+            )
+def dados_perfil(id: Optional[int], session: Session = Depends(get_db),
+                 current_user: Usuario = Depends(obter_usuario_logado)):
     if id == 0:
         id = current_user.id
     return CrudUsuario(session).get_by_id(id)
@@ -191,13 +190,12 @@ def atualizar_foto(link: AtualizarFoto, session: Session = Depends(get_db)
     return CrudUsuario(session).atualizar_foto(current_user.id, link)
 
 
-@router.get("/books/{reading_type}", response_model=List[LivroId])
+@router.get("/books/{reading_type}", response_model=List[BookByType])
 def get_user_books(reading_type: str,
                    user_id: Optional[int] = None,
                    page: int = 0,
                    current_user: Usuario = Depends(obter_usuario_logado),
                    session: Session = Depends(get_db)):
-
     if not user_id:
         user_id = current_user.id
 
