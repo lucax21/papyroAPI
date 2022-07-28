@@ -85,11 +85,13 @@ class CrudUsuario:
 
         return self.session.query(models.User).filter(models.User.nome.like(nome + '%')).all()
 
-    def buscar_por_email(self, email) -> models.User:
-        query = select(models.User).where(
-            models.User.email == email
-        )
-        return self.session.execute(query).scalars().first()
+    def get_by_email(self, email):
+        return self.session.query(models.User.id, models.User.email, models.User.active, models.User.password)\
+            .where(models.User.email == email).first()
+        # query = select(models.User).where(
+        #     models.User.email == email
+        # )
+        # return self.session.execute(query).scalars().first()
 
     def buscar_por_apelido(self, nickname):
         return self.session.query(models.User.nickname).filter(models.User.nickname == nickname).first()

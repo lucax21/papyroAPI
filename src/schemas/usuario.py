@@ -13,6 +13,22 @@ class UsuarioSimples(BaseModel):
     description: Optional[str] = None
     birthday: Optional[str] = None
 
+class UsuarioDb(UsuarioSimples):
+    id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+
+class Usuario(UsuarioDb):
+    description: Optional[str] = None
+    birthday: Optional[str] = None
+    booksQt: Optional[int] = None
+    followers: Optional[int] = None
+    books_reading: Optional[List[LivroSimples]] = None
+    books_read: Optional[List[LivroSimples]] = None
+    books_to_read: Optional[List[LivroSimples]] = None
+
 class UsuarioCriar(UsuarioSimples):
     email: EmailStr
     password: Optional[str] = None
@@ -51,20 +67,6 @@ class UserUpdate(BaseModel):
     # class Config:
     #     orm_mode = True
 
-class UsuarioDb(UsuarioSimples):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
-
-class Usuario(UsuarioDb):
-    description: Optional[str] = None
-    birthday: Optional[str] = None
-    booksQt: Optional[int] = None
-    followers: Optional[int] = None
-    books_reading: Optional[List[LivroSimples]] = None
-    books_read: Optional[List[LivroSimples]] = None
-    books_to_read: Optional[List[LivroSimples]] = None
 
 class UsuarioAddLivroBiblioteca(BaseModel):
     # id_usuario: int

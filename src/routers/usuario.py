@@ -19,6 +19,9 @@ from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
 
+@router.get("/test")
+async def test(current_user: Usuario = Depends(obter_usuario_logado)):
+	return current_user
 
 @router.post("/",status_code=status.HTTP_201_CREATED, response_model=Usuario)
 async def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
