@@ -14,6 +14,7 @@ from src.core import hash_provider
 from src.utils.format_book_output import format_book_output
 
 
+# Apagar
 def get_book_simple_infos(data):
     if data:
         book = get_by_identifier(data.identifier)
@@ -25,10 +26,12 @@ def get_book_simple_infos(data):
             raise HTTPException(status_code=400, detail=book)
 
         return {'id': data.id,
-                    'book_title': book['volumeInfo']['title'],
-                    'cover': book['volumeInfo']['imageLinks']['thumbnail'] if 'imageLinks' in book['volumeInfo'] else 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1591030940l/50998096.jpg',
-                    'author': book['volumeInfo']['authors']}
+                'book_title': book['volumeInfo']['title'],
+                'cover': book['volumeInfo']['imageLinks']['thumbnail'] if 'imageLinks' in book[
+                    'volumeInfo'] else 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1591030940l/50998096.jpg',
+                'author': book['volumeInfo']['authors']}
     return {}
+
 
 def get_list_book_simple_infos(data):
     books = []
@@ -43,13 +46,16 @@ def get_list_book_simple_infos(data):
                 raise HTTPException(status_code=400, detail=book)
 
             books.append({'id': item.id,
-                        'book_title': book['volumeInfo']['title'],
-                        'cover': book['volumeInfo']['imageLinks']['thumbnail'] if 'imageLinks' in book['volumeInfo'] else 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1591030940l/50998096.jpg',
-                        'author': book['volumeInfo']['authors']})
+                          'book_title': book['volumeInfo']['title'],
+                          'cover': book['volumeInfo']['imageLinks']['thumbnail'] if 'imageLinks' in book[
+                              'volumeInfo'] else 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1591030940l/50998096.jpg',
+                          'author': book['volumeInfo']['authors']})
 
     return books
+#######################33
 
-class CrudUsuario():
+
+class CrudUsuario:
 
     def __init__(self, session: Session):
         self.session = session
@@ -66,7 +72,7 @@ class CrudUsuario():
             self.session.commit()
             self.session.refresh(db_usuario)
             return db_usuario
-        except Exception as error:
+        except Exception:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -98,72 +104,74 @@ class CrudUsuario():
                 'description': query.description,
                 'birthday': query.formatted_birthday,}
 
+
     def get_by_id(self, id) -> models.User:
-        query = self.session.query(models.User.id, 
-                                    models.User.name, 
-                                    func.count(models.Friend.fk_destiny).label('followers'), 
-                                    models.User.formatted_birthday, 
-                                    models.User.nickname, 
-                                    models.User.photo,
-                                    models.User.description)\
-            .join(models.Friend, models.Friend.fk_destiny == id, isouter=True)\
-            .filter(models.User.id == id)\
+        query = self.session.query(models.User.id,
+                                   models.User.name,
+                                   func.count(models.Friend.fk_destiny).label('followers'),
+                                   models.User.formatted_birthday,
+                                   models.User.nickname,
+                                   models.User.photo,
+                                   models.User.description) \
+            .join(models.Friend, models.Friend.fk_destiny == id, isouter=True) \
+            .filter(models.User.id == id) \
             .group_by(models.User).first()
 
         if not query:
             raise HTTPException(status_code=404, detail='Não encontrado')
 
         query_books_reading = self.session.query(
-                                models.Book.id,
-                                models.Book.identifier,
-                                func.count(models.UserBook.fk_status).label('count'))\
-                            .filter(and_(models.UserBook.fk_status == 1, models.UserBook.fk_user == id))\
-                            .join(models.Book, models.Book.id == models.UserBook.fk_book, isouter=True)\
-                            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+            models.Book.id,
+            models.Book.identifier,
+            func.count(models.UserBook.fk_status).label('count')) \
+            .filter(and_(models.UserBook.fk_status == 1, models.UserBook.fk_user == id)) \
+            .join(models.Book, models.Book.id == models.UserBook.fk_book, isouter=True) \
+            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+
         query_books_read = self.session.query(
-                                models.Book.id,
-                                models.Book.identifier,
-                                func.count(models.UserBook.fk_status).label('count'))\
-                            .filter(and_(models.UserBook.fk_status == 2, models.UserBook.fk_user == id))\
-                            .join(models.Book, models.Book.id == models.UserBook.fk_book, isouter=True)\
-                            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+            models.Book.id,
+            models.Book.identifier,
+            func.count(models.UserBook.fk_status).label('count')) \
+            .filter(and_(models.UserBook.fk_status == 2, models.UserBook.fk_user == id)) \
+            .join(models.Book, models.Book.id == models.UserBook.fk_book, isouter=True) \
+            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
 
         query_books_to_read = self.session.query(
-                                models.Book.id,
-                                models.Book.identifier,
-                                func.count(models.UserBook.fk_status).label('count'))\
-                            .filter(and_(models.UserBook.fk_status == 3, models.UserBook.fk_user == id))\
-                            .join(models.Book, models.Book.id == models.UserBook.fk_book, isouter=True)\
-                            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+            models.Book.id,
+            models.Book.identifier,
+            func.count(models.UserBook.fk_status).label('count')) \
+            .filter(and_(models.UserBook.fk_status == 3, models.UserBook.fk_user == id)) \
+            .join(models.Book, models.Book.id == models.UserBook.fk_book, isouter=True) \
+            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
 
         query_books_reading_count = self.session.query(
-                                func.count(models.UserBook.fk_book).label('count'))\
-                            .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status==1))\
-                            .one()
+            func.count(models.UserBook.fk_book).label('count')) \
+            .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == 1)) \
+            .one()
 
         query_books_read_count = self.session.query(
-                                func.count(models.UserBook.fk_book).label('count'))\
-                            .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status==2))\
-                            .one()
+            func.count(models.UserBook.fk_book).label('count')) \
+            .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == 2)) \
+            .one()
 
         query_books_to_read_count = self.session.query(
-                                func.count(models.UserBook.fk_book).label('count'))\
-                            .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status==3))\
-                            .one()
+            func.count(models.UserBook.fk_book).label('count')) \
+            .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == 3)) \
+            .one()
 
         formated_books_reading = get_list_book_simple_infos(query_books_reading)
         formated_books_read = get_list_book_simple_infos(query_books_read)
         formated_books_to_read = get_list_book_simple_infos(query_books_to_read)
 
-        if formated_books_reading:
-            formated_books_reading[0]['count'] = query_books_reading_count.count
+        formated_books_reading[0].update({'count': query_books_reading_count.count})
+
         if formated_books_read:
             formated_books_read[0]['count'] = query_books_read_count.count
         if formated_books_to_read:
             formated_books_to_read[0]['count'] = query_books_to_read_count.count
 
-        return {'id': id, 
-                'name': query.name, 
+        return {'id': id,
+                'name': query.name,
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
@@ -174,7 +182,6 @@ class CrudUsuario():
                 'books_read': formated_books_read,
                 'books_to_read': formated_books_to_read
                 }
-
 
     def ativar_conta(self, instancia_usu):
         try:
@@ -227,19 +234,19 @@ class CrudUsuario():
     def user_books(self, user_id: int, reading_type: int, page: int):
         data = self.session.query(models.Book.identifier,
                                   func.count(models.Rate.id).label('count'),
-                                  func.sum(models.Rate.rate).label('sum'))\
+                                  func.sum(models.Rate.rate).label('sum')) \
             .join(models.UserBook, and_(models.UserBook.fk_book == models.Book.id,
                                         models.UserBook.fk_user == user_id,
                                         models.UserBook.fk_status == reading_type)) \
             .join(models.Rate, models.Book.id == models.Rate.fk_book, isouter=True) \
             .group_by(models.Book.identifier) \
-            .limit(20).offset(page * 20) \
+            .offset(page * 20).limit(20) \
             .all()
 
         def arrange_book(x):
             book = format_book_output(get_by_identifier(x['identifier']))
             book.update({
-                'rate': x['sum']/x['count'] if x['count'] > 0 else None
+                'rate': x['sum'] / x['count'] if x['count'] > 0 else None
             })
             return book
 
