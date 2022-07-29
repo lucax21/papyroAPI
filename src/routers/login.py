@@ -19,7 +19,7 @@ router = APIRouter()
 , response_model=LoginSucesso
 )
 def login(login: Login, session: Session = Depends(get_db)):
-    # try:
+
         if not login.email:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Preencha o E-mail.")
@@ -61,9 +61,7 @@ def login(login: Login, session: Session = Depends(get_db)):
         lo.refresh_token=refresh_token
         lo.token_type="Bearer"
         return lo
-    # except:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    
+
 
 @router.post("/refresh")
 def refresh(current_user: User = Depends(obter_usuario_logado)):

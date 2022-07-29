@@ -9,7 +9,7 @@ from src.core.token_provider import check_access_token, get_confirmation_token
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil, UsuarioSimples
+from src.schemas.usuario import User, UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil, UsuarioSimples
 from src.schemas.livro import LivroId
 from src.utils.enum.reading_type import ReadingTypes
 from jose import jwt
@@ -19,9 +19,6 @@ from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
 
-@router.get("/test")
-async def test(current_user: Usuario = Depends(obter_usuario_logado)):
-	return current_user
 
 @router.post("/",status_code=status.HTTP_201_CREATED, response_model=Usuario)
 async def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
@@ -149,11 +146,11 @@ def buscar_por_id(id: int, session: Session = Depends(get_db)):
     return dado
 
 
-@router.get("/visualizarPerfil/{id}"
-,response_model=Usuario
+@router.get("/viewProfile/{id}"
+# ,response_model=Usuario
 )
-def dados_perfil(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
-    if id == 0:
+async def view_profile(id:Optional[int], session: Session = Depends(get_db),current_user: Usuario = Depends(obter_usuario_logado)):  
+    if not id:
         id = current_user.id
     return CrudUsuario(session).get_by_id(id)
 

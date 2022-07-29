@@ -11,7 +11,6 @@ class UsuarioSimples(BaseModel):
     nickname: Optional[str] = None
     photo: Optional[str] = None
     description: Optional[str] = None
-    birthday: Optional[str] = None
 
 class UsuarioDb(UsuarioSimples):
     id: Optional[int] = None
@@ -20,7 +19,11 @@ class UsuarioDb(UsuarioSimples):
         orm_mode = True
 
 
+class User(BaseModel):
+    id: int
+
 class Usuario(UsuarioDb):
+    birthday: Optional[str] = None
     description: Optional[str] = None
     birthday: Optional[str] = None
     booksQt: Optional[int] = None
