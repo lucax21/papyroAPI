@@ -25,7 +25,6 @@ def upgrade():
                     sa.Column('fk_user', sa.Integer(), nullable=True),
                     sa.Column('fk_book', sa.Integer(), nullable=True),
                     sa.Column('fk_rate', sa.Integer(), nullable=True),
-                    sa.ForeignKeyConstraint(['fk_book'], ['book.id'], ),
                     sa.ForeignKeyConstraint(['fk_user'], ['user.id'], ),
                     sa.ForeignKeyConstraint(['fk_rate'], ['rate.id'], ),
                     sa.PrimaryKeyConstraint('id')

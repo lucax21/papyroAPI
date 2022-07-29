@@ -79,7 +79,7 @@ def upgrade():
 
     op.execute('''
         INSERT INTO
-            status(id, status)
+           like()
         VALUES
             (1, 'Lendo'),
             (2, 'Lido'),
