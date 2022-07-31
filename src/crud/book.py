@@ -31,12 +31,24 @@ class CrudBook():
                                        models.Rate.rate,
                                        models.User.id.label('user_id'),
                                        models.User.nickname,
-                                       models.Like.id.label('like_id')) \
+                                       models.Like.id.label('like_id'),
+                                       func.count(models.Comment.id).label('comments')) \
                 .where(models.Rate.fk_book == id) \
                 .join(models.User, models.Rate.fk_user == models.User.id) \
                 .join(models.Like, and_(models.Like.fk_rate == models.Rate.id,
                                         models.Like.fk_user == user_id,
-                                        user_id is not None), isouter=True).offset(page * 20).limit(20).all()
+                                        user_id is not None), isouter=True)\
+                .join(models.Comment, models.Comment.fk_rate == models.Rate.id, isouter=True) \
+                .group_by(models.Rate.text,
+                          models.Rate.date,
+                          models.Rate.likes,
+                          models.Rate.id,
+                          models.User.photo,
+                          models.Rate.rate,
+                          models.User.id.label('user_id'),
+                          models.User.nickname,
+                          models.Like.id.label('like_id'))\
+                .offset(page * 20).limit(20).all()
 
             for rate in rates:
                 rating_new_format.append({
@@ -46,6 +58,7 @@ class CrudBook():
                     'rate': rate.rate,
                     'you_like': rate.like_id is not None,
                     'text': rate.text,
+                    'comments': rate.comments,
                     'user': {
                         'nickname': rate.nickname,
                         'photo': rate.photo,
