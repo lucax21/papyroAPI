@@ -1,3 +1,4 @@
+import posixpath
 from pyexpat import model
 from sqlalchemy import select, update, insert, and_
 from sqlalchemy.sql.functions import func
@@ -110,7 +111,7 @@ class CrudUsuario:
 
         query_books_count = self.session.query(
             func.count(models.UserBook.fk_book).label('count'), models.UserBook.fk_status) \
-            .where(and_(models.UserBook.fk_user == id)) \
+            .where(and_(models.UserBook.fk_user == id))\
             .group_by(models.UserBook.fk_status).all()
 
         
@@ -128,18 +129,22 @@ class CrudUsuario:
                 book[0]['count']=count_book
                 return book
             return None
+       
+        aux = [0,0,0]
+        for o in query_books_count:
+            aux[o[1]-1] = o[0]
 
         return {'id': id,
                 'name': query.name,
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'booksQt': query_books_count[ReadingTypes.READ-1],
+                'booksQt': query_books_count[ReadingTypes.READ-1] if len(query_books_to_read) > 0 else 0,
                 'birthday': query.formatted_birthday,
                 'followers': query.followers,
-                'books_to_read': books(query_books_to_read, query_books_count[ReadingTypes.TO_READ-1]['count']),
-                'books_read': books(query_books_read, query_books_count[ReadingTypes.READ-1]['count']),
-                'books_reading': books(query_books_reading, query_books_count[ReadingTypes.READING-1]['count'])
+                'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ-1]),
+                'books_read': books(query_books_read, aux[ReadingTypes.READ-1]),
+                'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
                 }
 
     def ativar_conta(self, instancia_usu):
