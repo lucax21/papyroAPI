@@ -21,3 +21,12 @@ class Comments(BaseModel):
     review: BookReviewBase
     reviewer: BookUser
     comments: Optional[List[Comment]] = [None]
+
+
+class NewComment(BaseModel):
+    rate_id: int
+    text: str
+
+
+class CommentReturn(BaseModel):
+    comment: int
