@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -28,7 +29,7 @@ class Settings(BaseSettings):
     TOKEN_ALGORITHM: str = os.getenv("TOKEN_ALGORITHM")
     AUTHJWT_ALGORITHM: str = os.getenv("TOKEN_ALGORITHM")
     REGISTRATION_TOKEN_LIFETIME = 60 * 60
-    USER_TOKEN_LIFETIME = 30
+    USER_TOKEN_LIFETIME = timedelta(days=1)
     REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
     # EMAIL_HOST = ['smtp.office365.com', 587]

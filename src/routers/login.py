@@ -44,13 +44,14 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
                             detail="Senha inválida.")
 
     access_token = Authorize.create_access_token(subject=user.email, expires_time=settings.USER_TOKEN_LIFETIME)
-    refresh_token = Authorize.create_refresh_token(subject=user.email, expires_time=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    refresh_token = Authorize.create_refresh_token(subject=user.email, expires_time=None)
 
     us = UsuarioSimples()
     us.name = user.name
     us.nickname = user.nickname
     us.photo = user.photo
     us.description = user.description
+    us.birthday = user.formatted_birthday
 
     lo = LoginSucesso()
     lo.user = us

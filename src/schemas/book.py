@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Optional, List
-from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -16,34 +16,36 @@ class BookBase(BaseModel):
         orm_mode = True
 
 
-class UserBook(BaseModel):
+class BookExtended(BaseModel):
+    status: Optional[int] = None
+    genre: Optional[List[str]] = [None]
+    description: Optional[str] = None
+
+
+class BookUser(BaseModel):
     nickname: str
     photo: Optional[str] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
     id: int
 
 
-class Review(BaseModel):
-    date: datetime
+class BookReviewBase(BaseModel):
+    date: str
     likes: Optional[int] = 0
     comments: Optional[int] = 0
     rate: Optional[int] = None
     you_like: Optional[bool] = False
     text: str
-    user: UserBook
 
 
-class BookByID(BaseModel):
-    id: Optional[int] = None
+class BookReview(BookReviewBase):
+    user: BookUser
+
+
+class BookByID(BookExtended):
     identifier: Optional[str] = None
-    cover: Optional[str] = None
-    book_title: str
     rate: Optional[int]
     raters: Optional[int]
-    description: str
-    author: List[str]
-    reviews: Optional[List[Review]] = []
-    genre: Optional[List[str]] = None
-    book_status_user: Optional[str] = None
+    reviews: Optional[List[BookReview]] = [None]
 
     class Config:
         orm_mode = True

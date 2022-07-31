@@ -24,7 +24,7 @@ class CrudBook():
         rating_new_format = []
         if data.count > 0:
             rates = self.session.query(models.Rate.text,
-                                       models.Rate.date,
+                                       models.Rate.formatted_date,
                                        models.Rate.likes,
                                        models.Rate.id,
                                        models.User.photo,
@@ -40,7 +40,7 @@ class CrudBook():
                                         user_id is not None), isouter=True)\
                 .join(models.Comment, models.Comment.fk_rate == models.Rate.id, isouter=True) \
                 .group_by(models.Rate.text,
-                          models.Rate.date,
+                          models.Rate.formatted_date,
                           models.Rate.likes,
                           models.Rate.id,
                           models.User.photo,
@@ -52,7 +52,7 @@ class CrudBook():
 
             for rate in rates:
                 rating_new_format.append({
-                    'date': rate.date,
+                    'date': rate.formatted_date,
                     'id': rate.id,
                     'likes': rate.likes,
                     'rate': rate.rate,
@@ -68,7 +68,8 @@ class CrudBook():
 
         user = self.session.query(models.UserBook.fk_status) \
             .where(and_(models.UserBook.fk_book == id,
-                        models.UserBook.fk_user == user_id)).first()
+                        models.UserBook.fk_user == user_id))\
+            .first()
 
         book = get_by_identifier(data.identifier)
 
@@ -82,7 +83,7 @@ class CrudBook():
 
         book.update({
             'id': id,
-            'book_status_user': user.fk_status if user else None,
+            'status': user.fk_status if user else None,
             'rate': data.sum / data.count if data.count > 0 else None,
             'raters': data.count,
             'reviews': rating_new_format
