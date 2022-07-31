@@ -4,7 +4,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
-from src.schemas.book import BookExtended, BookReview, BookUser, BookReviewBase
+from src.schemas.book import BookExtended, BookUser, BookReviewBase
 
 
 class Comment(BaseModel):
@@ -13,15 +13,11 @@ class Comment(BaseModel):
     date: str
     text: str
     you_liked: Optional[bool] = False
-
-
-class CommentList(BaseModel):
     user: BookUser
-    comment: Comment
 
 
 class Comments(BaseModel):
     book: BookExtended
     review: BookReviewBase
     reviewer: BookUser
-    comments: Optional[List[CommentList]] = [None]
+    comments: Optional[List[Comment]] = [None]
