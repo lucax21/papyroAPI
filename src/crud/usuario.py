@@ -9,7 +9,7 @@ from src.core import hash_provider
 from src.db.models import models
 from src.external_api.get_book import get_by_identifier
 from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UserUpdate, UsuarioPerfil
-from src.utils.format_book_output import format_book_output
+from src.utils.format_book_output import get_and_format_output
 
 
 # Apagar
@@ -242,7 +242,7 @@ class CrudUsuario:
             .all()
 
         def arrange_book(x):
-            book = format_book_output(get_by_identifier(x['identifier']))
+            book = get_and_format_output(x['identifier'])
             book.update({
                 'rate': x['sum'] / x['count'] if x['count'] > 0 else None,
                 'id': x['id']

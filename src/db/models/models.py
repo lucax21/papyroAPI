@@ -1,13 +1,11 @@
 # Representação do banco de dados
-from turtle import back
 import uuid
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import func, Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
-from sqlalchemy.orm import relationship
-from src.db.database import Base
-from sqlalchemy.ext.associationproxy import association_proxy
 
-from sqlalchemy.orm import column_property
+from sqlalchemy import func, Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship, column_property
+
+from src.db.database import Base
 
 user_genre = Table("user_genre", Base.metadata,
                    Column("fk_genre", ForeignKey("genre.id"), primary_key=True),
@@ -30,40 +28,8 @@ class User(Base):
     active = Column(Boolean, default=False)
     confirmation = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
     formatted_birthday = column_property(func.to_char(birthday, 'DD/MM/YYYY'))
-    
+
     genres = relationship("Genre", secondary=user_genre, back_populates='users')
-    # lendoss = relationship("UsuarioLivro", back_populates='usuario')
-    # livros_lidos = relationship("Livro", 
-    #                                                 secondary='join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
-    #                                                 # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
-    #                                                 # ,
-    #                                                 ,primaryjoin="and_(StatusUsuarioLivro.status=='Lido(s)')"
-    #                                                 # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
-    #                                                 ,uselist=True,
-    #                                                 viewonly=True
-    #                                                 )
-    # livros_lerei = relationship("Livro", 
-    #                                                 secondary='join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
-    #                                                 # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
-    #                                                 # ,
-    #                                                 ,primaryjoin="and_(StatusUsuarioLivro.status=='Lerei')"
-    #                                                 # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
-    #                                                 ,uselist=True,
-    #                                                 viewonly=True
-    #                                                 )
-    # livros_lendo = relationship("Livro", 
-    #                                                 secondary='join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
-    #                                                 # 'join(UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status)'
-    #                                                 # ,
-    #                                                 ,primaryjoin="and_(StatusUsuarioLivro.status=='Lendo')"
-    #                                                 # secondaryjoin="UsuarioLivro, StatusUsuarioLivro, StatusUsuarioLivro.id == UsuarioLivro.fk_status"
-    #                                                 ,uselist=True,
-    #                                                 viewonly=True
-    #                                                 )
-    # usuario_avaliacao = relationship("Avaliacao", back_populates="usuario")
-    # friends = relationship("Friend", back_populates="user_origin")
-    # friends = relationship('Friend', backref='Friend.fk_destino',primaryjoin='User.id==Friend.fk_origin', lazy='dynamic')
-    # mensagens = relationship('Mensagem', backref='Mensagem.fk_destino',primaryjoin='Usuario.id==Mensagem.fk_origem', lazy='dynamic')
 
 
 class Genre(Base):
@@ -71,18 +37,14 @@ class Genre(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100))
     description = Column(Text)
-
     users = relationship("User", secondary=user_genre, back_populates="genres")
-
-    # generos = relationship("Livro", back_populates="genero")
-
 
 
 class Book(Base):
     __tablename__ = 'book'
 
     id = Column(Integer, primary_key=True, index=True)
-    
+
     identifier = Column(String(25))
 
 
@@ -90,11 +52,7 @@ class Status(Base):
     __tablename__ = 'status'
 
     id = Column(Integer, primary_key=True, index=True)
-
     status = Column(String(100))
-
-    # livro_status = relationship('UsuarioLivro', back_populates="status")
-    # livros = relationship("UsuarioLivro", back_populates="statuss")  
 
 
 class UserBook(Base):
@@ -118,11 +76,8 @@ class Rate(Base):
 
     fk_user = Column(ForeignKey("user.id"))
     fk_book = Column(ForeignKey("book.id"))
-    fk_like = Column(ForeignKey("like.id"))
 
-    # avaliacao = relationship("Livro", back_populates="avaliacoes")
-    # usuario = relationship("Usuario", back_populates="usuario_avaliacao")
-    # comentarios = relationship("Likes", back_populates="avaliacao")
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
 
 
 class Comment(Base):
@@ -138,7 +93,7 @@ class Comment(Base):
     fk_book = Column(ForeignKey("book.id"))
     fk_rate = Column(ForeignKey("rate.id"))
 
-    # avaliacoes = relationship("Likes", back_populates="comentario")
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
 
 
 class Like(Base):
@@ -150,9 +105,6 @@ class Like(Base):
     fk_rate = Column(ForeignKey("rate.id"))
     fk_user = Column(ForeignKey("user.id"))
 
-    # avaliacao = relationship("Avaliacao", back_populates="comentarios")
-    # comentario = relationship("Comentario", back_populates="avaliacoes")
-
 
 class Friend(Base):
     __tablename__ = 'friend'
@@ -161,10 +113,6 @@ class Friend(Base):
     ignored = Column(Boolean)
     fk_origin = Column(ForeignKey("user.id"), primary_key=True)
     fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
-
-    # user_origin = relationship("User", foreign_keys='Friend.fk_origin')
-    # user_destiny = relationship("User", foreign_keys='Friend.fk_destiny')
-
 
 # class Message(Base):
 #     __tablename__ = 'message'

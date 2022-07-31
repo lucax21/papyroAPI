@@ -25,7 +25,7 @@ def upgrade():
                     sa.Column('nickname', sa.String(length=30), nullable=True),
                     sa.Column('description', sa.Text(), nullable=True),
                     sa.Column('password', sa.String(length=256), nullable=True),
-                    sa.Column('birthday', sa.DateTime(), nullable=True),
+                    sa.Column('birthday', sa.Date(), nullable=True),
                     sa.Column('photo', sa.String(length=255), nullable=True),
                     sa.Column('active', sa.Boolean(), nullable=True),
                     sa.Column('confirmation', postgresql.UUID(as_uuid=True), nullable=True),
