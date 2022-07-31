@@ -8,7 +8,7 @@ from src.external_api.get_book import get_by_identifier
 from src.utils.format_book_output import format_book_output
 
 
-class CrudBook():
+class CrudBook:
     def __init__(self, session: Session):
         self.session = session
 
