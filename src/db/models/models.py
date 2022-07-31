@@ -90,7 +90,6 @@ class Comment(Base):
     likes = Column(Integer)
 
     fk_user = Column(ForeignKey("user.id"))
-    fk_book = Column(ForeignKey("book.id"))
     fk_rate = Column(ForeignKey("rate.id"))
 
     formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
