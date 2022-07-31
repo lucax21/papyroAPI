@@ -10,22 +10,12 @@ class CrudComment:
     def __init__(self, session: Session):
         self.session = session
 
-    # def salvar_comentario(self, id_user: int, dado: SaveComment):
-    #     try:
-    #         stmt = models.Comentario(fk_livro=dado.id_livro, fk_usuario=id_user, data_criacao=func.now(), texto=dado.texto,
-    #                                  likes=0, nota=dado.nota)
-    #         self.session.add(stmt)
-    #         self.session.commit()
-    #         self.session.refresh(stmt)
-    #
-    #         stmt2 = models.Likes(fk_comentario=stmt.id, fk_avaliacao=dado.id_avaliacao, fk_usuario=stmt.fk_usuario)
-    #         self.session.add(stmt2)
-    #         self.session.commit()
-    #         self.session.refresh(stmt2)
-    #         return stmt2
-    #     except Exception as error:
-    #         self.session.rollback()
-    #         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def new_comment(self, data, user_id):
+        stmt = Comment(fk_user=user_id, date=func.now(), text=data.text, likes=0, fk_rate=data.rate_id)
+        self.session.add(stmt)
+        self.session.commit()
+        self.session.refresh(stmt)
+        return {'comment_id': stmt.id}
 
     def get_comments(self, rate_id, user_id, page):
         review = self.session.query(Rate.id.label('rate_id'), Rate.text, Rate.rate, Rate.likes, Rate.formatted_date,

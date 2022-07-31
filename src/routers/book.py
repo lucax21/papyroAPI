@@ -16,9 +16,6 @@ async def get_book_by_id(id: int,
                          current_user: Usuario = Depends(obter_usuario_logado),
                          session: Session = Depends(get_db)):
 
-    if not id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
-
     data = CrudBook(session).get_by_id(id, page, current_user.id)
 
     return data
