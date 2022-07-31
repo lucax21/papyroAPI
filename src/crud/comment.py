@@ -52,17 +52,15 @@ class CrudComment:
 
         def format_comment(comment):
             return {
+                'id': comment['comment_id'],
+                'likes': comment['likes'],
+                'date': comment['formatted_date'],
+                'text': comment['text'],
+                'you_liked': True if comment['like_id'] else False,
                 'user': {
                     'id': comment['user_id'],
                     'nickname': comment['nickname'],
                     'photo': comment['photo']
-                },
-                'comment': {
-                    'id': comment['comment_id'],
-                    'likes': comment['likes'],
-                    'date': comment['formatted_date'],
-                    'text': comment['text'],
-                    'you_liked': True if comment['like_id'] else False
                 }
             }
 
