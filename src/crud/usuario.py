@@ -5,15 +5,20 @@ from sqlalchemy.sql.functions import func
 from sqlalchemy.orm import Session, joinedload
 from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UserUpdate, UsuarioPerfil
 from src.db.models import models
+
 from typing import List
 
-from src.external_api.get_book import get_by_identifier
-
 from fastapi import HTTPException, status
+from sqlalchemy import select, update, insert, and_
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.sql.functions import func
 
 from src.core import hash_provider
+from src.db.models import models
 from src.utils.enum.reading_type import ReadingTypes
-from src.utils.format_book_output import format_book_output 
+from src.external_api.get_book import get_by_identifier
+from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UserUpdate, UsuarioPerfil
+from src.utils.format_book_output import get_and_format_output, format_book_output 
 
 
 class CrudUsuario:
@@ -58,17 +63,15 @@ class CrudUsuario:
 
     def buscar_por_apelido(self, nickname):
         return self.session.query(models.User.nickname).filter(models.User.nickname == nickname).first()
-    
 
     def get_user(self, id) -> models.User:
-        query = self.session.query(models.User).filter(models.User.id == id).first() 
+        query = self.session.query(models.User).filter(models.User.id == id).first()
 
-        return {  'name': query.name, 
+        return {'name': query.name,
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'birthday': query.formatted_birthday,}
-
+                'birthday': query.formatted_birthday, }
 
     def get_by_id(self, id) -> models.User:
         query = self.session.query(models.User.id,
@@ -196,21 +199,22 @@ class CrudUsuario:
         return dado
 
     def user_books(self, user_id: int, reading_type: int, page: int):
-        data = self.session.query(models.Book.identifier,
+        data = self.session.query(models.Book.id, models.Book.identifier,
                                   func.count(models.Rate.id).label('count'),
                                   func.sum(models.Rate.rate).label('sum')) \
             .join(models.UserBook, and_(models.UserBook.fk_book == models.Book.id,
                                         models.UserBook.fk_user == user_id,
                                         models.UserBook.fk_status == reading_type)) \
             .join(models.Rate, models.Book.id == models.Rate.fk_book, isouter=True) \
-            .group_by(models.Book.identifier) \
+            .group_by(models.Book.id, models.Book.identifier) \
             .offset(page * 20).limit(20) \
             .all()
 
         def arrange_book(x):
-            book = format_book_output(get_by_identifier(x['identifier']))
+            book = get_and_format_output(x['identifier'])
             book.update({
-                'rate': x['sum'] / x['count'] if x['count'] > 0 else None
+                'rate': x['sum'] / x['count'] if x['count'] > 0 else None,
+                'id': x['id']
             })
             return book
 

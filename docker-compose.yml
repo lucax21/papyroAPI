@@ -4,6 +4,7 @@ services:
   api:
     build: .
     container_name: papyroAPI
+    restart: always
     command: sh -c 'uvicorn src.main:app --proxy-headers --host 0.0.0.0 --reload --reload-dir=src'
     volumes:
      - .:/code

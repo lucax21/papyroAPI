@@ -1,10 +1,13 @@
 from __future__ import annotations
+
 from datetime import date
-from fastapi import HTTPException, status
-from pydantic import BaseModel, EmailStr, validator, HttpUrl
 from typing import Optional, List
 
-from .livro import LivroSimples
+from fastapi import HTTPException, status
+from pydantic import BaseModel, EmailStr, validator, HttpUrl
+
+from .book import BookBase
+
 
 class UsuarioSimples(BaseModel):
     name: Optional[str] = None
@@ -32,19 +35,22 @@ class Usuario(UsuarioDb):
     books_read: Optional[List[LivroSimples]] = None
     books_to_read: Optional[List[LivroSimples]] = None
 
+
 class UsuarioCriar(UsuarioSimples):
     email: EmailStr
     password: Optional[str] = None
     confirm_password: Optional[str] = None
-    
+
     class Config:
         orm_mode = True
+
 
 class UserPhoto(BaseModel):
     photo: HttpUrl
 
     class Config:
         orm_mode = True
+
 
 class UserUpdate(BaseModel):
     name: str
@@ -56,12 +62,12 @@ class UserUpdate(BaseModel):
     @validator('birthday')
     def vl_birthday(cls, value):
         # verifica se é maior de 18 anos
-        idade = (date.today() - value)     
+        idade = (date.today() - value)
         if (idade.days / 365.25) < 18.0:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                             detail="Você deve ser maior de idade para criar um conta.")
+                                detail="Você deve ser maior de idade para criar um conta.")
         return value
-    
+
     @validator('nickname')
     def username_alphanumeric(cls, v):
         assert v.isalnum(), 'deve ser alfanumérico'
@@ -79,30 +85,32 @@ class UsuarioAddLivroBiblioteca(BaseModel):
     class Config:
         orm_mode = True
 
+
 from src.schemas.genero import Genero
+
 
 class UsuarioGeneros(UsuarioSimples):
     generos: List[Genero] = []
 
     class Config:
         orm_mode = True
-        arbitrary_types_allowed  =  True
-
+        arbitrary_types_allowed = True
 
 
 UsuarioGeneros.update_forward_refs()
 
-from src.schemas.livro import LivroId
+from src.schemas.book import BookByID
+
 
 class UsuarioPerfil(UsuarioSimples):
     # descricao: Optional[str] = None
-    livros_lendo: List[LivroId] = []
-    livros_lerei: List[LivroId] = []
-    livros_lidos: List[LivroId] = []
-    
+    livros_lendo: List[BookByID] = []
+    livros_lerei: List[BookByID] = []
+    livros_lidos: List[BookByID] = []
+
     class Config:
         orm_mode = True
-        arbitrary_types_allowed  =  True
+        arbitrary_types_allowed = True
+
 
 UsuarioPerfil.update_forward_refs()
-

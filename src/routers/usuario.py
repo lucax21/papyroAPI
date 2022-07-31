@@ -1,26 +1,26 @@
+import re
+from datetime import date
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from jose import jwt
 from sqlalchemy.orm import Session
 
-from datetime import date
-import re
-
-from typing import List, Optional
+from src.core.email_provider import Mailer
 from src.core.token_provider import check_access_token, get_confirmation_token
+from src.crud.usuario import CrudUsuario
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
-from src.crud.usuario import CrudUsuario
-from src.schemas.usuario import User, UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioPerfil, UsuarioSimples
-from src.schemas.livro import LivroId
-from src.utils.enum.reading_type import ReadingTypes
-from jose import jwt
 
-from src.core.email_provider import Mailer
+from src.schemas.book import BookByType
+from src.schemas.usuario import UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioSimples
+
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
 
 
-@router.post("/",status_code=status.HTTP_201_CREATED, response_model=Usuario)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=Usuario)
 async def cadastrar(usuario: UsuarioCriar, session: Session = Depends(get_db)):
     # verifica campos vazios
     if not usuario.nome:
@@ -146,6 +146,7 @@ def buscar_por_id(id: int, session: Session = Depends(get_db)):
     return dado
 
 
+
 @router.get("/viewProfile/{id}"
 # ,response_model=Usuario
 )
@@ -157,7 +158,7 @@ async def view_profile(id:Optional[int], session: Session = Depends(get_db),curr
 
 @router.put("/atualizarDados", status_code=status.HTTP_200_OK)
 async def editar_dados(usuario: UserUpdate, session: Session = Depends(get_db),
-                 current_user: Usuario = Depends(obter_usuario_logado)):
+                       current_user: Usuario = Depends(obter_usuario_logado)):
     # verifica campos vazios
     # if not usuario.name:
     #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
@@ -177,10 +178,12 @@ async def editar_dados(usuario: UserUpdate, session: Session = Depends(get_db),
     CrudUsuario(session).atualizar_usuario(current_user.id, usuario)
     # return usuario_db['nickname']
 
+
 @router.get("/editProfile", response_model=UsuarioSimples)
 async def edit_profile(session: Session = Depends(get_db)
-                   , current_user: Usuario = Depends(obter_usuario_logado)):
+                       , current_user: Usuario = Depends(obter_usuario_logado)):
     return CrudUsuario(session).get_user(current_user.id)
+
 
 @router.put("/atualizarFoto", status_code=status.HTTP_200_OK)
 def atualizar_foto(link: UserPhoto, session: Session = Depends(get_db)
@@ -190,18 +193,14 @@ def atualizar_foto(link: UserPhoto, session: Session = Depends(get_db)
     # return link
 
 
-@router.get("/books/{reading_type}", response_model=List[LivroId])
+@router.get("/books/{reading_type}", response_model=List[BookByType])
 def get_user_books(reading_type: str,
                    user_id: Optional[int] = None,
                    page: int = 0,
                    current_user: Usuario = Depends(obter_usuario_logado),
                    session: Session = Depends(get_db)):
-
     if not user_id:
         user_id = current_user.id
-
-    if not isinstance(user_id, int):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Sem usuário no escopo.")
 
     if reading_type == 'reading':
         return CrudUsuario(session).user_books(user_id, ReadingTypes.READING, page)
