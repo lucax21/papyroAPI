@@ -108,21 +108,6 @@ class CrudUsuario:
             .join(models.Book, models.Book.id == models.UserBook.fk_book) \
             .group_by(models.Book.identifier, models.Book.id).limit(1).all()
 
-        # query_books_reading_count = self.session.query(
-        #     func.count(models.UserBook.fk_book).label('count')) \
-        #     .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == 1)) \
-        #     .one()
-
-        # query_books_read_count = self.session.query(
-        #     func.count(models.UserBook.fk_book).label('count')) \
-        #     .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == 2)) \
-        #     .one()
-
-        # query_books_to_read_count = self.session.query(
-        #     func.count(models.UserBook.fk_book).label('count')) \
-        #     .filter(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == 3)) \
-        #     .one()
-
         query_books_count = self.session.query(
             func.count(models.UserBook.fk_book).label('count'), models.UserBook.fk_status) \
             .where(and_(models.UserBook.fk_user == id)) \
@@ -130,48 +115,32 @@ class CrudUsuario:
 
         
         def arrange_book(x):
+            print(x)
             book = format_book_output(get_by_identifier(x['identifier']))
-            # book.update({
-            #     'rate': x['sum'] / x['count'] if x['count'] > 0 else None,
-            #     'id': x['id']
-            # })
+            book.update({          
+                'count': 0
+            })
             return book
         
-        book_to_read = None
-        if len(query_books_to_read) > 0:
-            book = list(map(arrange_book, query_books_to_read))
-            # book_to_read.update({'asd':book, 'count': query_books_count[ReadingTypes.TO_READ-1]['count']})
-            
-            book_to_read = ({'count': query_books_count[ReadingTypes.TO_READ-1]['count']})
-            book_to_read.update({'bk':book})
+        def books(query_book, count_book):
+            if len(query_book) > 0:
+                book = list(map(arrange_book, query_book))
+                book[0]['count']=count_book
+                return book
+            return None
 
-        return book_to_read
-        # return query_books_count[ReadingTypes.READING-1]
-
-        # formated_books_reading = get_list_book_simple_infos(query_books_reading)
-        # formated_books_read = get_list_book_simple_infos(query_books_read)
-        # formated_books_to_read = get_list_book_simple_infos(query_books_to_read)
-
-        # formated_books_reading[0].update({'count': query_books_reading_count.count})
-
-        # if formated_books_read:
-        #     formated_books_read[0]['count'] = query_books_read_count.count
-        # if formated_books_to_read:
-        #     formated_books_to_read[0]['count'] = query_books_to_read_count.count
-
-        return 
-        # return {'id': id,
-        #         'name': query.name,
-        #         'nickname': query.nickname,
-        #         'photo': query.photo,
-        #         'description': query.description,
-        #         'booksQt': query_books_count[ReadingTypes.READ-1],
-        #         'birthday': query.formatted_birthday,
-        #         'followers': query.followers,
-        #         'books_reading': formated_books_reading,
-        #         'books_read': formated_books_read,
-        #         'books_to_read': formated_books_to_read
-        #         }
+        return {'id': id,
+                'name': query.name,
+                'nickname': query.nickname,
+                'photo': query.photo,
+                'description': query.description,
+                'booksQt': query_books_count[ReadingTypes.READ-1],
+                'birthday': query.formatted_birthday,
+                'followers': query.followers,
+                'books_to_read': books(query_books_to_read, query_books_count[ReadingTypes.TO_READ-1]['count']),
+                'books_read': books(query_books_read, query_books_count[ReadingTypes.READ-1]['count']),
+                'books_reading': books(query_books_reading, query_books_count[ReadingTypes.READING-1]['count'])
+                }
 
     def ativar_conta(self, instancia_usu):
         try:
