@@ -200,9 +200,6 @@ def get_user_books(reading_type: str,
     if not user_id:
         user_id = current_user.id
 
-    if not isinstance(user_id, int):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Sem usuário no escopo.")
-
     if reading_type == 'reading':
         return CrudUsuario(session).user_books(user_id, ReadingTypes.READING, page)
     if reading_type == 'read':
