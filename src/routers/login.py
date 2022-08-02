@@ -61,7 +61,7 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
     return lo
 
 
-@router.post("/refresh")
+@router.get("/refresh")
 def refresh(Authorize: AuthJWT = Depends()):
     Authorize.jwt_refresh_token_required()
 
