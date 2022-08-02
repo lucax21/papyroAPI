@@ -229,6 +229,82 @@ class CrudUsuario:
 
         return dado
 
+    def feed(self, id: int, page: int):
+        # query = self.session.query(models.Comment.text.label('comment'),
+        #                            models.Comment.formatted_date.label('date_comment'),
+        #                            models.Comment.id.label('id_comment'),
+        #                            models.Comment.likes.label('likes_comment'),
+        #                            models.Rate.id.label('id_rate'),
+        #                            models.Rate.text.label('rate'),
+        #                            models.Rate.date.label('date_rate'),
+        #                            models.Rate.likes.label('likes_rate'),
+        #                            models.User.id.label('id_user'),
+        #                            models.User.nickname,
+        #                            models.User.photo,
+        #                            models.Book.id.label('id_book'),
+        #                            models.Book.identifier
+        #                            )\
+        #                     .join(models.Friend, and_(models.Friend.fk_origin == id,
+        #                                               models.Friend.ignored == False,
+        #                                               models.Friend.pending == False))\
+        #                     .join(models.Rate, models.User.id == models.Rate.fk_user,  isouter=True)\
+        #                     .join(models.Comment, models.User.id == models.Comment.fk_user,  isouter=True)\
+        #                     .join(models.Book, models.Book.id == models.Rate.fk_book)\
+        #                     .order_by(models.Comment.date.desc(), models.Rate.date.desc())\
+        #                     .offset(page * 200).limit(200).all()
+
+                            # .join(models.Rate, models.User.id == models.Rate.fk_user,  isouter=True)\
+                            # .join(models.Comment, models.User.id == models.Comment.fk_user,  isouter=True)\
+
+                                                        # .join(models.Rate, models.Rate.id == models.Comment.fk_rate, full=True)\
+
+        query = self.session.query(func.count(models.Comment.fk_rate).label('count_comments'),
+                                   models.Comment.id.label('id_comment'),
+                                   models.Rate.id.label('id_rate'),
+                                   models.Rate.text.label('rate'),
+                                   models.Rate.date.label('date_rate'),
+                                   models.Rate.likes.label('likes_rate'),
+                                   models.User.id.label('id_user'),
+                                   models.User.nickname,
+                                   models.User.photo,
+                                   models.Book.id.label('id_book'),
+                                   models.Book.identifier
+                                   )\
+                            .join(models.User, models.User.id == models.Comment.fk_user)\
+                            .join(models.Friend, and_(models.Friend.fk_origin == id,
+                                                      models.Friend.ignored == False,
+                                                      models.Friend.pending == False))\
+                            .join(models.Rate, models.Rate.id == models.Comment.fk_rate)\
+                            .join(models.Book, models.Book.id == models.Rate.fk_book)\
+                            .group_by(
+                                    models.Comment.id.label('id_comment'),
+                                    models.Rate.id.label('id_rate'),
+                                    models.Rate.text.label('text_rate'),
+                                    models.Rate.date.label('date_rate'),
+                                    models.Rate.rate.label('rate'),
+                                    models.Rate.likes.label('likes_rate'),
+                                    models.User.id.label('id_user'),
+                                    models.User.nickname,
+                                    models.User.photo,
+                                    models.Book.id.label('id_book'),
+                                    models.Book.identifier
+                                   )\
+                            .order_by(models.Rate.date.desc())\
+                            .offset(page * 2000).limit(2000).all()
+        aa = []
+        for x in query:
+            aa.append({
+                'id': x.id_comment,
+                # 'text': x.text_rate,
+                'type': 'comentario',
+                'date': x.date_rate,
+                'rate': x.rate,
+                # 'likes': x.likes,
+                'you_liked': False
+            })
+            
+        return aa
+
     def user_books(self, user_id: int, reading_type: int, page: int):
         data = self.session.query(models.Book.id, models.Book.identifier,
                                   func.count(models.Rate.id).label('count'),

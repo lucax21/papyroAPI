@@ -91,6 +91,7 @@ class Comment(Base):
 
     fk_user = Column(ForeignKey("user.id"))
     fk_rate = Column(ForeignKey("rate.id"))
+    fk_book = Column(ForeignKey("book.id"))
 
     formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
 

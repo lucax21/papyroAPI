@@ -190,6 +190,14 @@ def atualizar_foto(link: UserPhoto, session: Session = Depends(get_db)
     CrudUsuario(session).atualizar_foto(current_user.id, link)
     # return link
 
+@router.get("/feed"
+# ,response_model=
+)
+async def feed(session: Session = Depends(get_db),
+                    #    , current_user: Usuario = Depends(obter_usuario_logado
+				page: int = 0
+				):
+	return CrudUsuario(session).feed(2, page)
 
 @router.get("/books/{reading_type}", response_model=List[BookByType])
 def get_user_books(reading_type: str,
