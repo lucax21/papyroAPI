@@ -336,36 +336,34 @@ class CrudUsuario:
                             .join(models.Book, models.Book.id == models.Rate.fk_book)\
                             .group_by(
                                    models.Rate.id.label('id_rate'),
-                                #    models.Rate.text.label('rate'),
-                                #    models.Rate.date.label('date_rate'),
-                                #    models.Rate.likes.label('likes_rate'),
                                    models.User.id.label('id_user'),
-                                #    models.User.nickname.label('nickname'),
-                                #    models.User.photo.label('photo'),
                                    models.Like.id.label('like_id'),
-                                   models.Book.id.label('id_book'),
-                                #    models.Book.identifier.label('identifier')
+                                   models.Book.id.label('id_book')
                                    )\
                             .order_by(models.Rate.date.desc())\
                             .offset(page * 20).limit(20).all()
 
         aux = []
         for x in query:
-                print(x.identifier)
                 aa = self.session.query(func.count(models.Comment.id).label('count_comments'))\
                                     .where(models.Comment.fk_rate == x.id_rate).all()
-                aaaa = self.session.query(func.count(models.Like.id).label('count_likes'))\
-                                    .where(models.Like.fk_rate == x.id_rate).all()
+                # aaaa = self.session.query(func.count(models.Like.id).label('count_likes'))\
+                #                     .where(models.Like.fk_rate == x.id_rate).all()
 
-                book = get_and_format_output('-PUrAAAAYAAJ')
-                print(book)
+                book = get_and_format_output(x['identifier'])
+                book.update({'id': x['id_book']})
                 aux.append({
                     'count_comments': aa[0]['count_comments'],
-                    'count_likes': aaaa,
+                    # 'count_likes': aaaa[0]['count_likes'],
                     'text': x.rate,
-                    'date': x.date_rate,
+                    # 'date': x.date_rate,
                     'rate': x.rate,
                     'likes': x.likes_rate,
+                    'user': {
+                        'nickname': x.nickname,
+                        'photo': x.photo,
+                        'id': x.id_user
+                    },
                     'book': book
                 })
             

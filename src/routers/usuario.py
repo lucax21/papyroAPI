@@ -12,7 +12,7 @@ from src.crud.usuario import CrudUsuario
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.book import BookByType
-from src.schemas.usuario import UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioSimples
+from src.schemas.usuario import UserFeed, UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioSimples
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
@@ -191,7 +191,7 @@ def atualizar_foto(link: UserPhoto, session: Session = Depends(get_db)
     # return link
 
 @router.get("/feed"
-# ,response_model=
+# ,response_model=List[UserFeed]
 )
 async def feed(session: Session = Depends(get_db),
                     #    , current_user: Usuario = Depends(obter_usuario_logado
