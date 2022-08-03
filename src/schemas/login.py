@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 from src.schemas.usuario import UsuarioSimples
 
 class Login(BaseModel):
     password: str
-    email: str
+    email: EmailStr
 
 class LoginSucesso(BaseModel):
     user: Optional[UsuarioSimples] = None
