@@ -81,16 +81,6 @@ class UserSuperBasic(BaseModel):
     photo: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
 
 
-class UserFeed(BaseModel):
-    count_comments: Optional[int] = 0
-    text: Optional[str] = None
-    # date: Optional[str] = None
-    # rate: Optional[int] = None
-    likes: Optional[int] = 0
-    user: UserSuperBasic
-    book: BookFeed
-
-
 class UsuarioAddLivroBiblioteca(BaseModel):
     # id_usuario: int
     id_livro: int
