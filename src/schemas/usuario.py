@@ -14,7 +14,26 @@ class UsuarioSimples(BaseModel):
     nickname: Optional[str] = None
     photo: Optional[str] = None
     description: Optional[str] = None
+
+class UsuarioDb(UsuarioSimples):
+    id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+
+class User(BaseModel):
+    id: int
+
+class Usuario(UsuarioDb):
     birthday: Optional[str] = None
+    description: Optional[str] = None
+    birthday: Optional[str] = None
+    booksQt: Optional[int] = None
+    followers: Optional[int] = None
+    books_reading: Optional[List[LivroSimples]] = None
+    books_read: Optional[List[LivroSimples]] = None
+    books_to_read: Optional[List[LivroSimples]] = None
 
 
 class UsuarioCriar(UsuarioSimples):
