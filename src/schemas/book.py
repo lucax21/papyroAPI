@@ -17,11 +17,13 @@ class BookBase(BaseModel):
 
 
 class BookExtended(BaseModel):
+    id: Optional[int]
     book_title: str
     cover: str
     status: Optional[int] = None
     genre: List[str]
     description: str
+    author: List[str]
 
 
 class BookUser(BaseModel):
@@ -31,6 +33,7 @@ class BookUser(BaseModel):
 
 
 class BookReviewBase(BaseModel):
+    id: Optional[int]
     date: str
     likes: Optional[int] = 0
     comments: Optional[int] = 0
@@ -48,7 +51,6 @@ class BookByID(BookExtended):
     rate: Optional[int]
     raters: Optional[int] = 0
     reviews: Optional[List[BookReview]] = [None]
-    author: List[str]
     company: Optional[int] = 0
 
     class Config:
