@@ -27,7 +27,7 @@ class CrudFeed:
                                    models.Book.id.label('id_book'),
                                    models.Book.identifier.label('identifier'),
                                    models.Like.id.label('like_id'),
-                                   literal('Avaliação').label("type")
+                                   literal('r').label("type")
                                    )\
                     .where(and_(
                                 models.Friend.fk_origin==id,
@@ -56,7 +56,7 @@ class CrudFeed:
                                     models.Book.id.label('id_book'),
                                     models.Book.identifier.label('identifier'),
                                     models.Like.id.label('like_id'),
-                                    literal('Comentário').label("type")
+                                    literal('c').label("type")
                                     )\
                                 .where(and_(
                                 models.Friend.fk_origin==id,
@@ -80,7 +80,7 @@ class CrudFeed:
         
         aux = []
         for x in query['data']:
-                print(x)
+
                 query_count = self.session.query(func.count(models.Comment.id).label('count_comments'))\
                                     .where(models.Comment.fk_rate == x.id_rate).all()
 
@@ -89,10 +89,10 @@ class CrudFeed:
                 aux.append({
                     'rates': query_count[0]['count_comments'],
                     'type': x.type,
-                    'id': x.id_rate if x.type == 'Avaliação' else x.id_comment,
+                    'id': x.id_rate if x.type == 'r' else x.id_comment,
                     'date': x.formatted_date,
                     'text': x.text,
-                    'rate': x.rate if x.type == 'Avaliação' else 0,
+                    'rate': x.rate if x.type == 'r' else 0,
                     'you_liked': True if x.like_id else False,
                     'likes': x.likes,
                     'user': {
