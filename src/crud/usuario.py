@@ -119,7 +119,6 @@ class CrudUsuario:
 
         
         def arrange_book(x):
-            print(x)
             book = format_book_output(get_by_identifier(x['identifier']))
             book.update({          
                 'count': 0
@@ -224,38 +223,6 @@ class CrudUsuario:
 
         return None
 
-    def add_livro_biblioteca(self, id_user: int, dado: UsuarioAddLivroBiblioteca):
-        query = self.session.query(models.UserLivro).where(models.UserLivro.fk_usuario == id_user).where(
-            models.UserLivro.fk_livro == dado.id_livro).first()
-
-        # update
-        if query:
-            stmt = update(models.UserLivro).where(models.UserLivro.fk_usuario == id_user).where(
-                models.UserLivro.fk_livro == dado.id_livro).values(fk_livro=dado.id_livro,
-                                                                   fk_usuario=id_user,
-                                                                   fk_status=dado.id_status,
-                                                                   data_entrada=func.now()
-                                                                   )
-            try:
-                self.session.execute(stmt)
-                self.session.commit()
-            except Exception as error:
-                self.session.rollback()
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # insert
-        else:
-            # self.session.execute(models.UserLivro.insert().values(fk_usuario=id_user,fk_livro=dado.id_livro, fk_status=dado.id_status))
-            stmt = insert(models.UserLivro).values(fk_livro=dado.id_livro,
-                                                   fk_usuario=id_user,
-                                                   fk_status=dado.id_status,
-                                                   data_entrada=func.now()
-                                                   )
-            try:
-                self.session.execute(stmt)
-                self.session.commit()
-            except Exception as error:
-                self.session.rollback()
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def atualizar_foto(self, id_user: int, dado: str):
 

@@ -1,5 +1,5 @@
-from fastapi import HTTPException
-from sqlalchemy import and_
+from fastapi import HTTPException, status
+from sqlalchemy import and_, update, insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
 
@@ -95,6 +95,47 @@ class CrudBook:
         })
 
         return book
+
+    def book_user_status(self, id_user: int, id_status: int, id_book: int):
+
+        query = self.session.query(models.UserBook)\
+                            .where(and_(
+                                        models.UserBook.fk_user == id_user,
+                                        models.UserBook.fk_book == id_book)).first()
+
+        # update
+        if query:
+            stmt = update(models.UserBook)\
+                        .where(and_(models.UserBook.fk_user == id_user,
+                                models.UserBook.fk_book == id_book))\
+                        .values(fk_book=id_book,
+                                fk_user=id_user,
+                                fk_status=id_status,
+                                date=func.now()
+                            )
+            try:
+                self.session.execute(stmt)
+                self.session.commit()
+                
+                return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
+            except Exception:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # insert
+        else:
+            stmt = insert(models.UserBook).values(fk_book=id_book,
+                                                   fk_user=id_user,
+                                                   fk_status=id_status,
+                                                   date=func.now()
+                                                )
+            try:
+                self.session.execute(stmt)
+                self.session.commit()
+
+                return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
+            except Exception:
+                self.session.rollback()
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     #
     # def avaliar_livro(self, id_user, ava: LivroAvaliar):
