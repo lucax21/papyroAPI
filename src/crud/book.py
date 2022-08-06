@@ -1,5 +1,5 @@
-from fastapi import HTTPException
-from sqlalchemy import and_
+from fastapi import HTTPException, status
+from sqlalchemy import and_, update, insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
 
@@ -7,7 +7,7 @@ from src.db.models import models
 from src.external_api.get_book import get_by_identifier
 from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import format_book_output
-
+from sqlalchemy.exc import IntegrityError
 
 class CrudBook:
     def __init__(self, session: Session):
@@ -95,6 +95,49 @@ class CrudBook:
         })
 
         return book
+
+    def book_user_status(self, id_user: int, id_status: int, id_book: int):
+
+        query = self.session.query(models.UserBook)\
+                            .where(and_(
+                                        models.UserBook.fk_user == id_user,
+                                        models.UserBook.fk_book == id_book)).first()
+
+        # update
+        if query:
+            stmt = update(models.UserBook)\
+                        .where(and_(models.UserBook.fk_user == id_user,
+                                models.UserBook.fk_book == id_book))\
+                        .values(fk_book=id_book,
+                                fk_user=id_user,
+                                fk_status=id_status,
+                                date=func.now()
+                            )
+            try:
+                self.session.execute(stmt)
+                self.session.commit()
+                
+                return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
+            except IntegrityError as err:
+                self.session.rollback()
+                print(err)
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
+        # insert
+        else:
+            stmt = insert(models.UserBook).values(fk_book=id_book,
+                                                   fk_user=id_user,
+                                                   fk_status=id_status,
+                                                   date=func.now()
+                                                )
+            try:
+                self.session.execute(stmt)
+                self.session.commit()
+
+                return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
+            except IntegrityError as err:
+                self.session.rollback()
+                print(err)
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
 
     #
     # def avaliar_livro(self, id_user, ava: LivroAvaliar):
