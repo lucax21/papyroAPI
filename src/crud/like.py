@@ -1,7 +1,7 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, update
 from sqlalchemy.orm import Session
 
-from src.db.models.models import Like
+from src.db.models.models import Like, Rate
 
 
 class CrudLike:
@@ -9,18 +9,29 @@ class CrudLike:
         self.session = session
 
     def like_by_id(self, id, like_type, user_id, mode):
+        
         if like_type == 'r':
             like_obj = self.session.query(Like).where(and_(Like.fk_user == user_id, Like.fk_rate == id)).first()
             stmt = Like(fk_rate=id, fk_user=user_id)
             if mode and not like_obj:
+                query_rate = self.session.query(Rate.likes).where(Rate.id == id).first()
+                update_rate = update(Rate).values(likes=query_rate['likes']+1).where(Rate.id==id)
+                self.session.execute(update_rate)
+                
                 self.session.add(stmt)
                 self.session.commit()
                 self.session.refresh(stmt)
+                
                 return {'id': stmt.id}
 
             if not mode and like_obj:
+                query_rate = self.session.query(Rate.likes).where(Rate.id == id).first()
+                update_rate = (update(Rate).values(likes=query_rate['likes']-1).where(Rate.id==id))
+                self.session.execute(update_rate)
+
                 self.session.delete(like_obj)
                 self.session.commit()
+                
                 return {'id': -1}
 
         if like_type == 'c':
