@@ -5,6 +5,7 @@ from sqlalchemy.sql.functions import func
 
 from src.db.models import models
 from src.external_api.get_book import get_by_identifier
+from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import format_book_output
 
 
@@ -71,6 +72,9 @@ class CrudBook:
                         models.UserBook.fk_user == user_id))\
             .first()
 
+        people_reading = self.session.query(func.count(models.UserBook.fk_user).label('users'))\
+            .where((models.UserBook.fk_status == ReadingTypes.READING)).first()
+
         book = get_by_identifier(data.identifier)
 
         if "volumeInfo" not in book:
@@ -86,7 +90,8 @@ class CrudBook:
             'status': user.fk_status if user else None,
             'rate': data.sum / data.count if data.count > 0 else None,
             'raters': data.count,
-            'reviews': rating_new_format
+            'reviews': rating_new_format,
+            'company': people_reading.users if people_reading else 0
         })
 
         return book

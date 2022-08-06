@@ -17,9 +17,11 @@ class BookBase(BaseModel):
 
 
 class BookExtended(BaseModel):
+    book_title: str
+    cover: str
     status: Optional[int] = None
-    genre: Optional[List[str]] = [None]
-    description: Optional[str] = None
+    genre: List[str]
+    description: str
 
 
 class BookUser(BaseModel):
@@ -44,8 +46,10 @@ class BookReview(BookReviewBase):
 class BookByID(BookExtended):
     identifier: Optional[str] = None
     rate: Optional[int]
-    raters: Optional[int]
+    raters: Optional[int] = 0
     reviews: Optional[List[BookReview]] = [None]
+    author: List[str]
+    company: Optional[int] = 0
 
     class Config:
         orm_mode = True
