@@ -7,7 +7,7 @@ from src.db.models import models
 from src.external_api.get_book import get_by_identifier
 from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import format_book_output
-
+from sqlalchemy.exc import IntegrityError
 
 class CrudBook:
     def __init__(self, session: Session):
@@ -118,9 +118,10 @@ class CrudBook:
                 self.session.commit()
                 
                 return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
-            except Exception:
+            except IntegrityError as err:
                 self.session.rollback()
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                print(err)
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
         # insert
         else:
             stmt = insert(models.UserBook).values(fk_book=id_book,
@@ -133,9 +134,10 @@ class CrudBook:
                 self.session.commit()
 
                 return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
-            except Exception:
+            except IntegrityError as err:
                 self.session.rollback()
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                print(err)
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
 
     #
     # def avaliar_livro(self, id_user, ava: LivroAvaliar):
