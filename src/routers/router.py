@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.routers import login, usuario, genero, book, avaliacao, comment, mensagem, like
+from src.routers import login, usuario, genero, book, avaliacao, comment, mensagem, like, feed
 
 router = APIRouter()
 
@@ -12,3 +12,4 @@ router.include_router(avaliacao.router, prefix="/avaliacoes", tags=["avaliacoes"
 router.include_router(comment.router, prefix="/comments", tags=["comments"])
 router.include_router(mensagem.router, prefix="/mensagens", tags=["mensagens"])
 router.include_router(like.router, prefix="/like", tags=["likes"])
+router.include_router(feed.router, prefix="/feed", tags=["feed"])

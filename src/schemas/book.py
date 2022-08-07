@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 
 class BookBase(BaseModel):
@@ -55,6 +55,12 @@ class BookByID(BookExtended):
 
     class Config:
         orm_mode = True
+
+
+class BookFeed(BaseModel):
+    id: Optional[int] = None
+    cover: Optional[HttpUrl] = None
+    book_title: Optional[str] = None
 
 
 class BookByType(BaseModel):

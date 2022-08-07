@@ -197,6 +197,7 @@ class CrudUsuario:
 
         return dado
 
+
     def user_books(self, user_id: int, reading_type: int, page: int):
         data = self.session.query(models.Book.id, models.Book.identifier,
                                   func.count(models.Rate.id).label('count'),

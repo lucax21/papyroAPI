@@ -6,7 +6,7 @@ from typing import Optional, List
 from fastapi import HTTPException, status
 from pydantic import BaseModel, EmailStr, validator, HttpUrl
 
-from .book import BookBase
+from .book import BookBase, BookFeed
 
 
 class UsuarioSimples(BaseModel):
@@ -77,6 +77,29 @@ class UserUpdate(BaseModel):
     #     orm_mode = True
 
 
+class UsuarioDb(UsuarioSimples):
+    id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+
+class Usuario(UsuarioDb):
+    description: Optional[str] = None
+    birthday: Optional[str] = None
+    booksQt: Optional[int] = None
+    followers: Optional[int] = None
+    books_reading: Optional[List[BookBase]] = None
+    books_read: Optional[List[BookBase]] = None
+    books_to_read: Optional[List[BookBase]] = None
+
+
+class UserSuperBasic(BaseModel):
+    id: int
+    nickname: str
+    photo: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
+
+
 class UsuarioAddLivroBiblioteca(BaseModel):
     # id_usuario: int
     id_livro: int
@@ -84,6 +107,7 @@ class UsuarioAddLivroBiblioteca(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 
 from src.schemas.genero import Genero
