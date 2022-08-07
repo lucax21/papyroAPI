@@ -9,12 +9,10 @@ class Feed(BaseModel):
     rates: Optional[int] = 0
     type: str
     id: int
-    date: str
-    rate: int
     you_liked: Optional[bool] = False
     text: Optional[str] = None
-    # date: Optional[str] = None
-    # rate: Optional[int] = None
+    date: Optional[str] = None
+    rate: Optional[int] = 0
     likes: Optional[int] = 0
     user: UserSuperBasic
     book: BookFeed
