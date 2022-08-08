@@ -12,12 +12,12 @@ from src.schemas.usuario import UsuarioGeneros
 router = APIRouter()
 
 @router.get("/"
-, response_model=List[Genero]
+# , response_model=List[Genero]
 )
 async def listar_generos(session: Session = Depends(get_db)
 # , current_user: User = Depends(obter_usuario_logado)
 ):
-    dado = CrudGenero(session).listar_generos()
+    dado = CrudGenero(session).listar_generos(2)
     if not dado:
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado

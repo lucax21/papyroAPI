@@ -8,14 +8,28 @@ from fastapi import HTTPException, status
 
 from src.schemas.usuario import UsuarioGeneros
 from src.schemas.genero import GeneroUsuarioCriar
+from sqlalchemy.sql.expression import literal
 
 class CrudGenero():
     def __init__(self, session: Session):
         self.session = session
 
-    def listar_generos(self) -> List[models.Genre]:
-        return self.session.query(models.Genre).all()
-        
+    def listar_generos(self, id_user: int):
+        ddata = self.session.query(models.Genre.id, models.Genre.name, models.Genre.description, literal(False).label("select")).all()
+
+     
+        query = self.session.query(models.Genre.id, models.UserGenre.fk_user)\
+                            .where(models.UserGenre.fk_user == id_user)\
+                            .join(models.UserGenre, models.Genre.id == models.UserGenre.fk_genre)\
+                            .all()
+
+        aux = []
+        for x in ddata:
+            aux.append({
+
+            })
+
+        return ddata
 
     def listar_generos_usuario(self, user_id) -> UsuarioGeneros:
        
