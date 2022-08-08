@@ -76,6 +76,20 @@ class BookByType(BaseModel):
 
 
 class BookUserStatus(BaseModel):
-	id_user: int
-	id_book: int
-	id_status: int 
+    id_user: int
+    id_book: int
+    id_status: int 
+
+
+from src.schemas.usuario import UserSuperBasic
+
+class BookCompany(BaseModel):
+    id: int
+    status: str
+    list: Optional[List[UserSuperBasic]] = []
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
+
+BookCompany.update_forward_refs()

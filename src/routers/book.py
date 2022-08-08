@@ -32,3 +32,23 @@ async def book_user_status(
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Status do livro inválido.")
 
 	return CrudBook(session).book_user_status(current_user.id, id_status, id_book)
+
+@router.get("/{id}/company"
+# , response_model=
+)
+async def get_company(id: int,
+					  session: Session = Depends(get_db)):
+	return CrudBook(session).get_company(id)
+
+@router.get("/{id_book}/{id_status}"
+, response_model=BookUserStatus
+)
+async def book_user_status(
+                            id_book: int,
+	                        id_status: int,
+    	                    session: Session = Depends(get_db)
+                    ):
+    if id_status != ReadingTypes.READING and id_status != ReadingTypes.READ and id_status != ReadingTypes.TO_READ:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Status do livro inválido.")
+
+    return CrudBook(session).get_company_status(id_book, id_status)
