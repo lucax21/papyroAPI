@@ -17,7 +17,7 @@ class CrudGenre:
 
     def list_user_genres(self, user_id) -> UserGenre:
 
-        dado = self.session.query(models.User).options(joinedload(models.User.generos)).where(
+        dado = self.session.query(models.User).options(joinedload(models.User.genres)).where(
             models.User.id == user_id).one()
         # return UsuarioGeneros.from_orm(dado)
         return dado

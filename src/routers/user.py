@@ -74,7 +74,7 @@ async def cadastrar(user: UserNew, session: Session = Depends(get_db)):
     return usuario_criado
 
 
-@router.get("/conversas", response_model=User)
+@router.get("/chat", response_model=User)
 def conversas(session: Session = Depends(get_db)
               , current_user: User = Depends(obter_usuario_logado)):
     pass
@@ -102,8 +102,8 @@ def buscar_por_id(id: int, session: Session = Depends(get_db)):
     return dado
 
 
-@router.get("/viewProfile/{id}", response_model=User)
-async def view_profile(id: Optional[int], session: Session = Depends(get_db),
+@router.get("/viewProfile", response_model=User)
+async def view_profile(id: Optional[int] = None, session: Session = Depends(get_db),
                        current_user: User = Depends(obter_usuario_logado)):
     if not id:
         id = current_user.id

@@ -75,34 +75,34 @@ class CrudUser:
         if not query:
             raise HTTPException(status_code=404, detail='Não encontrado')
 
-        query_books_reading = self.session.query(
-            models.Book.id,
-            models.Book.identifier,
-            func.count(models.UserBook.fk_status).label('count')) \
-            .filter(and_(models.UserBook.fk_status == ReadingTypes.READING, models.UserBook.fk_user == id)) \
-            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
-
-        query_books_read = self.session.query(
-            models.Book.id,
-            models.Book.identifier,
-            func.count(models.UserBook.fk_status).label('count')) \
-            .filter(and_(models.UserBook.fk_status == ReadingTypes.READ, models.UserBook.fk_user == id)) \
-            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
-
-        query_books_to_read = self.session.query(
-            models.Book.id,
-            models.Book.identifier,
-            func.count(models.UserBook.fk_status).label('count')) \
-            .filter(and_(models.UserBook.fk_status == ReadingTypes.TO_READ, models.UserBook.fk_user == id)) \
-            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+        # query_books_reading = self.session.query(
+        #     models.Book.id,
+        #     models.Book.identifier,
+        #     func.count(models.UserBook.fk_status).label('count')) \
+        #     .filter(and_(models.UserBook.fk_status == ReadingTypes.READING, models.UserBook.fk_user == id)) \
+        #     .join(models.Book, models.Book.id == models.UserBook.fk_book) \
+        #     .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+        #
+        # query_books_read = self.session.query(
+        #     models.Book.id,
+        #     models.Book.identifier,
+        #     func.count(models.UserBook.fk_status).label('count')) \
+        #     .filter(and_(models.UserBook.fk_status == ReadingTypes.READ, models.UserBook.fk_user == id)) \
+        #     .join(models.Book, models.Book.id == models.UserBook.fk_book) \
+        #     .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+        #
+        # query_books_to_read = self.session.query(
+        #     models.Book.id,
+        #     models.Book.identifier,
+        #     func.count(models.UserBook.fk_status).label('count')) \
+        #     .filter(and_(models.UserBook.fk_status == ReadingTypes.TO_READ, models.UserBook.fk_user == id)) \
+        #     .join(models.Book, models.Book.id == models.UserBook.fk_book) \
+        #     .group_by(models.Book.identifier, models.Book.id).limit(1).all()
 
         query_books_count = self.session.query(
-            func.count(models.UserBook.fk_book).label('count'), models.UserBook.fk_status) \
-            .where(and_(models.UserBook.fk_user == id)) \
-            .group_by(models.UserBook.fk_status).all()
+            func.count(models.UserBook.fk_book).label('count')) \
+            .where(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == ReadingTypes.READ)) \
+            .group_by(models.UserBook.fk_status).first()
 
         def arrange_book(x):
             book = format_book_output(get_by_identifier(x['identifier']))
@@ -118,21 +118,15 @@ class CrudUser:
                 return book
             return None
 
-        aux = [0, 0, 0]
-        for o in query_books_count:
-            aux[o[1] - 1] = o[0]
 
         return {'id': id,
                 'name': query.name,
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'booksQt': query_books_count[ReadingTypes.READ - 1] if len(query_books_to_read) > 0 else 0,
+                'booksQt': query_books_count.count if query_books_count else 0,
                 'birthday': query.formatted_birthday,
-                'followers': query.followers,
-                'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ - 1]),
-                'books_read': books(query_books_read, aux[ReadingTypes.READ - 1]),
-                'books_reading': books(query_books_reading, aux[ReadingTypes.READING - 1])
+                'followers': query.followers
                 }
 
     def ativar_conta(self, instancia_usu):

@@ -32,11 +32,8 @@ class UserDB(BaseUser):
 class User(UserDB):
     birthday: Optional[str] = None
     description: Optional[str] = None
-    booksQt: Optional[int] = None
+    booksQt: Optional[int] = 0
     followers: Optional[int] = None
-    books_reading: Optional[List[BookBase]] = None
-    books_read: Optional[List[BookBase]] = None
-    books_to_read: Optional[List[BookBase]] = None
 
 
 class UserNew(BaseUser):
