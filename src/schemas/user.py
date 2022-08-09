@@ -79,14 +79,7 @@ class UserUpdate(BaseModel):
     #     orm_mode = True
 
 
-class UsuarioDb(UsuarioSimples):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
-
-
-class Usuario(UsuarioDb):
+class Usuario(UserDB):
     description: Optional[str] = None
     birthday: Optional[str] = None
     booksQt: Optional[int] = None
@@ -104,6 +97,7 @@ class UserSuperBasic(BaseModel):
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
+
 
 class UserAddBookToLibrary(BaseModel):
     id_livro: int

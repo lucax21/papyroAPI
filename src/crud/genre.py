@@ -1,11 +1,10 @@
 from typing import List
 
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
 from src.db.models import models
 from src.schemas.genre import GenreUserNew
-from src.schemas.user import UserGenre
 
 
 class CrudGenre:
@@ -15,12 +14,29 @@ class CrudGenre:
     def list_genres(self) -> List[models.Genre]:
         return self.session.query(models.Genre).all()
 
-    def list_user_genres(self, user_id) -> UserGenre:
+    def list_user_genres(self, user_id):
+        query_genres = self.session.query(models.Genre.id, models.Genre.name, models.Genre.description) \
+            .order_by(models.Genre.name).all()
 
-        dado = self.session.query(models.User).options(joinedload(models.User.genres)).where(
-            models.User.id == user_id).one()
-        # return UsuarioGeneros.from_orm(dado)
-        return dado
+        query_genres_select = self.session.query(models.Genre.id, models.UserGenre.fk_user) \
+            .where(models.UserGenre.fk_user == user_id) \
+            .join(models.UserGenre, models.Genre.id == models.UserGenre.fk_genre) \
+            .all()
+
+        aux = [False] * len(query_genres)
+        for x in query_genres_select:
+            aux[x['id'] - 1] = True
+
+        result = []
+        for x in query_genres:
+            result.append({
+                'id': x.id,
+                'name': x.name,
+                'description': x.description,
+                'select_genre': aux[x.id - 1]
+            })
+
+        return result
 
     def save_user_genres(self, userGenre: List[GenreUserNew], user_id):
         try:
