@@ -6,23 +6,40 @@ from typing import List
 
 from fastapi import HTTPException, status
 
-from src.schemas.usuario import UsuarioGeneros
 from src.schemas.genero import GeneroUsuarioCriar
 
 class CrudGenero():
     def __init__(self, session: Session):
         self.session = session
 
-    def listar_generos(self) -> List[models.Genre]:
-        return self.session.query(models.Genre).all()
-        
+    def get_genres_user(self, id_user: int):
+        query_genres = self.session.query(models.Genre.id, models.Genre.name, models.Genre.description)\
+                                    .order_by(models.Genre.name).all()
 
-    def listar_generos_usuario(self, user_id) -> UsuarioGeneros:
-       
-        dado = self.session.query(models.Usuario).options(joinedload(models.Usuario.generos)).where(models.Usuario.id == user_id).one()
-        # return UsuarioGeneros.from_orm(dado)
-        return dado
+     
+        query_genres_select = self.session.query(models.Genre.id, models.UserGenre.fk_user)\
+                            .where(models.UserGenre.fk_user == id_user)\
+                            .join(models.UserGenre, models.Genre.id == models.UserGenre.fk_genre)\
+                            .all()
 
+        aux = [False]*len(query_genres)
+        for x in query_genres_select:
+            aux[x['id']-1]=True
+
+        result=[]
+        for x in query_genres:
+            result.append({
+                'id': x.id,
+                'name': x.name,
+                'description': x.description,
+                'select_genre': aux[x.id-1]
+            })
+
+        return result
+
+    def get_genres(self):
+        return self.session.query(models.Genre.id, models.Genre.name, models.Genre.description)\
+                                    .order_by(models.Genre.name).all()
 
     def salvar_generos_usuario(self, generosUsuario: List[GeneroUsuarioCriar], user_id):
  

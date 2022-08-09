@@ -7,10 +7,16 @@ from sqlalchemy.orm import relationship, column_property
 
 from src.db.database import Base
 
-user_genre = Table("user_genre", Base.metadata,
-                   Column("fk_genre", ForeignKey("genre.id"), primary_key=True),
-                   Column("fk_user", ForeignKey("user.id"), primary_key=True)
-                   )
+# user_genre = Table("user_genre", Base.metadata,
+#                    Column("fk_genre", ForeignKey("genre.id"), primary_key=True),
+#                    Column("fk_user", ForeignKey("user.id"), primary_key=True)
+#                    )
+
+class UserGenre(Base):
+    __tablename__ = 'user_genre'
+
+    fk_genre = Column(ForeignKey("genre.id"), primary_key=True)
+    fk_user = Column(ForeignKey("user.id"), primary_key=True)
 
 
 class User(Base):
@@ -29,15 +35,12 @@ class User(Base):
     confirmation = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
     formatted_birthday = column_property(func.to_char(birthday, 'DD/MM/YYYY'))
 
-    genres = relationship("Genre", secondary=user_genre, back_populates='users')
-
 
 class Genre(Base):
     __tablename__ = 'genre'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100))
     description = Column(Text)
-    users = relationship("User", secondary=user_genre, back_populates="genres")
 
 
 class Book(Base):
