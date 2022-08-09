@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import Optional
-from xmlrpc.client import boolean
 from pydantic import BaseModel
-from src.schemas.usuario import UserSuperBasic
+from src.schemas.user import UserSuperBasic
 from src.schemas.book import BookFeed
+
 
 class Feed(BaseModel):
     rates: Optional[int] = 0

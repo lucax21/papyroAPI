@@ -6,40 +6,44 @@ from typing import Optional, List
 from fastapi import HTTPException, status
 from pydantic import BaseModel, EmailStr, validator, HttpUrl
 
-from .book import BookBase, BookFeed
+from src.schemas.book import BookByID, BookBase
+from src.schemas.genre import Genre
 
 
-class UsuarioSimples(BaseModel):
+class BaseUser(BaseModel):
     name: Optional[str] = None
     nickname: Optional[str] = None
     photo: Optional[str] = None
     description: Optional[str] = None
+    birthday: Optional[str]
 
-class UsuarioDb(UsuarioSimples):
+
+class UserID(BaseModel):
+    id: int
+
+
+class UserDB(BaseUser):
     id: Optional[int] = None
 
     class Config:
         orm_mode = True
 
 
-class User(BaseModel):
-    id: int
-
-class Usuario(UsuarioDb):
+class User(UserDB):
     birthday: Optional[str] = None
     description: Optional[str] = None
-    birthday: Optional[str] = None
     booksQt: Optional[int] = None
     followers: Optional[int] = None
-    books_reading: Optional[List[LivroSimples]] = None
-    books_read: Optional[List[LivroSimples]] = None
-    books_to_read: Optional[List[LivroSimples]] = None
+    books_reading: Optional[List[BookBase]] = None
+    books_read: Optional[List[BookBase]] = None
+    books_to_read: Optional[List[BookBase]] = None
 
 
-class UsuarioCriar(UsuarioSimples):
+class UserNew(BaseUser):
     email: EmailStr
     password: Optional[str] = None
     confirm_password: Optional[str] = None
+    birthday: Optional[str] = None
 
     class Config:
         orm_mode = True
@@ -73,26 +77,6 @@ class UserUpdate(BaseModel):
         assert v.isalnum(), 'deve ser alfanumérico'
         return v
 
-    # class Config:
-    #     orm_mode = True
-
-
-class UsuarioDb(UsuarioSimples):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
-
-
-class Usuario(UsuarioDb):
-    description: Optional[str] = None
-    birthday: Optional[str] = None
-    booksQt: Optional[int] = None
-    followers: Optional[int] = None
-    books_reading: Optional[List[BookBase]] = None
-    books_read: Optional[List[BookBase]] = None
-    books_to_read: Optional[List[BookBase]] = None
-
 
 class UserSuperBasic(BaseModel):
     id: int
@@ -100,8 +84,7 @@ class UserSuperBasic(BaseModel):
     photo: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
 
 
-class UsuarioAddLivroBiblioteca(BaseModel):
-    # id_usuario: int
+class UserAddBookToLibrary(BaseModel):
     id_livro: int
     id_status: int
 
@@ -109,32 +92,25 @@ class UsuarioAddLivroBiblioteca(BaseModel):
         orm_mode = True
 
 
-
-from src.schemas.genero import Genero
-
-
-class UsuarioGeneros(UsuarioSimples):
-    generos: List[Genero] = []
+class UserGenre(BaseUser):
+    genres: List[Genre] = []
 
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
 
 
-UsuarioGeneros.update_forward_refs()
-
-from src.schemas.book import BookByID
+UserGenre.update_forward_refs()
 
 
-class UsuarioPerfil(UsuarioSimples):
-    # descricao: Optional[str] = None
-    livros_lendo: List[BookByID] = []
-    livros_lerei: List[BookByID] = []
-    livros_lidos: List[BookByID] = []
+class UserProfile(BaseUser):
+    reading_books: List[BookByID] = []
+    to_read_book: List[BookByID] = []
+    read_books: List[BookByID] = []
 
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
 
 
-UsuarioPerfil.update_forward_refs()
+UserProfile.update_forward_refs()

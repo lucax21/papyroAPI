@@ -1,38 +1,30 @@
-import posixpath
-from pyexpat import model
-from sqlalchemy import select, update, insert, and_
-from sqlalchemy.sql.functions import func
-from sqlalchemy.orm import Session, joinedload
-from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UserUpdate, UsuarioPerfil
-from src.db.models import models
-
 from typing import List
 
 from fastapi import HTTPException, status
-from sqlalchemy import select, update, insert, and_
+from sqlalchemy import update, and_
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql.functions import func
 
 from src.core import hash_provider
 from src.db.models import models
-from src.utils.enum.reading_type import ReadingTypes
 from src.external_api.get_book import get_by_identifier
-from src.schemas.usuario import Usuario, UsuarioAddLivroBiblioteca, UserUpdate, UsuarioPerfil
-from src.utils.format_book_output import get_and_format_output, format_book_output 
+from src.schemas.user import User, UserUpdate, UserProfile
+from src.utils.enum.reading_type import ReadingTypes
+from src.utils.format_book_output import get_and_format_output, format_book_output
 
 
-class CrudUsuario:
+class CrudUser:
 
     def __init__(self, session: Session):
         self.session = session
 
-    def criar_usuario(self, usuario: Usuario):
+    def new_user(self, user: User):
         try:
-            db_usuario = models.User(nome=usuario.nome,
-                                     email=usuario.email,
-                                     apelido=usuario.apelido,
-                                     senha=hash_provider.get_password_hash(usuario.senha),
-                                     data_nascimento=usuario.data_nascimento,
+            db_usuario = models.User(nome=user.nome,
+                                     email=user.email,
+                                     apelido=user.apelido,
+                                     senha=hash_provider.get_password_hash(user.senha),
+                                     data_nascimento=user.data_nascimento,
                                      ativo=False)
             self.session.add(db_usuario)
             self.session.commit()
@@ -42,23 +34,18 @@ class CrudUsuario:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-    def buscar_por_nome(self, nome) -> List[models.User]:
+    def search_by_name(self, nome) -> List[models.User]:
 
         return self.session.query(models.User).filter(models.User.nome.like(nome + '%')).all()
 
     def current_user(self, email):
-        return self.session.query(models.User.id)\
+        return self.session.query(models.User.id) \
             .where(models.User.email == email).first()
 
     def get_by_email(self, email):
         return self.session.query(models.User.id, models.User.email, models.User.active, models.User.password,
-                                models.User.name, models.User.nickname, models.User.photo, models.User.description)\
-            .where(models.User.email == email).first()
-
-    def get_by_email2(self, email):
-        return self.session.query(models.User.id, models.User.email, models.User.active, models.User.password,
-                                models.User.name, models.User.nickname, models.User.photo, models.User.description)\
+                                  models.User.name, models.User.nickname, models.User.photo, models.User.description,
+                                  models.User.formatted_birthday) \
             .where(models.User.email == email).first()
 
     def buscar_por_apelido(self, nickname):
@@ -71,7 +58,7 @@ class CrudUsuario:
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'birthday': query.formatted_birthday, }
+                'birthday': query.formatted_birthday}
 
     def get_by_id(self, id) -> models.User:
         query = self.session.query(models.User.id,
@@ -114,39 +101,38 @@ class CrudUsuario:
 
         query_books_count = self.session.query(
             func.count(models.UserBook.fk_book).label('count'), models.UserBook.fk_status) \
-            .where(and_(models.UserBook.fk_user == id))\
+            .where(and_(models.UserBook.fk_user == id)) \
             .group_by(models.UserBook.fk_status).all()
 
-        
         def arrange_book(x):
             book = format_book_output(get_by_identifier(x['identifier']))
-            book.update({          
+            book.update({
                 'count': 0
             })
             return book
-        
+
         def books(query_book, count_book):
             if len(query_book) > 0:
                 book = list(map(arrange_book, query_book))
-                book[0]['count']=count_book
+                book[0]['count'] = count_book
                 return book
             return None
-       
-        aux = [0,0,0]
+
+        aux = [0, 0, 0]
         for o in query_books_count:
-            aux[o[1]-1] = o[0]
+            aux[o[1] - 1] = o[0]
 
         return {'id': id,
                 'name': query.name,
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'booksQt': query_books_count[ReadingTypes.READ-1] if len(query_books_to_read) > 0 else 0,
+                'booksQt': query_books_count[ReadingTypes.READ - 1] if len(query_books_to_read) > 0 else 0,
                 'birthday': query.formatted_birthday,
                 'followers': query.followers,
-                'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ-1]),
-                'books_read': books(query_books_read, aux[ReadingTypes.READ-1]),
-                'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
+                'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ - 1]),
+                'books_read': books(query_books_read, aux[ReadingTypes.READ - 1]),
+                'books_reading': books(query_books_reading, aux[ReadingTypes.READING - 1])
                 }
 
     def ativar_conta(self, instancia_usu):
@@ -184,7 +170,7 @@ class CrudUsuario:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def perfil_usuario(self, user_id: int) -> UsuarioPerfil:
+    def perfil_usuario(self, user_id: int) -> UserProfile:
 
         dado = self.session.query(models.User).options(
             joinedload(models.User.grupos),
@@ -196,7 +182,6 @@ class CrudUsuario:
         ).one()
 
         return dado
-
 
     def user_books(self, user_id: int, reading_type: int, page: int):
         data = self.session.query(models.Book.id, models.Book.identifier,
@@ -223,7 +208,6 @@ class CrudUsuario:
             return book
 
         return None
-
 
     def atualizar_foto(self, id_user: int, dado: str):
 

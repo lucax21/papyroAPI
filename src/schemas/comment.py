@@ -29,4 +29,4 @@ class NewComment(BaseModel):
 
 
 class CommentReturn(BaseModel):
-    comment: int
+    comment_id: int
