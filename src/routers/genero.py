@@ -6,22 +6,31 @@ from src.db.database import get_db
 from src.crud.genero import CrudGenero
 from src.db.models.models import User
 from src.routers.login_utils import obter_usuario_logado
-from src.schemas.genero import Genero, GeneroUsuarioCriar
+from src.schemas.genero import Genero, GeneroUsuarioCriar, GenreUser
 from src.schemas.usuario import UsuarioGeneros
 
 router = APIRouter()
 
 @router.get("/"
-# , response_model=List[Genero]
+, response_model=List[Genero]
 )
-async def listar_generos(session: Session = Depends(get_db)
-# , current_user: User = Depends(obter_usuario_logado)
+async def get_genres(session: Session = Depends(get_db)
 ):
-    dado = CrudGenero(session).listar_generos(2)
+    dado = CrudGenero(session).get_genres()
     if not dado:
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
 
+@router.get("/user"
+, response_model=List[GenreUser]
+)
+async def get_genres(session: Session = Depends(get_db)
+# , current_user: User = Depends(obter_usuario_logado)
+):
+    dado = CrudGenero(session).get_genres_user(2)
+    if not dado:
+        raise HTTPException(status_code=404, detail='Não encontrado')
+    return dado
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
 def generos_usuario_gravar(lista: List[GeneroUsuarioCriar], session: Session = Depends(get_db)
