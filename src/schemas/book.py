@@ -76,6 +76,6 @@ class BookByType(BaseModel):
 
 
 class BookUserStatus(BaseModel):
-	id_user: int
-	id_book: int
-	id_status: int 
+    id_user: int
+    id_book: int
+    id_status: int 

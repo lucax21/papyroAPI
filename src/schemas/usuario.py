@@ -6,7 +6,7 @@ from typing import Optional, List
 from fastapi import HTTPException, status
 from pydantic import BaseModel, EmailStr, validator, HttpUrl
 
-from .book import BookBase, BookFeed
+from src.schemas.book import BookBase
 
 
 class UsuarioSimples(BaseModel):
@@ -73,9 +73,6 @@ class UserUpdate(BaseModel):
         assert v.isalnum(), 'deve ser alfanumérico'
         return v
 
-    # class Config:
-    #     orm_mode = True
-
 
 class UsuarioDb(UsuarioSimples):
     id: Optional[int] = None
@@ -99,6 +96,9 @@ class UserSuperBasic(BaseModel):
     nickname: str
     photo: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
 
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
 
 class UsuarioAddLivroBiblioteca(BaseModel):
     # id_usuario: int
@@ -107,7 +107,6 @@ class UsuarioAddLivroBiblioteca(BaseModel):
 
     class Config:
         orm_mode = True
-
 
 
 from src.schemas.genero import Genero
@@ -138,3 +137,23 @@ class UsuarioPerfil(UsuarioSimples):
 
 
 UsuarioPerfil.update_forward_refs()
+
+
+class UsersCompanyStatus(BaseModel):
+    id: int
+    status: str
+    readers: Optional[List[UserSuperBasic]] = []
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
+
+
+class UsersCompany(BaseModel):
+    readers_reading: Optional[UsersCompanyStatus] = None
+    readers_read: Optional[UsersCompanyStatus] = None
+    readers_to_read: Optional[UsersCompanyStatus] = None
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True

@@ -11,9 +11,8 @@ from src.core.token_provider import check_access_token, get_confirmation_token
 from src.crud.usuario import CrudUsuario
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
-
 from src.schemas.book import BookByType
-from src.schemas.usuario import UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioSimples
+from src.schemas.usuario import UsersCompany, UsersCompanyStatus, UserPhoto, UserUpdate, Usuario, UsuarioAddLivroBiblioteca, UsuarioCriar, UsuarioSimples
 
 from src.utils.enum.reading_type import ReadingTypes
 
@@ -217,3 +216,23 @@ def add_livro_biblioteca(addLivro: UsuarioAddLivroBiblioteca, session: Session =
                          , current_user: Usuario = Depends(obter_usuario_logado)
                          ):
     return CrudUsuario(session).add_livro_biblioteca(current_user.id, addLivro)
+
+@router.get("/{id}/company"
+, response_model=UsersCompany
+)
+async def get_company(id: int,
+					  session: Session = Depends(get_db)):
+	return CrudUsuario(session).get_company(id)
+
+@router.get("/{id_book}/{id_status}"
+, response_model=UsersCompanyStatus
+)
+async def book_user_status(
+                            id_book: int,
+	                        id_status: int,
+    	                    session: Session = Depends(get_db)
+                    ):
+    if id_status != ReadingTypes.READING and id_status != ReadingTypes.READ and id_status != ReadingTypes.TO_READ:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Status do livro inválido.")
+
+    return CrudUsuario(session).get_company_status(id_book, id_status)
