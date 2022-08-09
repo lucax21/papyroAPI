@@ -138,6 +138,7 @@ class CrudBook:
                 print(err)
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
 
+
     #
     # def avaliar_livro(self, id_user, ava: LivroAvaliar):
     #     try:

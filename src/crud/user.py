@@ -212,3 +212,72 @@ class CrudUser:
         except Exception as error:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+    def get_company(self, id_book: int):
+        readers_reading = self.session.query(models.User.id.label('id'),
+                                   models.User.nickname,
+                                   models.User.photo,
+                            )\
+                            .where(and_(models.UserBook.fk_book == id_book, models.UserBook.fk_status == ReadingTypes.READING))\
+                            .join(models.UserBook, models.UserBook.fk_user == models.User.id)\
+                            .limit(16).all()
+        readers_read = self.session.query(models.User.id.label('id'),
+                                   models.User.nickname,
+                                   models.User.photo,
+                            )\
+                            .where(and_(models.UserBook.fk_book == id_book, models.UserBook.fk_status == ReadingTypes.READ))\
+                            .join(models.UserBook, models.UserBook.fk_user == models.User.id)\
+                            .limit(16).all()
+        readers_to_read = self.session.query(models.User.id.label('id'),
+                                   models.User.nickname,
+                                   models.User.photo,
+                            )\
+                            .where(and_(models.UserBook.fk_book == id_book, models.UserBook.fk_status == ReadingTypes.TO_READ))\
+                            .join(models.UserBook, models.UserBook.fk_user == models.User.id)\
+                            .limit(16).all()
+
+        query_status = self.session.query(models.Status).all()
+
+        def find_status(list, value):
+            for x in list:
+                if x.id == value:
+                    return x.status
+            return 'Erro ao carregar status.'
+
+ 
+        return {
+            'readers_reading': {
+                'id': ReadingTypes.READING,
+                'status': find_status(query_status, ReadingTypes.READING),
+                'readers': readers_reading,
+            },
+            'readers_read': {
+                'id': ReadingTypes.READ,
+                'status': find_status(query_status, ReadingTypes.READ),
+                'readers': readers_read,
+            },
+            'readers_to_read': {
+                'id': ReadingTypes.TO_READ,
+                'status': find_status(query_status, ReadingTypes.TO_READ),
+                'readers': readers_to_read,
+            }
+        }
+
+    def get_company_status(self, id_book: int, id_status: int):
+            query = self.session.query(models.User.id.label('id'),
+                                   models.User.nickname,
+                                   models.User.photo,
+                            )\
+                            .where(and_(models.UserBook.fk_book == id_book, models.UserBook.fk_status == id_status))\
+                            .join(models.UserBook, models.UserBook.fk_user == models.User.id)\
+                            .all()
+            query_status = self.session.query(models.Status).where(models.Status.id == id_status).first()
+
+            return {
+            
+                'id': id_status,
+                'status': query_status.status if query_status.status else 'Erro, status inexistente.',
+                'readers': query
+            
+        }

@@ -32,7 +32,8 @@ class UserDB(BaseUser):
 class User(UserDB):
     birthday: Optional[str] = None
     description: Optional[str] = None
-    booksQt: Optional[int] = 0
+    birthday: Optional[str] = None
+    booksQt: Optional[int] = None
     followers: Optional[int] = None
 
 
@@ -74,12 +75,35 @@ class UserUpdate(BaseModel):
         assert v.isalnum(), 'deve ser alfanumérico'
         return v
 
+    # class Config:
+    #     orm_mode = True
+
+
+class UsuarioDb(UsuarioSimples):
+    id: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+
+class Usuario(UsuarioDb):
+    description: Optional[str] = None
+    birthday: Optional[str] = None
+    booksQt: Optional[int] = None
+    followers: Optional[int] = None
+    books_reading: Optional[List[BookBase]] = None
+    books_read: Optional[List[BookBase]] = None
+    books_to_read: Optional[List[BookBase]] = None
+
 
 class UserSuperBasic(BaseModel):
     id: int
     nickname: str
     photo: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
 
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
 
 class UserAddBookToLibrary(BaseModel):
     id_livro: int
@@ -111,3 +135,23 @@ class UserProfile(BaseUser):
 
 
 UserProfile.update_forward_refs()
+
+
+class UsersCompanyStatus(BaseModel):
+    id: int
+    status: str
+    readers: Optional[List[UserSuperBasic]] = []
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
+
+
+class UsersCompany(BaseModel):
+    readers_reading: Optional[UsersCompanyStatus] = None
+    readers_read: Optional[UsersCompanyStatus] = None
+    readers_to_read: Optional[UsersCompanyStatus] = None
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
