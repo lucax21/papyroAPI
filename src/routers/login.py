@@ -4,14 +4,13 @@ from sqlalchemy.orm import Session
 
 from src.core import hash_provider
 from src.core.config import Settings
-from src.crud.usuario import CrudUsuario
+from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.schemas.login import Login, LoginSucesso
-from src.schemas.usuario import UsuarioSimples
+from src.schemas.user import BaseUser
 
 settings = Settings()
 router = APIRouter()
-
 
 
 @AuthJWT.load_config
@@ -28,7 +27,7 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Preencha a Senha.")
 
-    user = CrudUsuario(session).buscar_por_email(login.email)
+    user = CrudUser(session).get_by_email(login.email)
 
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -47,7 +46,7 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
     access_token = Authorize.create_access_token(subject=user.email, expires_time=settings.USER_TOKEN_LIFETIME)
     refresh_token = Authorize.create_refresh_token(subject=user.email, expires_time=None)
 
-    us = UsuarioSimples()
+    us = BaseUser()
     us.name = user.name
     us.nickname = user.nickname
     us.photo = user.photo

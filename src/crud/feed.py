@@ -102,6 +102,4 @@ class CrudFeed:
                     },
                     'book': book
                 })
-                    
-            
         return aux

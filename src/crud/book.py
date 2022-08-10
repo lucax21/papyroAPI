@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy import and_, update, insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
 
@@ -7,7 +8,7 @@ from src.db.models import models
 from src.external_api.get_book import get_by_identifier
 from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import format_book_output
-from sqlalchemy.exc import IntegrityError
+
 
 class CrudBook:
     def __init__(self, session: Session):
@@ -38,7 +39,7 @@ class CrudBook:
                 .join(models.User, models.Rate.fk_user == models.User.id) \
                 .join(models.Like, and_(models.Like.fk_rate == models.Rate.id,
                                         models.Like.fk_user == user_id,
-                                        user_id is not None), isouter=True)\
+                                        user_id is not None), isouter=True) \
                 .join(models.Comment, models.Comment.fk_rate == models.Rate.id, isouter=True) \
                 .group_by(models.Rate.text,
                           models.Rate.formatted_date,
@@ -48,7 +49,7 @@ class CrudBook:
                           models.Rate.rate,
                           models.User.id.label('user_id'),
                           models.User.nickname,
-                          models.Like.id.label('like_id'))\
+                          models.Like.id.label('like_id')) \
                 .offset(page * 20).limit(20).all()
 
             for rate in rates:
@@ -69,10 +70,10 @@ class CrudBook:
 
         user = self.session.query(models.UserBook.fk_status) \
             .where(and_(models.UserBook.fk_book == id,
-                        models.UserBook.fk_user == user_id))\
+                        models.UserBook.fk_user == user_id)) \
             .first()
 
-        people_reading = self.session.query(func.count(models.UserBook.fk_user).label('users'))\
+        people_reading = self.session.query(func.count(models.UserBook.fk_user).label('users')) \
             .where((models.UserBook.fk_status == ReadingTypes.READING)).first()
 
         book = get_by_identifier(data.identifier)
@@ -98,25 +99,23 @@ class CrudBook:
 
     def book_user_status(self, id_user: int, id_status: int, id_book: int):
 
-        query = self.session.query(models.UserBook)\
-                            .where(and_(
-                                        models.UserBook.fk_user == id_user,
-                                        models.UserBook.fk_book == id_book)).first()
+        query = self.session.query(models.UserBook) \
+            .where(and_(models.UserBook.fk_user == id_user, models.UserBook.fk_book == id_book)).first()
 
         # update
         if query:
-            stmt = update(models.UserBook)\
-                        .where(and_(models.UserBook.fk_user == id_user,
-                                models.UserBook.fk_book == id_book))\
-                        .values(fk_book=id_book,
-                                fk_user=id_user,
-                                fk_status=id_status,
-                                date=func.now()
-                            )
+            stmt = update(models.UserBook) \
+                .where(and_(models.UserBook.fk_user == id_user,
+                            models.UserBook.fk_book == id_book)) \
+                .values(fk_book=id_book,
+                        fk_user=id_user,
+                        fk_status=id_status,
+                        date=func.now()
+                        )
             try:
                 self.session.execute(stmt)
                 self.session.commit()
-                
+
                 return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
             except IntegrityError as err:
                 self.session.rollback()
@@ -125,10 +124,10 @@ class CrudBook:
         # insert
         else:
             stmt = insert(models.UserBook).values(fk_book=id_book,
-                                                   fk_user=id_user,
-                                                   fk_status=id_status,
-                                                   date=func.now()
-                                                )
+                                                  fk_user=id_user,
+                                                  fk_status=id_status,
+                                                  date=func.now()
+                                                  )
             try:
                 self.session.execute(stmt)
                 self.session.commit()

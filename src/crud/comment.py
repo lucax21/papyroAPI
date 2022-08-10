@@ -1,7 +1,6 @@
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-# from src.schemas.comment import SaveComment
 from src.db.models.models import *
 from src.utils.format_book_output import get_and_format_output
 
