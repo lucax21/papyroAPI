@@ -11,8 +11,8 @@ class CrudGenre:
     def __init__(self, session: Session):
         self.session = session
 
-    def list_genres(self) -> List[models.Genre]:
-        return self.session.query(models.Genre).all()
+    def list_genres(self):
+        return self.session.query(models.Genre).order_by(models.Genre.name).all()
 
     def list_user_genres(self, user_id):
         query_genres = self.session.query(models.Genre.id, models.Genre.name, models.Genre.description) \

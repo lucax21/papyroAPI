@@ -15,7 +15,7 @@ class BaseUser(BaseModel):
     nickname: Optional[str] = None
     photo: Optional[str] = None
     description: Optional[str] = None
-    birthday: Optional[str]
+    birthday: Optional[str] = None
 
 
 class UserID(BaseModel):
@@ -30,9 +30,7 @@ class UserDB(BaseUser):
 
 
 class User(UserDB):
-    birthday: Optional[str] = None
     description: Optional[str] = None
-    birthday: Optional[str] = None
     booksQt: Optional[int] = None
     followers: Optional[int] = None
 
@@ -80,8 +78,6 @@ class UserUpdate(BaseModel):
 
 
 class Usuario(UserDB):
-    description: Optional[str] = None
-    birthday: Optional[str] = None
     booksQt: Optional[int] = None
     followers: Optional[int] = None
     books_reading: Optional[List[BookBase]] = None

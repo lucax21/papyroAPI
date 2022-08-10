@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -14,6 +14,8 @@ class Genre(BaseGenre):
     class Config:
         orm_mode = True
 
+class GenreUser(Genre):
+    select_genre: Optional[bool] = None
 
 class GenreUserNew(BaseModel):
-    idGenero: int
+    id: int

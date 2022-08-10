@@ -34,7 +34,7 @@ class CrudUser:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def search_by_name(self, nome) -> List[models.User]:
+    def search_by_name(self, nome):
 
         return self.session.query(models.User).filter(models.User.nome.like(nome + '%')).all()
 
@@ -60,7 +60,7 @@ class CrudUser:
                 'description': query.description,
                 'birthday': query.formatted_birthday}
 
-    def get_by_id(self, id) -> models.User:
+    def get_by_id(self, id):
         query = self.session.query(models.User.id,
                                    models.User.name,
                                    func.count(models.Friend.fk_destiny).label('followers'),
@@ -75,58 +75,66 @@ class CrudUser:
         if not query:
             raise HTTPException(status_code=404, detail='Não encontrado')
 
-        # query_books_reading = self.session.query(
-        #     models.Book.id,
-        #     models.Book.identifier,
-        #     func.count(models.UserBook.fk_status).label('count')) \
-        #     .filter(and_(models.UserBook.fk_status == ReadingTypes.READING, models.UserBook.fk_user == id)) \
-        #     .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-        #     .group_by(models.Book.identifier, models.Book.id).limit(1).all()
-        #
-        # query_books_read = self.session.query(
-        #     models.Book.id,
-        #     models.Book.identifier,
-        #     func.count(models.UserBook.fk_status).label('count')) \
-        #     .filter(and_(models.UserBook.fk_status == ReadingTypes.READ, models.UserBook.fk_user == id)) \
-        #     .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-        #     .group_by(models.Book.identifier, models.Book.id).limit(1).all()
-        #
-        # query_books_to_read = self.session.query(
-        #     models.Book.id,
-        #     models.Book.identifier,
-        #     func.count(models.UserBook.fk_status).label('count')) \
-        #     .filter(and_(models.UserBook.fk_status == ReadingTypes.TO_READ, models.UserBook.fk_user == id)) \
-        #     .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-        #     .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+        query_books_reading = self.session.query(
+            models.Book.id,
+            models.Book.identifier,
+            func.count(models.UserBook.fk_status).label('count')) \
+            .filter(and_(models.UserBook.fk_status == ReadingTypes.READING, models.UserBook.fk_user == id)) \
+            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
+            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+
+        query_books_read = self.session.query(
+            models.Book.id,
+            models.Book.identifier,
+            func.count(models.UserBook.fk_status).label('count')) \
+            .filter(and_(models.UserBook.fk_status == ReadingTypes.READ, models.UserBook.fk_user == id)) \
+            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
+            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
+
+        query_books_to_read = self.session.query(
+            models.Book.id,
+            models.Book.identifier,
+            func.count(models.UserBook.fk_status).label('count')) \
+            .filter(and_(models.UserBook.fk_status == ReadingTypes.TO_READ, models.UserBook.fk_user == id)) \
+            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
+            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
 
         query_books_count = self.session.query(
-            func.count(models.UserBook.fk_book).label('count')) \
-            .where(and_(models.UserBook.fk_user == id, models.UserBook.fk_status == ReadingTypes.READ)) \
-            .group_by(models.UserBook.fk_status).first()
+            func.count(models.UserBook.fk_book).label('count'), models.UserBook.fk_status) \
+            .where(and_(models.UserBook.fk_user == id))\
+            .group_by(models.UserBook.fk_status).all()
 
+        
         def arrange_book(x):
             book = format_book_output(get_by_identifier(x['identifier']))
-            book.update({
+            book.update({  
+                'id': x.id,        
                 'count': 0
             })
             return book
-
+        
         def books(query_book, count_book):
             if len(query_book) > 0:
                 book = list(map(arrange_book, query_book))
                 book[0]['count'] = count_book
                 return book
             return None
-
+       
+        aux = [0,0,0]
+        for o in query_books_count:
+            aux[o[1]-1] = o[0]
 
         return {'id': id,
                 'name': query.name,
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'booksQt': query_books_count.count if query_books_count else 0,
+                'booksQt': aux[ReadingTypes.READ-1],
                 'birthday': query.formatted_birthday,
-                'followers': query.followers
+                'followers': query.followers,
+                'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ-1]),
+                'books_read': books(query_books_read, aux[ReadingTypes.READ-1]),
+                'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
                 }
 
     def ativar_conta(self, instancia_usu):
@@ -150,7 +158,7 @@ class CrudUser:
             self.session.execute(atualizar_stmt)
             self.session.commit()
             # self.session.refresh(usuario)
-            # return usuario
+            return 1
         except Exception as error:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -164,18 +172,6 @@ class CrudUser:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def perfil_usuario(self, user_id: int) -> UserProfile:
-
-        dado = self.session.query(models.User).options(
-            joinedload(models.User.grupos),
-            joinedload(models.User.livros_lidos).options(joinedload(models.Book.test2)),
-            joinedload(models.User.livros_lerei).options(joinedload(models.Book.test2)),
-            joinedload(models.User.livros_lendo).options(joinedload(models.Book.test2))
-        ).where(
-            models.User.id == user_id
-        ).one()
-
-        return dado
 
     def user_books(self, user_id: int, reading_type: int, page: int):
         data = self.session.query(models.Book.id, models.Book.identifier,
@@ -209,6 +205,7 @@ class CrudUser:
             stmt = update(models.User).where(models.User.id == id_user).values(photo=dado.photo)
             self.session.execute(stmt)
             self.session.commit()
+            return 1
         except Exception as error:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

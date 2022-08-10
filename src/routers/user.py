@@ -11,7 +11,7 @@ from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.book import BookByType
-from src.schemas.user import UserUpdate, User, UserAddBookToLibrary, UserNew, BaseUser, UsersCompanyStatus, UsersCompany
+from src.schemas.user import UserUpdate, User, UserAddBookToLibrary, UserNew, BaseUser, UsersCompanyStatus, UsersCompany, Usuario
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
@@ -74,12 +74,6 @@ async def cadastrar(user: UserNew, session: Session = Depends(get_db)):
     return usuario_criado
 
 
-@router.get("/chat", response_model=User)
-def conversas(session: Session = Depends(get_db)
-              , current_user: User = Depends(obter_usuario_logado)):
-    pass
-
-
 @router.get("/buscarUsuarios{termo}", response_model=List[User])
 def buscar_usuario(termo: str, session: Session = Depends(get_db)):
     if not termo:
@@ -91,20 +85,12 @@ def buscar_usuario(termo: str, session: Session = Depends(get_db)):
     return dado
 
 
-@router.get("/get/{id}", response_model=User)
-def buscar_por_id(id: int, session: Session = Depends(get_db)):
-    if not id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
-
-    dado = CrudUser(session).get_by_id(id)
-    if not dado:
-        CrudUser(session).perfil_usuario(id)
-    return dado
-
-
-@router.get("/viewProfile", response_model=User)
+@router.get("/viewProfile/{id}"
+, response_model=Usuario
+)
 async def view_profile(id: Optional[int] = None, session: Session = Depends(get_db),
-                       current_user: User = Depends(obter_usuario_logado)):
+                       current_user: User = Depends(obter_usuario_logado)
+                       ):
     if not id:
         id = current_user.id
     return CrudUser(session).get_by_id(id)
@@ -113,24 +99,16 @@ async def view_profile(id: Optional[int] = None, session: Session = Depends(get_
 @router.put("/atualizarDados", status_code=status.HTTP_200_OK)
 async def editar_dados(usuario: UserUpdate, session: Session = Depends(get_db),
                        current_user: User = Depends(obter_usuario_logado)):
-    # verifica campos vazios
-    # if not usuario.name:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
-    # elif not usuario.nickname:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Apelido.")
-    # elif not usuario.birthday:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
 
-    # verifica se o usuário vai trocar de nickname
     usuario_db = CrudUser(session).get_user(current_user.id)
     if not usuario_db['nickname'] == usuario.nickname:
-        # verifica se o apelido já está sendo utilizado
+        
         apelido_buscado = CrudUser(session).buscar_por_apelido(usuario.nickname)
         if apelido_buscado:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
 
-    CrudUser(session).atualizar_usuario(current_user.id, usuario)
-    # return usuario_db['nickname']
+    return CrudUser(session).atualizar_usuario(current_user.id, usuario)
+    
 
 
 @router.get("/editProfile", response_model=BaseUser)
@@ -143,8 +121,8 @@ async def edit_profile(session: Session = Depends(get_db)
 def atualizar_foto(link: str, session: Session = Depends(get_db)
                    , current_user: User = Depends(obter_usuario_logado)
                    ):
-    CrudUser(session).atualizar_foto(current_user.id, link)
-    # return link
+    return CrudUser(session).atualizar_foto(current_user.id, link)
+
 
 
 @router.get("/books/{reading_type}", response_model=List[BookByType])
@@ -164,14 +142,6 @@ def get_user_books(reading_type: str,
         return CrudUser(session).user_books(user_id, ReadingTypes.TO_READ, page)
 
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passe o parâmetro de leitura.")
-
-
-@router.post("/addLivroBiblioteca/")
-def add_livro_biblioteca(addLivro: UserAddBookToLibrary, session: Session = Depends(get_db)
-                         , current_user: User = Depends(obter_usuario_logado)
-                         ):
-    pass
-    # return CrudUsuario(session).add_livro_biblioteca(current_user.id, addLivro)
 
 
 @router.get("/{id}/company", response_model=UsersCompany)
