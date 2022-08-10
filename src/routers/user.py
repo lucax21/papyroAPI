@@ -85,12 +85,9 @@ def buscar_usuario(termo: str, session: Session = Depends(get_db)):
     return dado
 
 
-@router.get("/viewProfile/{id}"
-, response_model=Usuario
-)
+@router.get("/viewProfile", response_model=Usuario)
 async def view_profile(id: Optional[int] = None, session: Session = Depends(get_db),
-                       current_user: User = Depends(obter_usuario_logado)
-                       ):
+                       current_user: User = Depends(obter_usuario_logado)):
     if not id:
         id = current_user.id
     return CrudUser(session).get_by_id(id)
