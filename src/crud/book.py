@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
 
 from src.db.models import models
-from src.external_api.get_book import get_by_identifier
+from src.external_api.get_book import get_by_identifier, search_book
 from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import format_book_output
 
@@ -138,7 +138,11 @@ class CrudBook:
                 print(err)
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
 
-
+    def search_book(self, search: str, page: int):
+        aa = search_book(search)
+        
+        return aa
+    
     #
     # def avaliar_livro(self, id_user, ava: LivroAvaliar):
     #     try:

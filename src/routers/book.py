@@ -22,6 +22,12 @@ async def get_book_by_id(id: int,
 
     return data
 
+@router.get("/search/")
+async def search_book(search: str,
+                        page: int = 0,
+                        # current_user: User = Depends(obter_usuario_logado),
+                        session: Session = Depends(get_db)):
+	return CrudBook(session).search_book(search, page)
 
 @router.patch("/{id_book}/{id_status}", response_model=BookUserStatus)
 async def book_user_status(
