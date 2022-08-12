@@ -139,9 +139,26 @@ class CrudBook:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
 
     def search_book(self, search: str, page: int):
-        aa = search_book(search)
-        
-        return aa
+        get_books = search_book(search, page, 16)
+        aux = []
+        for x in get_books['items']:
+            book = format_book_output(x)
+            
+            query_book = self.session.query(models.Book.id.label('id'),
+                                            func.count(models.Rate.id).label('count'),
+                                            func.sum(models.Rate.rate).label('sum'))\
+                                    .where(models.Book.identifier == book['identifier'])\
+                                    .join(models.Rate, models.Rate.fk_book == models.Book.id)\
+                                    .group_by(models.Book).first()
+            print("asdasd",query_book)
+            aux.append({'id': query_book.id if query_book else None,
+                        'rate': query_book.sum / query_book.count if query_book else 0,
+                        'cover': book['cover'],
+                        'identifier': book['identifier'],
+                        'book_title': book['book_title'],
+                        'author': book['author']
+                    })
+        return aux
     
     #
     # def avaliar_livro(self, id_user, ava: LivroAvaliar):

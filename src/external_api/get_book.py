@@ -9,10 +9,12 @@ def get_by_identifier(identifier):
     }
     return get_information(url, params)
 
-def search_book(search):
+def search_book(search, startIndex, maxResults):
     url = f'https://www.googleapis.com/books/v1/volumes?q={search}'
     params = {
-        'key': settings.GOOGLE_API
+ #       'key': settings.GOOGLE_API,
+         'startIndex': startIndex,
+         'maxResults': maxResults
     }
     return get_information(url, params)
 
