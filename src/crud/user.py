@@ -34,14 +34,14 @@ class CrudUser:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def search_by_nickname(self, nickname: str, id_user: int, page: int):
+    def search_by_name(self, name: str, id_user: int, page: int):
         subquery_genres = self.session.query(models.UserGenre.fk_genre).where(models.UserGenre.fk_user == id_user).subquery()
         subquery_books = self.session.query(models.UserBook.fk_book).where(models.UserBook.fk_user == id_user).subquery()
         query = self.session.query(models.User.id,
                                    models.User.nickname,
                                    models.User.photo,
                                    func.count(models.UserGenre.fk_genre).label('common_genre'),
-                                  ).where(and_(models.User.nickname.like(nickname + '%'), models.UserGenre.fk_genre.in_(subquery_genres)))\
+                                  ).where(and_(models.User.name.like('%' + name + '%'), models.UserGenre.fk_genre.in_(subquery_genres)))\
                                    .join(models.UserGenre, models.User.id == models.UserGenre.fk_user, isouter=True)\
                                    .group_by(models.User.id)\
                                    .offset(page * 20).limit(20).all()

@@ -83,7 +83,7 @@ def search_users(search: str, page: int = 0, session: Session = Depends(get_db)
     if not search:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campo de pesquisa vazio.")
 
-    return CrudUser(session).search_by_nickname(search, current_user.id, page)
+    return CrudUser(session).search_by_name(search, current_user.id, page)
 
 
 
