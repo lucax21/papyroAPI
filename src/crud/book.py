@@ -150,7 +150,8 @@ class CrudBook:
                                     .where(models.Book.identifier == book['identifier'])\
                                     .join(models.Rate, models.Rate.fk_book == models.Book.id)\
                                     .group_by(models.Book).first()
-            print("asdasd",query_book)
+      
+    
             aux.append({'id': query_book.id if query_book else None,
                         'rate': query_book.sum / query_book.count if query_book else 0,
                         'cover': book['cover'],
@@ -160,19 +161,3 @@ class CrudBook:
                     })
         return aux
     
-    #
-    # def avaliar_livro(self, id_user, ava: LivroAvaliar):
-    #     try:
-    #         stmt = insert(models.Avaliacao).values(fk_livro=ava.id_livro,
-    #                                                fk_usuario=id_user,
-    #                                                nota=ava.nota,
-    #                                                texto=ava.texto,
-    #                                                likes=0,
-    #                                                data_criacao=func.now()
-    #                                                )
-    #         self.session.execute(stmt)
-    #         self.session.commit()
-    #         return 1
-    #     except Exception as error:
-    #         self.session.rollback()
-    #         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
