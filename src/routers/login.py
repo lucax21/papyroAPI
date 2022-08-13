@@ -8,6 +8,7 @@ from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.schemas.login import Login, LoginSucesso
 from src.schemas.user import BaseUser
+from src.core.token_provider import check_access_token, get_confirmation_token
 
 settings = Settings()
 router = APIRouter()
@@ -68,3 +69,22 @@ def refresh(Authorize: AuthJWT = Depends()):
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}
+
+@router.get("/verification")
+def verification(token: str, session: Session = Depends(get_db)):
+    invalid_token_error = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid Token.')
+
+    try:
+        payload = check_access_token(token)
+    except jwt.JWSError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token has expired")
+    user = CrudUser(session).get_verification(email=payload)
+
+    if user.active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User already activated")
+    
+    CrudUser(session).ativar_conta(user.id, None, True)
+
+    return 1
+
+

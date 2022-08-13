@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import re
 from datetime import date
 from typing import Optional, List
 
@@ -35,15 +35,36 @@ class User(UserDB):
     followers: Optional[int] = None
 
 
-class UserNew(BaseUser):
+class NewUser(BaseUser):
     email: EmailStr
     password: Optional[str] = None
     confirm_password: Optional[str] = None
-    birthday: Optional[str] = None
-
+    birthday: date
+ 
+    @validator('birthday')
+    def vl_birthday(cls, value):
+        # verifica se é maior de 18 anos
+        idade = (date.today() - value)
+        if (idade.days / 365.25) < 18.0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail="Você deve ser maior de idade para criar um conta.")
+        return value
+    
+    @validator('password')
+    def vl_password(cls, value):
+        password = re.match('^(?=\\S+$).{8,32}$', value)
+        if not password:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A senha deve conter no mínimo 8 dígitos e no máximo 32 dígitos.")
+        return value
+    
+    @validator('confirm_password')
+    def vl_confirm_password(cls,v , values, **kwargs):
+        if 'password' in values and v != values['password']:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A senhas são diferentes.")
+        
     class Config:
         orm_mode = True
-
+        fields = {'description': {'exclude': True}}
 
 class UserPhoto(BaseModel):
     photo: HttpUrl
@@ -55,8 +76,7 @@ class UserPhoto(BaseModel):
 class UserUpdate(BaseModel):
     name: str
     nickname: str
-    photo: Optional[str] = None
-    description: Optional[str] = None
+    description: str
     birthday: date
 
     @validator('birthday')

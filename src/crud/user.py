@@ -20,16 +20,16 @@ class CrudUser:
 
     def new_user(self, user: User):
         try:
-            db_usuario = models.User(nome=user.nome,
+            stmt = models.User(name=user.name,
                                      email=user.email,
-                                     apelido=user.apelido,
-                                     senha=hash_provider.get_password_hash(user.senha),
-                                     data_nascimento=user.data_nascimento,
-                                     ativo=False)
-            self.session.add(db_usuario)
+                                     nickname=user.nickname,
+                                     password=hash_provider.get_password_hash(user.password),
+                                     birthday=user.birthday,
+                                     active=False)
+            self.session.add(stmt)
             self.session.commit()
-            self.session.refresh(db_usuario)
-            return db_usuario
+            self.session.refresh(stmt)
+            return stmt
         except Exception:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -61,6 +61,9 @@ class CrudUser:
     def current_user(self, email):
         return self.session.query(models.User.id) \
             .where(models.User.email == email).first()
+    
+    def get_verification(self, email: str):
+        return self.session.query(models.User.id, models.User.active, models.User.confirmation).where(models.User.email == email).first()
 
     def get_by_email(self, email):
         return self.session.query(models.User.id, models.User.email, models.User.active, models.User.password,
@@ -157,18 +160,21 @@ class CrudUser:
                 'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
                 }
 
-    def ativar_conta(self, instancia_usu):
+    def ativar_conta(self, id, confirmation, active):
         try:
             update_stmt = update(models.User).where(
-                models.User.id == instancia_usu.id).values(ativo=instancia_usu.ativo, confirmacao=instancia_usu.confirmacao)
+                models.User.id == id).values(active=active, confirmation=confirmation)
             self.session.execute(update_stmt)
             self.session.commit()
+            return 1
         except Exception as error:
-            self.session.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+           self.session.rollback()
+           raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def atualizar_usuario(self, user_id: int, usuario: UserUpdate):
+    def update_user(self, user_id: int, usuario: UserUpdate):
+        
 
+        return usuario.birthday
         try:
             atualizar_stmt = update(models.User).where(models.User.id == user_id).values(name=usuario.name,
                                                                                          nickname=usuario.nickname,

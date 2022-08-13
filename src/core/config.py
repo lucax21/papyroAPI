@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     USER_TOKEN_LIFETIME = timedelta(days=1)
     REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
-    # EMAIL_HOST = ['smtp.office365.com', 587]
+    #EMAIL_HOST = ['smtp.office365.com', 587]
     SSL = True
     EMAIL_HOST_USER: str = os.getenv("EMAIL_HOST")
     EMAIL_HOST_PASSWORD: str = os.getenv("EMAIL_HOST_PASSWORD")
