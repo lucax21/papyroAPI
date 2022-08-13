@@ -1,11 +1,10 @@
 from requests import get, HTTPError, Timeout, TooManyRedirects, RequestException
-from src.core.config import settings
 
 
 def get_by_term(term, page):
     url = f'https://www.googleapis.com/books/v1/volumes/'
     params = {
-        'key': settings.GOOGLE_API,
+        'key': 'AIzaSyDuFY-Q-UHBEUFxcDWi4MFXZLSMt5ru3VY',
         'q': term,
         'maxResults': 40,
         'printType': 'books',
