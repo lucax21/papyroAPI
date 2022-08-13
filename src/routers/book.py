@@ -25,11 +25,11 @@ async def get_book_by_id(id: int,
     return data
 
 @router.get("/search/"
-#, response_model=List[BookSearch]
+, response_model=List[BookSearch]
 )
 async def search_book(search: str,
                         page: int = 0,
-                        # current_user: User = Depends(obter_usuario_logado),
+                        current_user: User = Depends(obter_usuario_logado),
                         session: Session = Depends(get_db)):
 	return CrudBook(session).search_book(search, page)
 
