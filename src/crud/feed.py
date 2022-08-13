@@ -89,7 +89,7 @@ class CrudFeed:
                 aux.append({
                     'rates': query_count[0]['count_comments'],
                     'type': x.type,
-                    'id': x.id_rate if x.type == 'r' else x.id_comment,
+                    'id': x.id_rate,
                     'date': x.formatted_date,
                     'text': x.text,
                     'rate': x.rate if x.type == 'r' else 0,
