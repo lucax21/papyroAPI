@@ -11,7 +11,7 @@ from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.book import BookByType
-from src.schemas.user import UserUpdate, User, UserAddBookToLibrary, UserNew, BaseUser, UsersCompanyStatus, UsersCompany, Usuario
+from src.schemas.user import UserSearch, UserUpdate, User, UserAddBookToLibrary, UserNew, BaseUser, UsersCompanyStatus, UsersCompany, Usuario
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
@@ -74,15 +74,17 @@ async def cadastrar(user: UserNew, session: Session = Depends(get_db)):
     return usuario_criado
 
 
-@router.get("/buscarUsuarios{termo}", response_model=List[User])
-def buscar_usuario(termo: str, session: Session = Depends(get_db)):
-    if not termo:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Termo de pesquisa vazio.")
+@router.get("/search"
+, response_model=List[UserSearch]
+)
+def search_users(search: str, page: int = 0, session: Session = Depends(get_db)
+,current_user: User = Depends(obter_usuario_logado)
+):
+    if not search:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Campo de pesquisa vazio.")
 
-    dado = CrudUser(session).search_by_name(termo)
-    if not dado:
-        raise HTTPException(status_code=404, detail='Não encontrado')
-    return dado
+    return CrudUser(session).search_by_name(search, current_user.id, page)
+
 
 
 @router.get("/viewProfile", response_model=Usuario)

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
 
 from src.db.models import models
-from src.external_api.get_book import get_by_identifier
+from src.external_api.get_book import get_by_identifier, search_book
 from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import format_book_output
 
@@ -140,20 +140,26 @@ class CrudBook:
                 print(err)
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
 
-
-    #
-    # def avaliar_livro(self, id_user, ava: LivroAvaliar):
-    #     try:
-    #         stmt = insert(models.Avaliacao).values(fk_livro=ava.id_livro,
-    #                                                fk_usuario=id_user,
-    #                                                nota=ava.nota,
-    #                                                texto=ava.texto,
-    #                                                likes=0,
-    #                                                data_criacao=func.now()
-    #                                                )
-    #         self.session.execute(stmt)
-    #         self.session.commit()
-    #         return 1
-    #     except Exception as error:
-    #         self.session.rollback()
-    #         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def search_book(self, search: str, page: int):
+        get_books = search_book(search, page, 16)
+        aux = []
+        for x in get_books['items']:
+            book = format_book_output(x)
+            
+            query_book = self.session.query(models.Book.id.label('id'),
+                                            func.count(models.Rate.id).label('count'),
+                                            func.sum(models.Rate.rate).label('sum'))\
+                                    .where(models.Book.identifier == book['identifier'])\
+                                    .join(models.Rate, models.Rate.fk_book == models.Book.id)\
+                                    .group_by(models.Book).first()
+      
+    
+            aux.append({'id': query_book.id if query_book else None,
+                        'rate': query_book.sum / query_book.count if query_book else 0,
+                        'cover': book['cover'],
+                        'identifier': book['identifier'],
+                        'book_title': book['book_title'],
+                        'author': book['author']
+                    })
+        return aux
+    
