@@ -11,7 +11,7 @@ from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.book import BookByType
-from src.schemas.user import UserUpdate, User, UserAddBookToLibrary, UserNew, BaseUser, UsersCompanyStatus, UsersCompany, Usuario
+from src.schemas.user import UserUpdate, User, UserNew, BaseUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
@@ -96,16 +96,14 @@ async def view_profile(id: Optional[int] = None, session: Session = Depends(get_
 @router.put("/atualizarDados", status_code=status.HTTP_200_OK)
 async def editar_dados(usuario: UserUpdate, session: Session = Depends(get_db),
                        current_user: User = Depends(obter_usuario_logado)):
-
     usuario_db = CrudUser(session).get_user(current_user.id)
     if not usuario_db['nickname'] == usuario.nickname:
-        
+
         apelido_buscado = CrudUser(session).buscar_por_apelido(usuario.nickname)
         if apelido_buscado:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
 
     return CrudUser(session).atualizar_usuario(current_user.id, usuario)
-    
 
 
 @router.get("/editProfile", response_model=BaseUser)
@@ -119,7 +117,6 @@ def atualizar_foto(link: str, session: Session = Depends(get_db)
                    , current_user: User = Depends(obter_usuario_logado)
                    ):
     return CrudUser(session).atualizar_foto(current_user.id, link)
-
 
 
 @router.get("/books/{reading_type}", response_model=List[BookByType])
@@ -155,3 +152,10 @@ async def book_user_status(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Status do livro inválido.")
 
     return CrudUser(session).get_company_status(id_book, id_status)
+
+
+#
+@router.get("/suggestion", response_model=Suggestion)
+async def get_company(current_user: User = Depends(obter_usuario_logado), page: Optional[int] = 0,
+                      session: Session = Depends(get_db)):
+    return CrudUser(session).get_sugestions(current_user.id, page)
