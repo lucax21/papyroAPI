@@ -95,9 +95,6 @@ class UserUpdate(BaseModel):
         assert v.isalnum(), 'deve ser alfanumérico'
         return v
 
-    # class Config:
-    #     orm_mode = True
-
 
 class Usuario(UserDB):
     booksQt: Optional[int] = None

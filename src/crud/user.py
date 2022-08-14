@@ -160,7 +160,7 @@ class CrudUser:
                 'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
                 }
 
-    def ativar_conta(self, id, confirmation, active):
+    def active_account(self, id, confirmation, active):
         try:
             update_stmt = update(models.User).where(
                 models.User.id == id).values(active=active, confirmation=confirmation)
@@ -171,16 +171,15 @@ class CrudUser:
            self.session.rollback()
            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def update_user(self, user_id: int, usuario: UserUpdate):
+    def update_user(self, user_id: int, user: UserUpdate):
         try:
-            atualizar_stmt = update(models.User).where(models.User.id == user_id).values(name=usuario.name,
-                                                                                         nickname=usuario.nickname,
-                                                                                         description=usuario.description,
-                                                                                         birthday=usuario.birthday
+            stmt = update(models.User).where(models.User.id == user_id).values(name=user.name,
+                                                                                         nickname=user.nickname,
+                                                                                         description=user.description,
+                                                                                         birthday=user.birthday
                                                                                          )
-            self.session.execute(atualizar_stmt)
+            self.session.execute(stmt)
             self.session.commit()
-            # self.session.refresh(usuario)
             return 1
         except Exception as error:
             self.session.rollback()

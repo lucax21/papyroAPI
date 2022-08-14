@@ -83,7 +83,7 @@ def verification(token: str, session: Session = Depends(get_db)):
     if user.active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User already activated")
     
-    CrudUser(session).ativar_conta(user.id, None, True)
+    CrudUser(session).active_account(user.id, None, True)
 
     return 1
 
