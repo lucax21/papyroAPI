@@ -28,6 +28,6 @@ class Mailer:
         confirmacao_url = f'http://{settings.PROJECT_SERVER}:{settings.PROJECT_PORT}/login/verification?token={token}'
 
         mensagem = '''
-        Por favor, confirme sua cadastro no papyro: {}'''.format(confirmacao_url)
+        Por favor, confirme seu cadastro no papyro: {}'''.format(confirmacao_url)
         
         Mailer.enviar_email(mensagem, 'Confirme sua cadastro no papyro', user_email)
