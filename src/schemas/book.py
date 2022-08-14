@@ -16,6 +16,13 @@ class BookBase(BaseModel):
         orm_mode = True
 
 
+class BookSearch(BookBase):
+    id: Optional[int] = None
+    rate: Optional[int] = 0
+        
+    class Config:
+        fields = {'count': {'exclude': True}}
+
 class BookExtended(BaseModel):
     id: Optional[int]
     book_title: str

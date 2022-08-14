@@ -95,6 +95,11 @@ class UserSuperBasic(BaseModel):
         arbitrary_types_allowed = True
 
 
+class UserSearch(UserSuperBasic):
+	common_genre: Optional[int] = 0
+	common_book: Optional[int] = 0
+
+
 class UserSuggestion(UserSuperBasic):
     interactions: Optional[int] = 0
 
