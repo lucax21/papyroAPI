@@ -15,16 +15,16 @@ class CrudFriend:
                             models.Friend.ignored == False
                             ))\
                 .join(models.Friend, models.User.id == models.Friend.fk_destiny)\
-                .offset(page * 8).limit(8).all()
+                .offset(page * 16).limit(16).all()
     
-    def accept_or_block_friend(self, id_user, oper_type, mode, id_friend):
+    def accept_or_ignored_friend(self, id_user, oper_type, mode, id_friend):
         if oper_type == 'a':
-            update_friend = update(models.Friend).values(pending=mode).where(and_(models.Friend.fk_origin == id_user, models.Friend.fk_destiny == id_friend))
+            update_friend = update(models.Friend).values(pending=mode).where(and_(models.Friend.fk_origin == id_friend, models.Friend.fk_destiny == id_user))
             self.session.execute(update_friend)
             self.session.commit()
             return 1
         if oper_type == 'i':
-            update_friend = update(models.Friend).values(ignored=mode).where(and_(models.Friend.fk_origin == id_user, models.Friend.fk_destiny == id_friend))
+            update_friend = update(models.Friend).values(ignored=mode).where(and_(models.Friend.fk_origin == id_friend, models.Friend.fk_destiny == id_user))
             self.session.execute(update_friend)
             self.session.commit()
             return 1

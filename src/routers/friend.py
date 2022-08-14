@@ -17,14 +17,14 @@ async def get_friends(
     return CrudFriend(session).get_friends(current_user.id, page)
 
 @router.patch("/{oper_type}/{mode}/{id_friend}")
-async def accept_or_block_friend(
+async def accept_or_ignored_friend(
         oper_type: str, mode: bool, id_friend: int,
         session: Session = Depends(get_db),
         current_user: User = Depends(obter_usuario_logado)):
     if oper_type != 'a' and oper_type != 'i':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Argumento de tipo de post inválido.")
 
-    return CrudFriend(session).accept_or_block_friend(current_user.id, oper_type, mode, id_friend)
+    return CrudFriend(session).accept_or_ignored_friend(current_user.id, oper_type, mode, id_friend)
 
 @router.post("/{id_friend}")
 async def add_friend(
