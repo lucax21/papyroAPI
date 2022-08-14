@@ -100,6 +100,14 @@ class UserSearch(UserSuperBasic):
 	common_book: Optional[int] = 0
 
 
+class UserSuggestion(UserSuperBasic):
+    interactions: Optional[int] = 0
+
+
+class Suggestion(BaseModel):
+    data: List[UserSuggestion]
+
+
 class UserAddBookToLibrary(BaseModel):
     id_livro: int
     id_status: int

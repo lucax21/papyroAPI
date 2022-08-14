@@ -86,3 +86,7 @@ class BookUserStatus(BaseModel):
     id_user: int
     id_book: int
     id_status: int
+
+
+class BookSuggestion(BaseModel):
+    data: List[BookByType]

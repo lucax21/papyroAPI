@@ -4,7 +4,6 @@ from requests import get, HTTPError, Timeout, TooManyRedirects, RequestException
 def get_by_term(term, page):
     url = f'https://www.googleapis.com/books/v1/volumes/'
     params = {
-        'key': 'AIzaSyDuFY-Q-UHBEUFxcDWi4MFXZLSMt5ru3VY',
         'q': term,
         'maxResults': 40,
         'printType': 'books',
