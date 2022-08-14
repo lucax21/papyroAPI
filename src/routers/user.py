@@ -17,7 +17,7 @@ from src.utils.enum.reading_type import ReadingTypes
 router = APIRouter()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=User)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def new_user(user: NewUser, session: Session = Depends(get_db)):
     if not user.name:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
@@ -44,7 +44,7 @@ async def new_user(user: NewUser, session: Session = Depends(get_db)):
     except ConnectionRefusedError:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Email não poderia ser enviado. Por favor, tente de novo."
+            detail="Email não poderia ser enviado. Por favor, tente novamente."
         )
 
     return 1

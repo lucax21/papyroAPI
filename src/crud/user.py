@@ -1,5 +1,5 @@
 from typing import List
-
+from datetime import datetime
 from fastapi import HTTPException, status
 from sqlalchemy import update, and_
 from sqlalchemy.orm import Session, joinedload
@@ -172,9 +172,6 @@ class CrudUser:
            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def update_user(self, user_id: int, usuario: UserUpdate):
-        
-
-        return usuario.birthday
         try:
             atualizar_stmt = update(models.User).where(models.User.id == user_id).values(name=usuario.name,
                                                                                          nickname=usuario.nickname,
