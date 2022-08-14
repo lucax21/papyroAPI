@@ -1,9 +1,10 @@
 from typing import List
 from datetime import datetime
 from fastapi import HTTPException, status
-from sqlalchemy import update, and_
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import update, and_, bindparam, Integer
+from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
+from sqlalchemy.sql import text
 
 from src.core import hash_provider
 from src.db.models import models
@@ -73,6 +74,83 @@ class CrudUser:
 
     def buscar_por_apelido(self, nickname):
         return self.session.query(models.User.nickname).filter(models.User.nickname == nickname).first()
+
+    def get_suggestions(self, id, page):
+        s = text('''
+            WITH result AS(WITH aux AS (
+                    SELECT ub2.fk_user suggestion, COUNT(ub.fk_book) quantity
+                    from "user" u
+                    JOIN user_book ub on ub.fk_user = u.id
+                    JOIN user_book ub2 on ub.fk_book = ub2.fk_book and u.id <> ub2.fk_user
+                    WHERE 1 = 1
+                    and u.id = :x
+                    GROUP BY ub2.fk_user
+                UNION ALL
+                    SELECT r2.fk_user suggestion, COUNT(r.id) quantity
+                    from "user" u
+                    JOIN rate r on u.id = r.fk_user
+                    JOIN rate r2 on r2.fk_book = r.fk_book and u.id <> r2.fk_user
+                    WHERE 1 = 1
+                    and u.id = :x
+                    GROUP BY r2.fk_user
+                UNION all
+                    SELECT c.fk_user suggestion, COUNT(r.id) quantity
+                    from "user" u
+                    JOIN rate r on u.id = r.fk_user
+                    JOIN comment c on r.id = c.fk_rate and u.id <> c.fk_user
+                    WHERE 1 = 1
+                    and u.id = :x
+                    GROUP BY c.fk_user
+                UNION ALL
+                    SELECT c.fk_user suggestion, COUNT(r.id) quantity
+                    from "user" u
+                    JOIN comment c on u.id = c.fk_user
+                    JOIN rate r on c.fk_rate = r.id and r.fk_user <> u.id
+                    WHERE 1 = 1
+                    and u.id = :x
+                    GROUP BY c.fk_user
+                UNION ALL
+                    SELECT ug2.fk_user suggestion, COUNT(ug.fk_genre) quantity
+                    from "user" u
+                    JOIN user_genre ug on u.id = ug.fk_user
+                    JOIN user_genre ug2 on ug2.fk_genre = ug.fk_genre
+                    WHERE 1 = 1
+                    and u.id = :x
+                    GROUP BY ug2.fk_user
+                UNION ALL
+                    SELECT l.fk_user suggestion, COUNT(l.id) quantity
+                    from "user" u
+                    JOIN comment c on u.id = c.fk_user
+                    JOIN "like" l on c.id = l.fk_comment
+                    WHERE 1 = 1
+                    and u.id = :x
+                    GROUP BY l.fk_user
+                UNION ALL
+                    SELECT l.fk_user suggestion, COUNT(l.id) quantity
+                    from "user" u
+                    JOIN rate r on u.id = r.fk_user
+                    JOIN "like" l on r.id = l.fk_rate
+                    WHERE 1 = 1
+                    and u.id = :x
+                    GROUP BY l.fk_user
+                    )
+            SELECT suggestion, sum(quantity) as quantity
+            FROM aux
+            GROUP BY suggestion )
+        SELECT "user".id, "user".nickname, "user".photo, result.quantity as interactions
+        FROM result
+            JOIN "user" on result.suggestion = "user".id
+        WHERE "user".id <> :x 
+            AND "user".id NOT IN (SELECT f.fk_origin FROM friend f where f.fk_destiny = 3)
+            AND "user".id NOT IN (SELECT f.fk_destiny FROM friend f where f.fk_origin = 3)
+        ORDER BY result.quantity DESC
+        OFFSET :y
+        LIMIT 20
+        ''')
+
+        s = s.bindparams(bindparam('x', type_=Integer), bindparam('y', type_=Integer))
+        result = self.session.execute(s, {'x': id, 'y': page}).fetchall()
+        return {'data': result}
 
     def get_user(self, id) -> models.User:
         query = self.session.query(models.User).filter(models.User.id == id).first()
