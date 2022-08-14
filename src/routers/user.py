@@ -156,8 +156,8 @@ async def book_user_status(
     return CrudUser(session).get_company_status(id_book, id_status)
 
 
-#
-@router.get("/suggestion", response_model=Suggestion)
-async def get_company(current_user: User = Depends(obter_usuario_logado), page: Optional[int] = 0,
+
+@router.get("/extras/suggestion/get", response_model=Suggestion)
+async def get_suggestion(current_user: User = Depends(obter_usuario_logado), page: Optional[int] = 0,
                       session: Session = Depends(get_db)):
-    return CrudUser(session).get_sugestions(current_user.id, page)
+    return CrudUser(session).get_suggestions(current_user.id, page)

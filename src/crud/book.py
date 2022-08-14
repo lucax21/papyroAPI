@@ -1,13 +1,14 @@
 from fastapi import HTTPException, status
-from sqlalchemy import and_, update, insert
+from sqlalchemy import and_, update, insert, Integer, bindparam
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
+from sqlalchemy.sql import text
 
 from src.db.models import models
 from src.external_api.get_book import get_by_identifier, search_book
 from src.utils.enum.reading_type import ReadingTypes
-from src.utils.format_book_output import format_book_output
+from src.utils.format_book_output import format_book_output, get_and_format_output
 
 
 class CrudBook:
@@ -162,4 +163,33 @@ class CrudBook:
                         'author': book['author']
                     })
         return aux
-    
+
+    def get_suggestions(self, id, page):
+        s = text('''
+            WITH aux AS (SELECT b.id, b.identifier, avg(r.rate) as rate, count(distinct ub.fk_user) users, count(ub.fk_book) genre
+            FROM user_genre ug
+            JOIN user_genre ug2 on ug.fk_genre = ug2.fk_genre
+            JOIN user_book ub on ug2.fk_user = ub.fk_user
+            JOIN rate r on ub.fk_book = r.fk_book
+            JOIN book b ON b.id = r.fk_book
+            WHERE ug.fk_user = :x
+             AND b.id NOT IN (SELECT b.fk_book FROM user_book b WHERE b.fk_user = :x)
+            GROUP BY b.id, b.identifier
+            ORDER BY 3 DESC, 4 DESC, 2 DESC
+            OFFSET :y
+            LIMIT 20)
+            SELECT identifier, id, rate from aux
+        ''')
+
+        s = s.bindparams(bindparam('x', type_=Integer), bindparam('y', type_=Integer))
+        result = self.session.execute(s, {'x': id, 'y': page}).all()
+
+        result_dict = []
+        for entry in result:
+            result_dict.append(dict(entry))
+
+        for entry in result_dict:
+            entry.update(get_and_format_output(entry['identifier']))
+
+        return {'data': result_dict}
+
