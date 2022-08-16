@@ -61,6 +61,7 @@ class UserBook(Base):
     fk_user = Column(ForeignKey("user.id"), primary_key=True)
     fk_status = Column(ForeignKey("status.id"))
     date = Column(DateTime)
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
 
 
 class Rate(Base):
@@ -98,6 +99,8 @@ class Like(Base):
     __tablename__ = 'like'
 
     id = Column(Integer, primary_key=True, index=True)
+    date = Column(DateTime)
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
     
     fk_comment = Column(ForeignKey("comment.id"))
     fk_rate = Column(ForeignKey("rate.id"))
@@ -110,6 +113,7 @@ class Friend(Base):
     date = Column(DateTime)
     pending = Column(Boolean)
     ignored = Column(Boolean)
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
     
     fk_origin = Column(ForeignKey("user.id"), primary_key=True)
     fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
