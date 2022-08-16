@@ -7,10 +7,6 @@ from sqlalchemy.orm import relationship, column_property
 
 from src.db.database import Base
 
-# user_genre = Table("user_genre", Base.metadata,
-#                    Column("fk_genre", ForeignKey("genre.id"), primary_key=True),
-#                    Column("fk_user", ForeignKey("user.id"), primary_key=True)
-#                    )
 
 class UserGenre(Base):
     __tablename__ = 'user_genre'
@@ -65,6 +61,7 @@ class UserBook(Base):
     fk_user = Column(ForeignKey("user.id"), primary_key=True)
     fk_status = Column(ForeignKey("status.id"))
     date = Column(DateTime)
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
 
 
 class Rate(Base):
@@ -94,7 +91,6 @@ class Comment(Base):
 
     fk_user = Column(ForeignKey("user.id"))
     fk_rate = Column(ForeignKey("rate.id"))
-    fk_book = Column(ForeignKey("book.id"))
 
     formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
 
@@ -103,7 +99,9 @@ class Like(Base):
     __tablename__ = 'like'
 
     id = Column(Integer, primary_key=True, index=True)
-
+    date = Column(DateTime)
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
+    
     fk_comment = Column(ForeignKey("comment.id"))
     fk_rate = Column(ForeignKey("rate.id"))
     fk_user = Column(ForeignKey("user.id"))
@@ -112,8 +110,11 @@ class Like(Base):
 class Friend(Base):
     __tablename__ = 'friend'
 
+    date = Column(DateTime)
     pending = Column(Boolean)
     ignored = Column(Boolean)
+    formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
+    
     fk_origin = Column(ForeignKey("user.id"), primary_key=True)
     fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
 
@@ -128,5 +129,3 @@ class Friend(Base):
 #     # fk_origin = Column(ForeignKey("user.id"))
 #     # fk_destiny = Column(ForeignKey("user.id"))
 
-#     # usuario_origem = relationship("Usuario", foreign_keys='Mensagem.fk_origem')
-#     # usuario_destino = relationship("Usuario", foreign_keys='Mensagem.fk_destino')
