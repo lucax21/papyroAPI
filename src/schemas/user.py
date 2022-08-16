@@ -88,7 +88,7 @@ class Usuario(UserDB):
 class UserSuperBasic(BaseModel):
     id: int
     nickname: str
-    photo: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
+    photo: Optional[HttpUrl] = 'https://i.pinimg.com/736x/67/4f/c5/674fc554838de6abdbf274bdc0ca446c.jpg'
 
     class Config:
         orm_mode = True
@@ -96,8 +96,8 @@ class UserSuperBasic(BaseModel):
 
 
 class UserSearch(UserSuperBasic):
-	common_genre: Optional[int] = 0
-	common_book: Optional[int] = 0
+    common_genre: Optional[int] = 0
+    common_book: Optional[int] = 0
 
 
 class UserSuggestion(UserSuperBasic):
