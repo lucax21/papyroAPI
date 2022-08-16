@@ -14,14 +14,14 @@ class CrudNotification:
       
         rates = self.session.query(
                                     models.Comment.date.label('data'),
-                                    models.Comment.id.label('id_comment'),
+                                    models.Comment.id,
                                     models.Comment.formatted_date,
                                     models.Rate.id.label('id_rate'),
                                     models.Book.id.label('id_book'),
                                     models.Book.identifier,
                                     models.User.nickname,
                                     models.User.photo,
-                                    models.User.id,
+                                    models.User.id.label('id_user'),
                                     literal('r').label('type'),
                                     func.concat(models.User.nickname, ' comentou ', ' "', func.substring(models.Comment.text, 1,12),'... "', ' na sua avaliação.').label('text'),
                                     )\
@@ -35,7 +35,7 @@ class CrudNotification:
                                         models.Friend.date.label('data'),
                                         models.Friend.pending,
                                         models.Friend.formatted_date,
-                                        models.User.id, models.User.nickname, models.User.photo,
+                                        models.User.id.label('id_user'), models.User.nickname, models.User.photo,
                                         literal('p').label('type'),
                                         func.concat(models.User.nickname, ' pediu para seguir você.').label('text'),
                                     )\
@@ -51,7 +51,7 @@ class CrudNotification:
                                         models.Friend.date.label('data'),
                                         models.Friend.pending,
                                         models.Friend.formatted_date,
-                                        models.User.id, models.User.nickname, models.User.photo,
+                                        models.User.id.label('id_user'), models.User.nickname, models.User.photo,
                                         literal('a').label('type'),
                                         func.concat(models.User.nickname, ' aceitou sua solicitação.').label('text'),
                                     )\
@@ -63,7 +63,7 @@ class CrudNotification:
                                     .order_by(models.Friend.date.desc())\
                                     .offset(page * 4).limit(4).all()
                            
-        likes = self.session.query(
+        likes_rate = self.session.query(
                                     models.Like.date.label('data'),
                                     models.Like.id,
                                     models.Like.formatted_date,
@@ -73,7 +73,7 @@ class CrudNotification:
                                     models.User.nickname,
                                     models.User.photo,
                                     models.User.id.label('id_user'),
-                                    literal('l').label('type'),
+                                    literal('lr').label('type'),
                                     func.concat(models.User.nickname, ' curtiu sua avaliação sobre o livro.').label('text'),
                                     )\
                             .where(models.Rate.fk_user == id_user)\
@@ -83,26 +83,54 @@ class CrudNotification:
                             .order_by(models.Like.date.desc())\
                             .offset(page * 4).limit(4).all()
         
+        likes_comment = self.session.query(
+                                    models.Like.date.label('data'),
+                                    models.Like.id,
+                                    models.Like.formatted_date,
+                                    models.Comment.id.label('id_comment'),
+                                    models.Rate.id.label('id_rate'),
+                                    models.Book.id.label('id_book'),
+                                    models.Book.identifier,
+                                    models.User.nickname,
+                                    models.User.photo,
+                                    models.User.id.label('id_user'),
+                                    literal('lc').label('type'),
+                                    func.concat(models.User.nickname, ' curtiu seu comentário sobre o livro.').label('text'),
+                                    )\
+                            .where(models.Comment.fk_user == id_user)\
+                            .join(models.Like, models.Like.fk_comment == models.Comment.id)\
+                            .join(models.Rate, models.Rate.id == models.Comment.fk_rate)\
+                            .join(models.Book, models.Book.id == models.Rate.fk_book)\
+                            .join(models.User, models.User.id == models.Like.fk_user)\
+                            .order_by(models.Like.date.desc())\
+                            .offset(page * 4).limit(4).all()
+        
 
         sort = rates
         sort.append(pending[0])
         sort.append(accept[0])
-        sort.append(likes[0])
+        sort.append(likes_rate[0])
+        sort.append(likes_comment[0])
 
         sort = sorted(sort, key = lambda x: x[0], reverse=True)
         data = {'data': sort}
+            
+        def book(identifier, id):
+            book = get_and_format_output(identifier) 
+            book.update({'id': id})
+            return book
 
         aux = []
         for x in data['data']:
             aux.append({
-                    'book': get_and_format_output(x.identifier) if x.type == 'l' else None,
+                    'book': book(x.identifier, x.id_book) if x.type == 'r' or x.type == 'lr' or x.type == 'lc' else None,
                     'user': {
-                            'id': x.id,
+                            'id': x.id_user,
                             'photo': x.photo,
                             'nickname': x.nickname,
                         },
                     'notification': {
-                            'id': x.id_rate if x.type == 'r' else None,
+                            'id': None if x.type == 'a' or x.type == 'p' else x.id,
                             'date': x.formatted_date,
                             'type': x.type,
                             'text': x.text,
