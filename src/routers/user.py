@@ -11,15 +11,14 @@ from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.book import BookByType
-from src.schemas.user import UserSearch, UserUpdate, User, UserNew, BaseUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
+from src.schemas.user import UserSearch, UserUpdate, User, NewUser, BaseUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=User)
-async def cadastrar(user: UserNew, session: Session = Depends(get_db)):
-    # verifica campos vazios
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def new_user(user: NewUser, session: Session = Depends(get_db)):
     if not user.name:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
     elif not user.nickname:
@@ -31,47 +30,24 @@ async def cadastrar(user: UserNew, session: Session = Depends(get_db)):
     elif not user.birthday:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
 
-    # verifica senha
-    """
-    a expressão do regex diz:
-    - senha deve ter de 8 a 20 digitos
-    - espaços em branco não são permitidos
-    """
-    result_senha = re.match('^(?=\\S+$).{8,20}$', user.password)
-    if not result_senha:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="A Senha deve conter no mínimo 8 dígitos e no máximo 20 dígitos.")
 
-    # verifica se é maior de 18 anos
-    idade = (date.today() - datetime.strptime(user.birthday, '%Y-%m-%d'))
-    result_idade = (idade.days / 365.25)
-    if result_idade < 18.0:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Você deve ser maior de idade para criar um conta.")
-
-    # verifica se o apelido já está sendo utilizado
-    apelido_buscado = CrudUser(session).buscar_por_apelido(user.nickname)
-    if apelido_buscado:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
-    # verifica se o email já está sendo utilizado
     email_buscado = CrudUser(session).get_by_email(user.email)
     if email_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
 
-    # cria o novo usuário
-    usuario_criado = CrudUser(session).new_user(user)
+    new_user = CrudUser(session).new_user(user)
 
-    token_confirmacao = get_confirmation_token(usuario_criado.email, usuario_criado.confirmacao)
+    token_confirmation = get_confirmation_token(new_user.email, new_user.confirmation)
 
     try:
-        Mailer.enviar_email_confirmacao(token_confirmacao["token"], usuario_criado.email)
+        Mailer.enviar_email_confirmacao(token_confirmation["token"], new_user.email)
     except ConnectionRefusedError:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Email não poderia ser enviado. Por favor, tente de novo."
+            detail="Email não poderia ser enviado. Por favor, tente novamente."
         )
 
-    return usuario_criado
+    return 1
 
 
 @router.get("/search"
@@ -95,24 +71,13 @@ async def view_profile(id: Optional[int] = None, session: Session = Depends(get_
     return CrudUser(session).get_by_id(id)
 
 
-@router.put("/atualizarDados", status_code=status.HTTP_200_OK)
+@router.put("/editProfile", status_code=status.HTTP_200_OK)
 async def editar_dados(usuario: UserUpdate, session: Session = Depends(get_db),
                        current_user: User = Depends(obter_usuario_logado)):
     usuario_db = CrudUser(session).get_user(current_user.id)
-    if not usuario_db['nickname'] == usuario.nickname:
 
-        apelido_buscado = CrudUser(session).buscar_por_apelido(usuario.nickname)
-        if apelido_buscado:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse apelido.")
-
-    return CrudUser(session).atualizar_usuario(current_user.id, usuario)
-
-
-@router.get("/editProfile", response_model=BaseUser)
-async def edit_profile(session: Session = Depends(get_db)
-                       , current_user: User = Depends(obter_usuario_logado)):
-    return CrudUser(session).get_user(current_user.id)
-
+    return CrudUser(session).update_user(current_user.id, usuario)
+    
 
 @router.put("/atualizarFoto", status_code=status.HTTP_200_OK)
 def atualizar_foto(link: str, session: Session = Depends(get_db)
