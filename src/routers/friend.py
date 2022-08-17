@@ -9,12 +9,15 @@ from src.crud.friend import CrudFriend
 
 router = APIRouter()
 
-@router.get("/", response_model=List[Friend])
+@router.get("/"
+        , response_model=List[Friend]
+        )
 async def get_friends(
+        friend_type: str,
         page: int = 0,
         current_user: User = Depends(obter_usuario_logado),
         session: Session = Depends(get_db)):
-    return CrudFriend(session).get_friends(current_user.id, page)
+    return CrudFriend(session).get_friends(current_user.id, friend_type, page)
 
 @router.patch("/{oper_type}/{mode}/{id_friend}")
 async def accept_or_ignored_friend(
