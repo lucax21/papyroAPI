@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import HTTPException, status
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from src.db.models import models
@@ -38,14 +39,15 @@ class CrudGenre:
 
         return result
 
-    def save_user_genres(self, userGenre: List[GenreUserNew], user_id):
-        try:
-            for i in userGenre:
-                id_genero = i.idGenero
-                print(id_genero)
-                self.session.execute(models.user_genre.insert().values(fk_usuario=user_id, fk_genero=id_genero))
-                self.session.commit()
-            return userGenre
-        except Exception as error:
-            self.session.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    def save_user_genres(self, id_user: int, id_genre: int, mode: bool):
+        genre_obj = self.session.query(models.UserGenre).where(and_(models.UserGenre.fk_user == id_user, models.UserGenre.fk_genre == id_genre)).first()
+        if mode and not genre_obj:        
+            stmt = models.UserGenre(fk_user=id_user, fk_genre=id_genre)
+            self.session.add(stmt)
+            self.session.commit()
+            return 1
+        if not mode and genre_obj:
+            self.session.delete(genre_obj)
+            self.session.commit()
+            return -1
+

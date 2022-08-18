@@ -19,15 +19,12 @@ async def list_genre(session: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail='Não encontrado')
     return dado
 
-
-@router.post("/", status_code=status.HTTP_201_CREATED)
-def user_genre_save(lista: List[GenreUserNew], session: Session = Depends(get_db),
-                    current_user: User = Depends(obter_usuario_logado)):
-    if len(lista) < 3:
-        raise HTTPException(status_code=404, detail='Deve haver um mínimo de 3 gêneros literários selecionados.')
-
-    return CrudGenre(session).save_user_genres(lista, current_user.id)
-
+@router.patch("/save/{id}/{mode}")
+async def save_user_genre(
+        id: int, mode: bool,
+        current_user: User = Depends(obter_usuario_logado),
+        session: Session = Depends(get_db)):
+    return CrudGenre(session).save_user_genres(current_user.id, id, mode)
 
 @router.get("/userGenre", response_model=List[GenreUser])
 async def list_user_genre(session: Session = Depends(get_db)
