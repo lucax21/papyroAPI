@@ -15,3 +15,9 @@ class LoginSucesso(BaseModel):
     access_token: Optional[str] = None
     refresh_token: Optional[str] = None
     token_type: Optional[str] = None
+
+class ResetPassword(BaseModel):
+    reset_password_token: str
+    new_password: str
+    confirm_password: str
+

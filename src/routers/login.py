@@ -87,4 +87,15 @@ def verification(token: str, session: Session = Depends(get_db)):
 
     return 1
 
+@router.patch("/resetPassword")
+async def reset_password(email: str):
+    return "aa"
 
+@router.post("/forgotPassword")
+async def forgot_password(email: str, session: Session = Depends(get_db)):
+    result = CrudUser(session).get_by_email(email)
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+    return result
