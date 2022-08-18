@@ -74,7 +74,7 @@ class CrudFeed:
                             .offset(page * 8).limit(8).all()
                             
         sort = rates
-        sort.append(comments[0])
+        sort.append(comments[0]) if comments else None
         sort = sorted(sort, key = lambda x: x[0], reverse=True)
         query = {'data': sort}
         
@@ -91,7 +91,7 @@ class CrudFeed:
                     'type': x.type,
                     'id': x.id_rate,
                     'date': x.formatted_date,
-                    'text': x.text,
+                    'text': x.text if len(x.text) < 250 else x.text[:250] + "...",
                     'rate': x.rate if x.type == 'r' else 0,
                     'you_liked': True if x.like_id else False,
                     'likes': x.likes,
