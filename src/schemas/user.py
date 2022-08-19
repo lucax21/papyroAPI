@@ -42,14 +42,9 @@ class NewUser(BaseUser):
     birthday: str
  
     @validator('birthday')
-    def vl_birthday(cls, value):
-        # verifica se é maior de 18 anos
-        value = datetime.datetime.strptime(value, "%d/%m/%Y").date()
-        idade = (date.today() - value)
-        if (idade.days / 365.25) < 18.0:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Você deve ser maior de idade para criar um conta.")
-        return value
+    def vl_format_date(cls, value):
+        return datetime.datetime.strptime(value, "%d/%m/%Y").date()
+        
     
     @validator('password')
     def vl_password(cls, value):
@@ -81,14 +76,9 @@ class UserUpdate(BaseModel):
     birthday: str
     
     @validator('birthday')
-    def vl_birthday(cls, value):
-        #verifica se é maior de 18 anos
-        value = datetime.datetime.strptime(value, "%d/%m/%Y").date()
-        idade = (date.today() - value)
-        if (idade.days / 365.25) < 18.0:
-           raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Você deve ser maior de idade para criar um conta.")
-        return value
+    def vl_format_date(cls, value):
+        return datetime.datetime.strptime(value, "%d/%m/%Y").date()
+
 
     @validator('nickname')
     def username_alphanumeric(cls, v):
