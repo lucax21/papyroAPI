@@ -14,7 +14,7 @@ class CrudNotification:
       
         rates = self.session.query(
                                     models.Comment.date.label('data'),
-                                    models.Comment.id,
+                                    models.Comment.id.label('id_comment'),
                                     models.Comment.formatted_date,
                                     models.Rate.id.label('id_rate'),
                                     models.Book.id.label('id_book'),
@@ -65,7 +65,7 @@ class CrudNotification:
                            
         likes_rate = self.session.query(
                                     models.Like.date.label('data'),
-                                    models.Like.id,
+                                    models.Like.id.label('id_like'),
                                     models.Like.formatted_date,
                                     models.Rate.id.label('id_rate'),
                                     models.Book.id.label('id_book'),
@@ -85,7 +85,7 @@ class CrudNotification:
         
         likes_comment = self.session.query(
                                     models.Like.date.label('data'),
-                                    models.Like.id,
+                                    models.Like.id.label('id_like'),
                                     models.Like.formatted_date,
                                     models.Comment.id.label('id_comment'),
                                     models.Rate.id.label('id_rate'),
@@ -107,10 +107,10 @@ class CrudNotification:
         
 
         sort = rates
-        sort.append(pending[0])
-        sort.append(accept[0])
-        sort.append(likes_rate[0])
-        sort.append(likes_comment[0])
+        sort.append(pending[0]) if pending else None
+        sort.append(accept[0]) if accept else None
+        sort.append(likes_rate[0]) if likes_rate else None
+        sort.append(likes_comment[0]) if likes_comment else None
 
         sort = sorted(sort, key = lambda x: x[0], reverse=True)
         data = {'data': sort}
@@ -122,6 +122,7 @@ class CrudNotification:
 
         aux = []
         for x in data['data']:
+            print(x)
             aux.append({
                     'book': book(x.identifier, x.id_book) if x.type == 'r' or x.type == 'lr' or x.type == 'lc' else None,
                     'user': {
@@ -130,7 +131,10 @@ class CrudNotification:
                             'nickname': x.nickname,
                         },
                     'notification': {
-                            'id': None if x.type == 'a' or x.type == 'p' else x.id,
+                            #'id': None if x.type == 'a' or x.type == 'p' else x.id,
+                            'id_like':  x.id_like if x.type == 'lc' or x.type == 'lr' else None,
+                            'id_comment': None if x.type == 'a' or x.type == 'p' or x.type == 'lr' else x.id_comment,
+                            'id_rate':  None if x.type == 'a' or x.type == 'p' else x.id_rate,
                             'date': x.formatted_date,
                             'type': x.type,
                             'text': x.text,
