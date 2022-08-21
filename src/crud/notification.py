@@ -122,7 +122,6 @@ class CrudNotification:
 
         aux = []
         for x in data['data']:
-            print(x)
             aux.append({
                     'book': book(x.identifier, x.id_book) if x.type == 'r' or x.type == 'lr' or x.type == 'lc' else None,
                     'user': {
