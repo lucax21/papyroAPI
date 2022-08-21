@@ -9,7 +9,6 @@ class Login(BaseModel):
     password: str
     email: EmailStr
 
-
 class LoginSucesso(BaseModel):
     user: Optional[BaseUser] = None
     access_token: Optional[str] = None
@@ -21,3 +20,5 @@ class ResetPassword(BaseModel):
     new_password: str
     confirm_password: str
 
+class ForgotPassword(BaseModel):
+    email: EmailStr

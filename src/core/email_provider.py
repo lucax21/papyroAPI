@@ -31,3 +31,12 @@ class Mailer:
         Por favor, confirme seu cadastro no papyro: {}'''.format(confirmacao_url)
         
         Mailer.enviar_email(mensagem, 'Confirme sua cadastro no papyro', user_email)
+
+    def forgot_password(token: str, user_email: str):
+
+        url = f'http://{settings.PROJECT_SERVER}:{settings.PROJECT_PORT}/login/resetPassword?token={token}'
+
+        mensagem = '''
+        Recuperacao de senha: {}'''.format(url)
+        
+        Mailer.enviar_email(mensagem, 'Recuperacao de senha.', user_email)

@@ -67,7 +67,7 @@ class CrudUser:
         return self.session.query(models.User.id, models.User.active, models.User.confirmation).where(models.User.email == email).first()
 
     def get_by_email(self, email):
-        return self.session.query(models.User.id, models.User.email, models.User.active, models.User.password,
+        return self.session.query(models.User.id, models.User.email, models.User.confirmation, models.User.active, models.User.password,
                                   models.User.name, models.User.nickname, models.User.photo, models.User.description,
                                   models.User.formatted_birthday) \
             .where(models.User.email == email).first()

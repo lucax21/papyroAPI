@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
-
+from src.core.email_provider import Mailer
 from src.core import hash_provider
 from src.core.config import Settings
 from src.crud.user import CrudUser
 from src.db.database import get_db
-from src.schemas.login import Login, LoginSucesso
+from src.schemas.login import ResetPassword, ForgotPassword, Login, LoginSucesso
 from src.schemas.user import BaseUser
 from src.core.token_provider import check_access_token, get_confirmation_token
 
@@ -87,15 +87,23 @@ def verification(token: str, session: Session = Depends(get_db)):
 
     return 1
 
-@router.patch("/resetPassword")
-async def reset_password(email: str):
-    return "aa"
+@router.post("/resetPassword")
+async def reset_password(aa: ResetPassword, token: str):
+    try:    
+        payload = check_access_token(token)
+    except jwt.JWSError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token has expired")
+
+    return 1
 
 @router.post("/forgotPassword")
-async def forgot_password(email: str, session: Session = Depends(get_db)):
-    result = CrudUser(session).get_by_email(email)
-    
+async def forgot_password(user: ForgotPassword, session: Session = Depends(get_db)):
+    result = CrudUser(session).get_by_email(user.email)
     if not result:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+    
+    token_confirmation = get_confirmation_token(result.email, result.confirmation)
+    
+    Mailer.forgot_password(token_confirmation["token"], result.email)
 
-    return result
+    return 1
