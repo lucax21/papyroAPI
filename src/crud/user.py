@@ -66,7 +66,7 @@ class CrudUser:
     def get_verification(self, email: str):
         return self.session.query(models.User.id, models.User.active, models.User.confirmation).where(models.User.email == email).first()
 
-    def get_by_email(self, email):
+    def get_by_email(self, email: str):
         return self.session.query(models.User.id, models.User.email, models.User.confirmation, models.User.active, models.User.password,
                                   models.User.name, models.User.nickname, models.User.photo, models.User.description,
                                   models.User.formatted_birthday) \
@@ -249,6 +249,19 @@ class CrudUser:
            self.session.rollback()
            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def reset_password(self, email, pw: str):
+        try:
+
+            update_stmt = update(models.User).where(
+                models.User.email == email).values(confirmation=None, password=hash_provider.get_password_hash(pw))
+            
+            self.session.execute(update_stmt)
+            self.session.commit()
+            return 1
+        except Exception:
+            self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def update_user(self, user_id: int, user: UserUpdate):
         try:
             stmt = update(models.User).where(models.User.id == user_id).values(name=user.name,
@@ -263,9 +276,27 @@ class CrudUser:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def check_reset_password_token(self, token):
+        return self.session.query(models.User).where(models.User.confirmation == token).first()
+
+    def reset_code(self, email, token_confirmation):
+
+        stmt = update(models.User).where(models.User.email == email).values(confirmation=token_confirmation)
+        self.session.execute(stmt)
+        self.session.commit()
+        return 1
+
+    def desable_reset_code(self, email, token_confirmation):
+    
+        stmt = update(models.User).where(models.User.email == email).values(confirmation=token_confirmation)
+        self.session.execute(stmt)
+        self.session.commit()
+        return 1
+ 
+
     def desabilitar_confirmação(self, user_id: int):
         try:
-            atualizar_stmt = update(models.User).where(models.User.id == user_id).values(ativo=False)
+            atualizar_stmt = update(models.User).where(models.User.id == user_id).values(active=False)
             self.session.execute(atualizar_stmt)
             self.session.commit()
         except Exception as error:

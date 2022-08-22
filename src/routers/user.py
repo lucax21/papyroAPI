@@ -37,16 +37,6 @@ async def new_user(user: NewUser, session: Session = Depends(get_db)):
 
     new_user = CrudUser(session).new_user(user)
 
-    token_confirmation = get_confirmation_token(new_user.email, new_user.confirmation)
-
-    try:
-        Mailer.enviar_email_confirmacao(token_confirmation["token"], new_user.email)
-    except ConnectionRefusedError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Email não poderia ser enviado. Por favor, tente novamente."
-        )
-
     return 1
 
 

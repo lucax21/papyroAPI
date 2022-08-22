@@ -9,6 +9,7 @@ from src.db.database import get_db
 from src.schemas.login import ResetPassword, ForgotPassword, Login, LoginSucesso
 from src.schemas.user import BaseUser
 from src.core.token_provider import check_access_token, get_confirmation_token
+import uuid
 
 settings = Settings()
 router = APIRouter()
@@ -33,10 +34,6 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Usuário não cadastrado.")
-
-    if not user.active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Por favor, ative sua conta.")
 
     senha_valida = hash_provider.verify_password(login.password, user.password)
 
@@ -87,23 +84,29 @@ def verification(token: str, session: Session = Depends(get_db)):
 
     return 1
 
-@router.post("/resetPassword")
-async def reset_password(aa: ResetPassword, token: str):
-    try:    
-        payload = check_access_token(token)
-    except jwt.JWSError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token has expired")
+@router.patch("/resetPassword")
+async def reset_password(request: ResetPassword, session: Session = Depends(get_db)):
+    
+    reset_token = CrudUser(session).check_reset_password_token(request.reset_password_token)
+    
 
+    CrudUser(session).reset_password(reset_token.email, request.new_password)
+
+
+    
     return 1
+
 
 @router.post("/forgotPassword")
 async def forgot_password(user: ForgotPassword, session: Session = Depends(get_db)):
     result = CrudUser(session).get_by_email(user.email)
     if not result:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+        raise HTTPException(status_code=status.HTTP_404_BAD_REQUEST, detail="Error. Not found.")
     
-    token_confirmation = get_confirmation_token(result.email, result.confirmation)
-    
-    Mailer.forgot_password(token_confirmation["token"], result.email)
+    reset_code = str(uuid.uuid1())
+
+    CrudUser(session).reset_code(result.email, reset_code)
+
+    Mailer.forgot_password(reset_code, result.email)
 
     return 1
