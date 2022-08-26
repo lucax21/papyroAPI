@@ -27,8 +27,8 @@ class User(Base):
     password = Column(String(256))
     birthday = Column(Date)
     photo = Column(String(255), nullable=True)
-    active = Column(Boolean, default=False)
-    confirmation = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
+    code_otp = Column(String(6), nullable=True)
+    code_otp_time = Column(DateTime)
     formatted_birthday = column_property(func.to_char(birthday, 'DD/MM/YYYY'))
 
 

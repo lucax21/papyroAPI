@@ -9,7 +9,8 @@ from src.db.database import get_db
 from src.schemas.login import ResetPassword, ForgotPassword, Login, LoginSucesso
 from src.schemas.user import BaseUser
 from src.core.token_provider import check_access_token, get_confirmation_token
-import uuid
+import math, random
+
 
 settings = Settings()
 router = APIRouter()
@@ -18,6 +19,16 @@ router = APIRouter()
 @AuthJWT.load_config
 def get_config():
     return Settings()
+
+
+def generateOTP():
+    string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    OTP = ""
+    length = len(string)
+    for i in range(6) :
+        OTP += string[math.floor(random.random() * length)]
+ 
+    return OTP
 
 
 @router.post("/", response_model=LoginSucesso)
@@ -84,16 +95,16 @@ def verification(token: str, session: Session = Depends(get_db)):
 
     return 1
 
-@router.patch("/resetPassword")
-async def reset_password(request: ResetPassword, session: Session = Depends(get_db)):
-    
-    reset_token = CrudUser(session).check_reset_password_token(request.reset_password_token)
-    
 
-    CrudUser(session).reset_password(reset_token.email, request.new_password)
+@router.post("/resetPassword")
+def reset_password(data: ResetPassword, session: Session = Depends(get_db)):
+    reset_code = CrudUser(session).check_reset_password_code(data.reset_password_code, data.email)
 
+    if not reset_code:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Código expirado.")
 
-    
+    CrudUser(session).reset_password(data.email, data.new_password)
+
     return 1
 
 
@@ -101,12 +112,12 @@ async def reset_password(request: ResetPassword, session: Session = Depends(get_
 async def forgot_password(user: ForgotPassword, session: Session = Depends(get_db)):
     result = CrudUser(session).get_by_email(user.email)
     if not result:
-        raise HTTPException(status_code=status.HTTP_404_BAD_REQUEST, detail="Error. Not found.")
+        return 1
     
-    reset_code = str(uuid.uuid1())
+    code_otp = generateOTP()
 
-    CrudUser(session).reset_code(result.email, reset_code)
+    CrudUser(session).save_reset_code(result.email, code_otp)
 
-    Mailer.forgot_password(reset_code, result.email)
+    Mailer.forgot_password(code_otp, result.email)
 
     return 1

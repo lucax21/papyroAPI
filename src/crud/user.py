@@ -1,15 +1,15 @@
-from typing import List
-from datetime import datetime
 from fastapi import HTTPException, status
 from sqlalchemy import update, and_, bindparam, Integer
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
-from sqlalchemy.sql import text
+from sqlalchemy import text
+from datetime import datetime, timedelta
+from dateutil import tz 
 
 from src.core import hash_provider
 from src.db.models import models
 from src.external_api.get_book import get_by_identifier
-from src.schemas.user import User, UserUpdate, UserProfile
+from src.schemas.user import User, UserUpdate
 from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import get_and_format_output, format_book_output
 
@@ -67,7 +67,7 @@ class CrudUser:
         return self.session.query(models.User.id, models.User.active, models.User.confirmation).where(models.User.email == email).first()
 
     def get_by_email(self, email: str):
-        return self.session.query(models.User.id, models.User.email, models.User.confirmation, models.User.active, models.User.password,
+        return self.session.query(models.User.id, models.User.email, models.User.password,
                                   models.User.name, models.User.nickname, models.User.photo, models.User.description,
                                   models.User.formatted_birthday) \
             .where(models.User.email == email).first()
@@ -238,22 +238,12 @@ class CrudUser:
                 'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
                 }
 
-    def active_account(self, id, confirmation, active):
-        try:
-            update_stmt = update(models.User).where(
-                models.User.id == id).values(active=active, confirmation=confirmation)
-            self.session.execute(update_stmt)
-            self.session.commit()
-            return 1
-        except Exception as error:
-           self.session.rollback()
-           raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def reset_password(self, email, pw: str):
         try:
 
             update_stmt = update(models.User).where(
-                models.User.email == email).values(confirmation=None, password=hash_provider.get_password_hash(pw))
+                models.User.email == email).values(code_otp_time=None, code_otp=None, password=hash_provider.get_password_hash(pw))
             
             self.session.execute(update_stmt)
             self.session.commit()
@@ -276,32 +266,24 @@ class CrudUser:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def check_reset_password_token(self, token):
-        return self.session.query(models.User).where(models.User.confirmation == token).first()
 
-    def reset_code(self, email, token_confirmation):
+    def check_reset_password_code(self, code: str, email: str):
 
-        stmt = update(models.User).where(models.User.email == email).values(confirmation=token_confirmation)
+        recent = datetime.now(tz=tz.tzlocal()) - timedelta(minutes=5)
+
+        return self.session.query(models.User.id)\
+                        .where(and_(models.User.email == email, models.User.code_otp == code, 
+                            models.User.code_otp_time >= recent
+                        ))\
+                        .first()
+
+
+    def save_reset_code(self, email, code_otp):
+
+        stmt = update(models.User).where(models.User.email == email).values(code_otp=code_otp, code_otp_time=func.now())
         self.session.execute(stmt)
         self.session.commit()
         return 1
-
-    def desable_reset_code(self, email, token_confirmation):
-    
-        stmt = update(models.User).where(models.User.email == email).values(confirmation=token_confirmation)
-        self.session.execute(stmt)
-        self.session.commit()
-        return 1
- 
-
-    def desabilitar_confirmação(self, user_id: int):
-        try:
-            atualizar_stmt = update(models.User).where(models.User.id == user_id).values(active=False)
-            self.session.execute(atualizar_stmt)
-            self.session.commit()
-        except Exception as error:
-            self.session.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
     def user_books(self, user_id: int, reading_type: int, page: int):
