@@ -2,6 +2,7 @@ from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.orm import Session
+import math, random
 
 from src.core import token_provider
 from src.core.config import Settings
@@ -31,3 +32,16 @@ def obter_usuario_logado(token: str = Depends(oauth2_schema),
         raise exception
 
     return user
+
+
+def generateOTP():
+    #uma opção mais forte
+   # string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    
+    string = '0123456789abcdefghijklmnopqrstuvwxyz'
+    OTP = ""
+    length = len(string)
+    for i in range(6) :
+        OTP += string[math.floor(random.random() * length)]
+ 
+    return OTP

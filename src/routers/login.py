@@ -8,9 +8,8 @@ from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.schemas.login import ResetPassword, ForgotPassword, Login, LoginSucesso
 from src.schemas.user import BaseUser
-from src.core.token_provider import check_access_token, get_confirmation_token
-import math, random
-
+from src.core.token_provider import check_access_token
+from src.routers.login_utils import generateOTP
 
 settings = Settings()
 router = APIRouter()
@@ -19,16 +18,6 @@ router = APIRouter()
 @AuthJWT.load_config
 def get_config():
     return Settings()
-
-
-def generateOTP():
-    string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    OTP = ""
-    length = len(string)
-    for i in range(6) :
-        OTP += string[math.floor(random.random() * length)]
- 
-    return OTP
 
 
 @router.post("/", response_model=LoginSucesso)
@@ -42,15 +31,11 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
 
     user = CrudUser(session).get_by_email(login.email)
 
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Usuário não cadastrado.")
-
     senha_valida = hash_provider.verify_password(login.password, user.password)
 
-    if not senha_valida:
+    if not senha_valida or not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Senha inválida.")
+                            detail="Email ou senha inválida.")
 
     access_token = Authorize.create_access_token(subject=user.email, expires_time=settings.USER_TOKEN_LIFETIME)
     refresh_token = Authorize.create_refresh_token(subject=user.email, expires_time=None)
@@ -80,7 +65,6 @@ def refresh(Authorize: AuthJWT = Depends()):
 
 @router.get("/verification")
 def verification(token: str, session: Session = Depends(get_db)):
-    invalid_token_error = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid Token.')
 
     try:
         payload = check_access_token(token)
