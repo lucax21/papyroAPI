@@ -22,9 +22,11 @@ def upgrade():
     op.add_column('user', sa.Column('code_otp_time', sa.DateTime(), nullable=True))
     op.drop_column('user', 'active')
     op.drop_column('user', 'confirmation')
+    op.drop_column('user', 'birthday')
 
 
 def downgrade():
+    op.add_column('user', sa.Column('birthday', sa.Date(), nullable=True))
     op.add_column('user', sa.Column('active', sa.Boolean(), nullable=True))
     op.add_column('user', sa.Column('confirmation', postgresql.UUID(as_uuid=True), nullable=True))
     op.drop_column('user', 'code_otp')

@@ -24,9 +24,8 @@ class CrudUser:
             stmt = models.User(name=user.name,
                                      email=user.email,
                                      nickname=user.nickname,
-                                     password=hash_provider.get_password_hash(user.password),
-                                     birthday=user.birthday,
-                                     active=False)
+                                     password=hash_provider.get_password_hash(user.password)
+									 )
             self.session.add(stmt)
             self.session.commit()
             self.session.refresh(stmt)
@@ -69,7 +68,7 @@ class CrudUser:
     def get_by_email(self, email: str):
         return self.session.query(models.User.id, models.User.email, models.User.password,
                                   models.User.name, models.User.nickname, models.User.photo, models.User.description,
-                                  models.User.formatted_birthday) \
+                                  ) \
             .where(models.User.email == email).first()
 
     def buscar_por_apelido(self, nickname):
@@ -159,13 +158,12 @@ class CrudUser:
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'birthday': query.formatted_birthday}
+                }
 
     def get_by_id(self, id):
         query = self.session.query(models.User.id,
                                    models.User.name,
                                    func.count(models.Friend.fk_destiny).label('followers'),
-                                   models.User.formatted_birthday,
                                    models.User.nickname,
                                    models.User.photo,
                                    models.User.description) \
@@ -231,7 +229,6 @@ class CrudUser:
                 'photo': query.photo,
                 'description': query.description,
                 'booksQt': aux[ReadingTypes.READ-1],
-                'birthday': query.formatted_birthday,
                 'followers': query.followers,
                 'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ-1]),
                 'books_read': books(query_books_read, aux[ReadingTypes.READ-1]),
@@ -256,8 +253,7 @@ class CrudUser:
         try:
             stmt = update(models.User).where(models.User.id == user_id).values(name=user.name,
                                                                                          nickname=user.nickname,
-                                                                                         description=user.description,
-                                                                                         birthday=user.birthday
+                                                                                         description=user.description
                                                                                          )
             self.session.execute(stmt)
             self.session.commit()

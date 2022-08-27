@@ -27,15 +27,12 @@ async def new_user(user: NewUser, session: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha.")
     elif not user.email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o E-mail.")
-    elif not user.birthday:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
-
 
     email_buscado = CrudUser(session).get_by_email(user.email)
     if email_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
 
-    new_user = CrudUser(session).new_user(user)
+    CrudUser(session).new_user(user)
 
     return 1
 
