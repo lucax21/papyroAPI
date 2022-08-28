@@ -19,9 +19,11 @@ class BookBase(BaseModel):
 class BookSearch(BookBase):
     id: Optional[int] = None
     rate: Optional[int] = 0
-        
+    identifier: Optional[str]
+
     class Config:
         fields = {'count': {'exclude': True}}
+
 
 class BookExtended(BaseModel):
     id: Optional[int]

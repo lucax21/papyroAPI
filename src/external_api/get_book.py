@@ -4,15 +4,14 @@ from src.core.config import settings
 
 def get_by_identifier(identifier):
     url = f'https://www.googleapis.com/books/v1/volumes/{identifier}'
-    params = {
-        'key': settings.GOOGLE_API
-    }
-    return get_information(url, params)
+    # params = {
+    #     'key': settings.GOOGLE_API
+    # }
+    return get_information(url)
 
 def search_book(search, startIndex, maxResults):
     url = f'https://www.googleapis.com/books/v1/volumes?q={search}'
     params = {
-         'key': settings.GOOGLE_API,
          'startIndex': startIndex,
          'maxResults': maxResults
     }
