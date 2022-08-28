@@ -19,7 +19,7 @@ class ResetPassword(BaseModel):
     email: EmailStr
     reset_password_code: str
     new_password: str
-    confirm_password: str
+    confirmation_password: str
 
     @validator('new_password')
     def vl_password(cls, value):
@@ -28,8 +28,8 @@ class ResetPassword(BaseModel):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A senha deve conter no mínimo 8 dígitos e no máximo 32 dígitos.")
         return value
     
-    @validator('confirm_password')
-    def vl_confirm_password(cls,v , values, **kwargs):
+    @validator('confirmation_password')
+    def vl_confirmation_password(cls,v , values, **kwargs):
         if 'password' in values and v != values['new_password']:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A senhas são diferentes.")
         

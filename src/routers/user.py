@@ -1,17 +1,11 @@
-import re
-from datetime import date, datetime
 from typing import List, Optional
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
-from src.core.email_provider import Mailer
-from src.core.token_provider import get_confirmation_token
 from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.book import BookByType
-from src.schemas.user import UserSearch, UserUpdate, User, NewUser, BaseUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
+from src.schemas.user import UserSearch, UserUpdate, User, NewUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()

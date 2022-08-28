@@ -23,20 +23,10 @@ class Mailer:
         s.send_message(msg)
         s.quit()
 
-    def enviar_email_confirmacao(token: str, user_email: str):
 
-        confirmacao_url = f'http://{settings.PROJECT_SERVER}:{settings.PROJECT_PORT}/login/verification?token={token}'
+    def forgot_password(code_otp: str, user_email: str):
 
-        mensagem = '''
-        Por favor, confirme seu cadastro no papyro: {}'''.format(confirmacao_url)
+        msg = '''
+        Codigo para recuperacao de senha: {}'''.format(code_otp)
         
-        Mailer.enviar_email(mensagem, 'Confirme sua cadastro no papyro', user_email)
-
-    def forgot_password(token: str, user_email: str):
-
-        url = f'http://{settings.PROJECT_SERVER}:{settings.PROJECT_PORT}/login/resetPassword?token={token}'
-
-        mensagem = '''
-        Recuperacao de senha: {}'''.format(url)
-        
-        Mailer.enviar_email(mensagem, 'Recuperacao de senha.', user_email)
+        Mailer.enviar_email(msg, 'Papyro. Recuperacao de senha.', user_email)

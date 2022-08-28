@@ -45,7 +45,6 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
     us.nickname = user.nickname
     us.photo = user.photo
     us.description = user.description
-    us.birthday = user.formatted_birthday
 
     lo = LoginSucesso()
     lo.user = us
@@ -96,7 +95,8 @@ def reset_password(data: ResetPassword, session: Session = Depends(get_db)):
 async def forgot_password(user: ForgotPassword, session: Session = Depends(get_db)):
     result = CrudUser(session).get_by_email(user.email)
     if not result:
-        return 1
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Email inválida.")
     
     code_otp = generateOTP()
 
