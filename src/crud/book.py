@@ -77,8 +77,6 @@ class CrudBook:
         people_reading = self.session.query(func.count(models.UserBook.fk_user).label('users')) \
             .where(models.UserBook.fk_status == ReadingTypes.READING).group_by(models.UserBook.fk_book).first()
 
-        print(people_reading)
-
         book = get_by_identifier(data.identifier)
 
         if "volumeInfo" not in book:
@@ -145,24 +143,23 @@ class CrudBook:
     def search_book(self, search: str, page: int):
         get_books = search_book(search, page, 16)
         aux = []
-        for x in get_books['items']:
+        for index, x in enumerate(get_books['items']):
             book = format_book_output(x)
-            
+
             query_book = self.session.query(models.Book.id.label('id'),
                                             func.count(models.Rate.id).label('count'),
-                                            func.sum(models.Rate.rate).label('sum'))\
-                                    .where(models.Book.identifier == book['identifier'])\
-                                    .join(models.Rate, models.Rate.fk_book == models.Book.id)\
-                                    .group_by(models.Book).first()
-      
-    
-            aux.append({'id': query_book.id if query_book else None,
+                                            func.sum(models.Rate.rate).label('sum')) \
+                .where(models.Book.identifier == book['identifier']) \
+                .join(models.Rate, models.Rate.fk_book == models.Book.id) \
+                .group_by(models.Book).first()
+
+            aux.append({'id': query_book.id if query_book else index,
                         'rate': query_book.sum / query_book.count if query_book else 0,
                         'cover': book['cover'],
                         'identifier': book['identifier'],
                         'book_title': book['book_title'],
                         'author': book['author']
-                    })
+                        })
         return aux
 
     def get_suggestions(self, id, page):
@@ -193,4 +190,3 @@ class CrudBook:
             entry.update(get_and_format_output(entry['identifier']))
 
         return {'data': result_dict}
-

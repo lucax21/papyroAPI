@@ -19,9 +19,11 @@ class BookBase(BaseModel):
 class BookSearch(BookBase):
     id: Optional[int] = None
     rate: Optional[int] = 0
-        
+    identifier: Optional[str]
+
     class Config:
         fields = {'count': {'exclude': True}}
+
 
 class BookExtended(BaseModel):
     id: Optional[int]
@@ -46,7 +48,7 @@ class BookReviewBase(BaseModel):
     comments: Optional[int] = 0
     rate: Optional[int] = None
     you_like: Optional[bool] = False
-    text: str
+    text: Optional[str] = ''
 
 
 class BookReview(BookReviewBase):

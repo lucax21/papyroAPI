@@ -41,7 +41,8 @@ class CrudUser:
                                    models.User.nickname,
                                    models.User.photo,
                                    func.count(models.UserGenre.fk_genre).label('common_genre'),
-                                  ).where(and_(models.User.name.like('%' + name + '%'), models.UserGenre.fk_genre.in_(subquery_genres)))\
+                                  ).where(and_(func.lower(models.User.name).like('%' + name.lower() + '%'),
+                                               models.UserGenre.fk_genre.in_(subquery_genres)))\
                                    .join(models.UserGenre, models.User.id == models.UserGenre.fk_user, isouter=True)\
                                    .group_by(models.User.id)\
                                    .offset(page * 20).limit(20).all()
