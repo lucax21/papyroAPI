@@ -21,12 +21,17 @@ class CrudComment:
                                     Book.id.label('book_id'), Book.identifier,
                                     UserBook.fk_status.label('status'),
                                     Like.id.label('like_id'),
+                                    func.count(Comment.id).label('comment_number'),
                                     User.id.label('user_id'), User.photo, User.nickname) \
             .where(Rate.id == rate_id) \
             .join(Book, Rate.fk_book == Book.id) \
             .join(User, User.id == Rate.fk_user) \
+            .join(Comment, Rate.id == Comment.fk_rate) \
             .join(UserBook, and_(Book.id == UserBook.fk_book, UserBook.fk_user == user_id), isouter=True) \
-            .join(Like, and_(Like.fk_user == user_id, Like.fk_rate == Rate.id), isouter=True).first()
+            .join(Like, and_(Like.fk_user == user_id, Like.fk_rate == Rate.id), isouter=True)\
+            .group_by(Rate.id.label('rate_id'), Rate.text, Rate.rate, Rate.likes, Rate.formatted_date,Book.id.label('book_id'), Book.identifier,
+                      UserBook.fk_status.label('status'), Like.id.label('like_id'), User.id.label('user_id'), User.photo, User.nickname) \
+            .first()
 
         if not review:
             return None
@@ -69,6 +74,7 @@ class CrudComment:
                 'rate': review.rate,
                 'likes': review.likes,
                 'date': review.formatted_date,
+                'comments': review.comment_number,
                 'you_liked': True if review.like_id else False
             },
             'book': book,
