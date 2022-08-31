@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy import and_, update, insert, Integer, bindparam
+from sqlalchemy import and_, update, insert, delete, Integer, bindparam
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
@@ -100,10 +100,26 @@ class CrudBook:
 
     def book_user_status(self, id_user: int, id_status: int, id_book):
             
+
             query = self.session.query(models.UserBook) \
                 .where(and_(models.UserBook.fk_user == id_user, models.UserBook.fk_book == id_book)).first()
+            
+            if query and id_status == 0:
+                stmt = (delete(models.UserBook).\
+                         where(and_(models.UserBook.fk_user == id_user, models.UserBook.fk_book == id_book)))
+
+                try:
+                    self.session.execute(stmt)
+                    self.session.commit()
+
+                    return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
+                except IntegrityError as err:
+                    self.session.rollback()
+                    print(err)
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
+
             # update
-            if query:
+            elif query:
                 stmt = update(models.UserBook) \
                     .where(and_(models.UserBook.fk_user == id_user,
                                 models.UserBook.fk_book == id_book)) \
@@ -121,6 +137,7 @@ class CrudBook:
                     self.session.rollback()
                     print(err)
                     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
+            
             # insert
             else:
                 stmt = insert(models.UserBook).values(fk_book=id_book,
