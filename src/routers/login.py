@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
-
+from src.core.email_provider import Mailer
 from src.core import hash_provider
 from src.core.config import Settings
 from src.crud.user import CrudUser
 from src.db.database import get_db
-from src.schemas.login import Login, LoginSucesso
+from src.schemas.login import ResetPassword, ForgotPassword, Login, LoginSucesso
 from src.schemas.user import BaseUser
-from src.core.token_provider import check_access_token, get_confirmation_token
+from src.core.token_provider import check_access_token
+from src.routers.login_utils import generateOTP
 
 settings = Settings()
 router = APIRouter()
@@ -29,20 +30,12 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
                             detail="Preencha a Senha.")
 
     user = CrudUser(session).get_by_email(login.email)
-
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Usuário não cadastrado.")
-
-    if not user.active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Por favor, ative sua conta.")
-
+    
     senha_valida = hash_provider.verify_password(login.password, user.password)
-
-    if not senha_valida:
+    print(login.password, user.password, senha_valida)
+    if not senha_valida or not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Senha inválida.")
+                            detail="Email ou senha inválida.")
 
     access_token = Authorize.create_access_token(subject=user.email, expires_time=settings.USER_TOKEN_LIFETIME)
     refresh_token = Authorize.create_refresh_token(subject=user.email, expires_time=None)
@@ -52,7 +45,6 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
     us.nickname = user.nickname
     us.photo = user.photo
     us.description = user.description
-    us.birthday = user.formatted_birthday
 
     lo = LoginSucesso()
     lo.user = us
@@ -72,7 +64,6 @@ def refresh(Authorize: AuthJWT = Depends()):
 
 @router.get("/verification")
 def verification(token: str, session: Session = Depends(get_db)):
-    invalid_token_error = HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid Token.')
 
     try:
         payload = check_access_token(token)
@@ -87,15 +78,30 @@ def verification(token: str, session: Session = Depends(get_db)):
 
     return 1
 
-@router.patch("/resetPassword")
-async def reset_password(email: str):
-    return "aa"
+
+@router.post("/resetPassword")
+def reset_password(data: ResetPassword, session: Session = Depends(get_db)):
+    reset_code = CrudUser(session).check_reset_password_code(data.reset_password_code, data.email)
+
+    if not reset_code:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Código expirado.")
+
+    CrudUser(session).reset_password(data.email, data.new_password)
+
+    return 1
+
 
 @router.post("/forgotPassword")
-async def forgot_password(email: str, session: Session = Depends(get_db)):
-    result = CrudUser(session).get_by_email(email)
-    
+async def forgot_password(user: ForgotPassword, session: Session = Depends(get_db)):
+    result = CrudUser(session).get_by_email(user.email)
     if not result:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Email inválida.")
+    
+    code_otp = generateOTP()
 
-    return result
+    CrudUser(session).save_reset_code(result.email, code_otp)
+
+    Mailer.forgot_password(code_otp, result.email)
+
+    return 1

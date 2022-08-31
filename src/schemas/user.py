@@ -15,7 +15,6 @@ class BaseUser(BaseModel):
     nickname: Optional[str] = None
     photo: Optional[str] = None
     description: Optional[str] = None
-    birthday: Optional[str] = None
 
 
 class UserID(BaseModel):
@@ -35,16 +34,13 @@ class User(UserDB):
     followers: Optional[int] = None
 
 
-class NewUser(BaseUser):
+class NewUser(BaseModel):
+    name: str
+    nickname: str
     email: EmailStr
-    password: Optional[str] = None
-    confirm_password: Optional[str] = None
-    birthday: str
- 
-    @validator('birthday')
-    def vl_format_date(cls, value):
-        return datetime.datetime.strptime(value, "%d/%m/%Y").date()
-        
+    password: str
+    confirmation_password: str
+
     
     @validator('password')
     def vl_password(cls, value):
@@ -53,8 +49,8 @@ class NewUser(BaseUser):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A senha deve conter no mínimo 8 dígitos e no máximo 32 dígitos.")
         return value
     
-    @validator('confirm_password')
-    def vl_confirm_password(cls,v , values, **kwargs):
+    @validator('confirmation_password')
+    def vl_confirmation_password(cls,v , values, **kwargs):
         if 'password' in values and v != values['password']:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A senhas são diferentes.")
         
@@ -73,12 +69,6 @@ class UserUpdate(BaseModel):
     name: str
     nickname: str
     description: str
-    birthday: str
-    
-    @validator('birthday')
-    def vl_format_date(cls, value):
-        return datetime.datetime.strptime(value, "%d/%m/%Y").date()
-
 
     @validator('nickname')
     def username_alphanumeric(cls, v):

@@ -1,9 +1,6 @@
-# Representação do banco de dados
-import uuid
-
-from sqlalchemy import func, Column, Integer, String, DateTime, ForeignKey, Date, Text, Boolean, Table
+from sqlalchemy import func, Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, column_property
+from sqlalchemy.orm import column_property
 
 from src.db.database import Base
 
@@ -25,11 +22,9 @@ class User(Base):
     nickname = Column(String(30), unique=True)
     description = Column(Text)
     password = Column(String(256))
-    birthday = Column(Date)
     photo = Column(String(255), nullable=True)
-    active = Column(Boolean, default=False)
-    confirmation = Column(UUID(as_uuid=True), nullable=True, default=uuid.uuid4)
-    formatted_birthday = column_property(func.to_char(birthday, 'DD/MM/YYYY'))
+    code_otp = Column(String(6), nullable=True)
+    code_otp_time = Column(DateTime)
 
 
 class Genre(Base):

@@ -1,17 +1,11 @@
-import re
-from datetime import date, datetime
 from typing import List, Optional
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
-from src.core.email_provider import Mailer
-from src.core.token_provider import get_confirmation_token
 from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
 from src.schemas.book import BookByType
-from src.schemas.user import UserSearch, UserUpdate, User, NewUser, BaseUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
+from src.schemas.user import UserSearch, UserUpdate, User, NewUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
 from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
@@ -27,25 +21,12 @@ async def new_user(user: NewUser, session: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Senha.")
     elif not user.email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o E-mail.")
-    elif not user.birthday:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha a Data de Nascimento.")
-
 
     email_buscado = CrudUser(session).get_by_email(user.email)
     if email_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
 
-    new_user = CrudUser(session).new_user(user)
-
-    token_confirmation = get_confirmation_token(new_user.email, new_user.confirmation)
-
-    try:
-        Mailer.enviar_email_confirmacao(token_confirmation["token"], new_user.email)
-    except ConnectionRefusedError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Email não poderia ser enviado. Por favor, tente novamente."
-        )
+    CrudUser(session).new_user(user)
 
     return 1
 

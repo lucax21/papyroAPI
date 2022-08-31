@@ -1,15 +1,15 @@
-from typing import List
-from datetime import datetime
 from fastapi import HTTPException, status
 from sqlalchemy import update, and_, bindparam, Integer
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
-from sqlalchemy.sql import text
+from sqlalchemy import text
+from datetime import datetime, timedelta
+from dateutil import tz 
 
 from src.core import hash_provider
 from src.db.models import models
 from src.external_api.get_book import get_by_identifier
-from src.schemas.user import User, UserUpdate, UserProfile
+from src.schemas.user import User, UserUpdate
 from src.utils.enum.reading_type import ReadingTypes
 from src.utils.format_book_output import get_and_format_output, format_book_output
 
@@ -24,9 +24,8 @@ class CrudUser:
             stmt = models.User(name=user.name,
                                      email=user.email,
                                      nickname=user.nickname,
-                                     password=hash_provider.get_password_hash(user.password),
-                                     birthday=user.birthday,
-                                     active=False)
+                                     password=hash_provider.get_password_hash(user.password)
+									 )
             self.session.add(stmt)
             self.session.commit()
             self.session.refresh(stmt)
@@ -67,10 +66,10 @@ class CrudUser:
     def get_verification(self, email: str):
         return self.session.query(models.User.id, models.User.active, models.User.confirmation).where(models.User.email == email).first()
 
-    def get_by_email(self, email):
-        return self.session.query(models.User.id, models.User.email, models.User.active, models.User.password,
+    def get_by_email(self, email: str):
+        return self.session.query(models.User.id, models.User.email, models.User.password,
                                   models.User.name, models.User.nickname, models.User.photo, models.User.description,
-                                  models.User.formatted_birthday) \
+                                  ) \
             .where(models.User.email == email).first()
 
     def buscar_por_apelido(self, nickname):
@@ -160,13 +159,12 @@ class CrudUser:
                 'nickname': query.nickname,
                 'photo': query.photo,
                 'description': query.description,
-                'birthday': query.formatted_birthday}
+                }
 
     def get_by_id(self, id):
         query = self.session.query(models.User.id,
                                    models.User.name,
                                    func.count(models.Friend.fk_destiny).label('followers'),
-                                   models.User.formatted_birthday,
                                    models.User.nickname,
                                    models.User.photo,
                                    models.User.description) \
@@ -232,30 +230,31 @@ class CrudUser:
                 'photo': query.photo,
                 'description': query.description,
                 'booksQt': aux[ReadingTypes.READ-1],
-                'birthday': query.formatted_birthday,
                 'followers': query.followers,
                 'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ-1]),
                 'books_read': books(query_books_read, aux[ReadingTypes.READ-1]),
                 'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
                 }
 
-    def active_account(self, id, confirmation, active):
+
+    def reset_password(self, email, pw: str):
         try:
+
             update_stmt = update(models.User).where(
-                models.User.id == id).values(active=active, confirmation=confirmation)
+                models.User.email == email).values(code_otp_time=None, code_otp=None, password=hash_provider.get_password_hash(pw))
+            
             self.session.execute(update_stmt)
             self.session.commit()
             return 1
-        except Exception as error:
-           self.session.rollback()
-           raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            self.session.rollback()
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def update_user(self, user_id: int, user: UserUpdate):
         try:
             stmt = update(models.User).where(models.User.id == user_id).values(name=user.name,
                                                                                          nickname=user.nickname,
-                                                                                         description=user.description,
-                                                                                         birthday=user.birthday
+                                                                                         description=user.description
                                                                                          )
             self.session.execute(stmt)
             self.session.commit()
@@ -264,14 +263,24 @@ class CrudUser:
             self.session.rollback()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def desabilitar_confirmação(self, user_id: int):
-        try:
-            atualizar_stmt = update(models.User).where(models.User.id == user_id).values(ativo=False)
-            self.session.execute(atualizar_stmt)
-            self.session.commit()
-        except Exception as error:
-            self.session.rollback()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def check_reset_password_code(self, code: str, email: str):
+
+        recent = datetime.now(tz=tz.tzlocal()) - timedelta(minutes=5)
+
+        return self.session.query(models.User.id)\
+                        .where(and_(models.User.email == email, models.User.code_otp == code, 
+                            models.User.code_otp_time >= recent
+                        ))\
+                        .first()
+
+
+    def save_reset_code(self, email, code_otp):
+
+        stmt = update(models.User).where(models.User.email == email).values(code_otp=code_otp, code_otp_time=func.now())
+        self.session.execute(stmt)
+        self.session.commit()
+        return 1
 
 
     def user_books(self, user_id: int, reading_type: int, page: int):
