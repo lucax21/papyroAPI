@@ -30,10 +30,12 @@ def login(login: Login, session: Session = Depends(get_db), Authorize: AuthJWT =
                             detail="Preencha a Senha.")
 
     user = CrudUser(session).get_by_email(login.email)
-    
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Email ou senha inválida.")
+
     senha_valida = hash_provider.verify_password(login.password, user.password)
-    print(login.password, user.password, senha_valida)
-    if not senha_valida or not user:
+    if not senha_valida:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Email ou senha inválida.")
 
