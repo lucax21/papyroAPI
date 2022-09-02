@@ -23,7 +23,8 @@ def upgrade():
     op.drop_column('user', 'active')
     op.drop_column('user', 'confirmation')
     op.drop_column('user', 'birthday')
-
+    op.execute(
+        '''UPDATE "user" SET photo = 'https://i.pinimg.com/736x/67/4f/c5/674fc554838de6abdbf274bdc0ca446c.jpg' where id > 3''')
 
 def downgrade():
     op.add_column('user', sa.Column('birthday', sa.Date(), nullable=True))
