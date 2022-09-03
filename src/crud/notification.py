@@ -32,19 +32,19 @@ class CrudNotification:
                             .offset(page * 4).limit(4).all()
 
  
-        accepted = self.session.query(
+        follower = self.session.query(
                                         models.Friend.date.label('data'),
                                         models.Friend.pending,
                                         models.Friend.formatted_date,
                                         models.User.id.label('id_user'), models.User.nickname, models.User.photo,
                                         literal('follower').label('type'),
-                                        func.concat(models.User.nickname, ' aceitou sua solicitação.').label('text'),
+                                        func.concat(models.User.nickname, ' começou a seguir você.').label('text'),
                                     )\
-                                    .where(and_(models.Friend.fk_origin == id_user,
+                                    .where(and_(models.Friend.fk_destiny == id_user,
                                                 models.Friend.ignored == False,
-                                                models.Friend.pending == False,
+                                                models.Friend.pending == True,
                                                 ))\
-                                    .join(models.Friend, models.User.id == models.Friend.fk_destiny)\
+                                    .join(models.Friend, models.User.id == models.Friend.fk_origin)\
                                     .order_by(models.Friend.date.desc())\
                                     .offset(page * 4).limit(4).all()
 
@@ -93,7 +93,7 @@ class CrudNotification:
         
 
         sort = rates
-        sort.append(accepted[0]) if accepted else None
+        sort.append(follower[0]) if follower else None
         sort.append(likes_rate[0]) if likes_rate else None
         sort.append(likes_comment[0]) if likes_comment else None
 
