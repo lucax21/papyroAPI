@@ -38,11 +38,14 @@ async def search_book(search: str,
 async def book_user_status(
         id_book: int,
         id_status: Optional[int],
+        user_id: Optional[int] = None,
         current_user: User = Depends(obter_usuario_logado),
         session: Session = Depends(get_db)):
     if id_status != ReadingTypes.READING and id_status != ReadingTypes.READ and id_status != ReadingTypes.TO_READ and id_status != 0:
          raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Status do livro inválido.")
-    return CrudBook(session).book_user_status(current_user.id, id_status, id_book)
+    if not user_id:
+        user_id = current_user.id
+    return CrudBook(session).book_user_status(user_id, id_status, id_book)
 
 
 @router.get("/extras/suggestion/get", response_model=BookSuggestion)
