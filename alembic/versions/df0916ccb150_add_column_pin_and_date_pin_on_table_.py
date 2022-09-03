@@ -23,6 +23,8 @@ def upgrade():
     op.drop_column('user', 'active')
     op.drop_column('user', 'confirmation')
     op.drop_column('user', 'birthday')
+    op.drop_column('friend', 'pending')
+    op.drop_column('friend', 'ignored')
     op.execute(
         '''UPDATE "user" SET photo = 'https://i.pinimg.com/736x/67/4f/c5/674fc554838de6abdbf274bdc0ca446c.jpg' where id > 3''')
 
@@ -30,5 +32,7 @@ def downgrade():
     op.add_column('user', sa.Column('birthday', sa.Date(), nullable=True))
     op.add_column('user', sa.Column('active', sa.Boolean(), nullable=True))
     op.add_column('user', sa.Column('confirmation', postgresql.UUID(as_uuid=True), nullable=True))
+    op.add_column('friend', sa.Column('pending', sa.Boolean(), nullable=True))
+    op.add_column('friend', sa.Column('ignored', sa.Boolean(), nullable=True))
     op.drop_column('user', 'code_otp')
     op.drop_column('user', 'code_otp_time')
