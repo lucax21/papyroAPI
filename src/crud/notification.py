@@ -22,7 +22,7 @@ class CrudNotification:
                                     models.User.nickname,
                                     models.User.photo,
                                     models.User.id.label('id_user'),
-                                    literal('r').label('type'),
+                                    literal('comment').label('type'),
                                     func.concat(models.User.nickname, ' comentou ', ' "', func.substring(models.Comment.text, 1,12),'... "', ' na sua avaliação.').label('text'),
                                     )\
                             .join(models.Comment, models.Comment.fk_rate == models.Rate.id)\
@@ -30,20 +30,21 @@ class CrudNotification:
                             .join(models.User, models.User.id == models.Comment.fk_user)\
                             .order_by(models.Rate.date.desc(), models.Comment.date.desc())\
                             .offset(page * 4).limit(4).all()
-        
-        pending = self.session.query(
+
+ 
+        accepted = self.session.query(
                                         models.Friend.date.label('data'),
                                         models.Friend.pending,
                                         models.Friend.formatted_date,
                                         models.User.id.label('id_user'), models.User.nickname, models.User.photo,
-                                        literal('p').label('type'),
-                                        func.concat(models.User.nickname, ' começou a seguir você.').label('text'),
+                                        literal('follower').label('type'),
+                                        func.concat(models.User.nickname, ' aceitou sua solicitação.').label('text'),
                                     )\
-                                    .where(and_(models.Friend.fk_destiny == id_user,
+                                    .where(and_(models.Friend.fk_origin == id_user,
                                                 models.Friend.ignored == False,
-                                                models.Friend.pending == True,
+                                                models.Friend.pending == False,
                                                 ))\
-                                    .join(models.Friend, models.User.id == models.Friend.fk_origin)\
+                                    .join(models.Friend, models.User.id == models.Friend.fk_destiny)\
                                     .order_by(models.Friend.date.desc())\
                                     .offset(page * 4).limit(4).all()
 
@@ -58,7 +59,7 @@ class CrudNotification:
                                     models.User.nickname,
                                     models.User.photo,
                                     models.User.id.label('id_user'),
-                                    literal('lr').label('type'),
+                                    literal('comment').label('type'),
                                     func.concat(models.User.nickname, ' curtiu sua avaliação sobre um livro.').label('text'),
                                     )\
                             .where(models.Rate.fk_user == id_user)\
@@ -72,14 +73,14 @@ class CrudNotification:
                                     models.Like.date.label('data'),
                                     models.Like.id.label('id_like'),
                                     models.Like.formatted_date,
-                                    models.Comment.id.label('id_comment'),
                                     models.Rate.id.label('id_rate'),
+                                    models.Comment.id.label('id_comment'),  
                                     models.Book.id.label('id_book'),
                                     models.Book.identifier,
                                     models.User.nickname,
                                     models.User.photo,
                                     models.User.id.label('id_user'),
-                                    literal('lc').label('type'),
+                                    literal('comment').label('type'),
                                     func.concat(models.User.nickname, ' curtiu seu comentário sobre um livro.').label('text'),
                                     )\
                             .where(models.Comment.fk_user == id_user)\
@@ -92,13 +93,13 @@ class CrudNotification:
         
 
         sort = rates
-        sort.append(pending[0]) if pending else None
+        sort.append(accepted[0]) if accepted else None
         sort.append(likes_rate[0]) if likes_rate else None
         sort.append(likes_comment[0]) if likes_comment else None
 
         sort = sorted(sort, key = lambda x: x[0], reverse=True)
         data = {'data': sort}
-            
+ 
         def book(identifier, id):
             book = get_and_format_output(identifier) 
             book.update({'id': id})
@@ -107,16 +108,14 @@ class CrudNotification:
         aux = []
         for x in data['data']:
             aux.append({
-                    'book': book(x.identifier, x.id_book) if x.type == 'r' or x.type == 'lr' or x.type == 'lc' else None,
+                    'book': book(x.identifier, x.id_book) if x.type == 'comment' else None,
                     'user': {
                             'id': x.id_user,
                             'photo': x.photo,
                             'nickname': x.nickname,
                         },
                     'notification': {
-                            'id_like':  x.id_like if x.type == 'lc' or x.type == 'lr' else None,
-                            'id_comment': None if x.type == 'a' or x.type == 'p' or x.type == 'lr' else x.id_comment,
-                            'id_rate':  None if x.type == 'a' or x.type == 'p' else x.id_rate,
+                            'id_rate': x.id_rate if x.type == 'comment' else None,
                             'date': x.formatted_date,
                             'type': x.type,
                             'text': x.text,

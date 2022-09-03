@@ -5,8 +5,6 @@ from src.schemas.user import UserSuperBasic
 from src.schemas.book import BookFeed
 
 class NotificationBase(BaseModel):
-    id_like: Optional[int] = None
-    id_comment: Optional[int] = None
     id_rate: Optional[int] = None
     text: str
     date: str
