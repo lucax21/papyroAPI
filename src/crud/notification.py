@@ -40,9 +40,7 @@ class CrudNotification:
                                         literal('follower').label('type'),
                                         func.concat(models.User.nickname, ' começou a seguir você.').label('text'),
                                     )\
-                                    .where(and_(models.Friend.fk_destiny == id_user,
-                                                models.Friend.ignored == False,
-                                                models.Friend.pending == True,
+                                    .where(and_(models.Friend.fk_destiny == id_user
                                                 ))\
                                     .join(models.Friend, models.User.id == models.Friend.fk_origin)\
                                     .order_by(models.Friend.date.desc())\
