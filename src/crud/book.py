@@ -75,8 +75,8 @@ class CrudBook:
             .first()
 
         people_reading = self.session.query(func.count(models.UserBook.fk_user).label('users')) \
-            .where(models.UserBook.fk_status == ReadingTypes.READING).group_by(models.UserBook.fk_book).first()
-
+            .where(and_(models.UserBook.fk_status == ReadingTypes.READING, models.UserBook.fk_book == id)).group_by(models.UserBook.fk_book).first()
+        print(people_reading)
         book = get_by_identifier(data.identifier)
 
         if "volumeInfo" not in book:
@@ -105,7 +105,7 @@ class CrudBook:
                 .where(and_(models.UserBook.fk_user == id_user, models.UserBook.fk_book == id_book)).first()
             
             if query and id_status == 0:
-                stmt = (delete(models.UserBook).\
+                stmt = (delete(models.UserBook).
                          where(and_(models.UserBook.fk_user == id_user, models.UserBook.fk_book == id_book)))
 
                 try:
