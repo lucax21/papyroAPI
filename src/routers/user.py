@@ -95,11 +95,12 @@ async def get_company(id: int, session: Session = Depends(get_db)):
 async def book_user_status(
         id_book: int,
         id_status: int,
+        page: int = 0,
         session: Session = Depends(get_db)):
     if id_status != ReadingTypes.READING and id_status != ReadingTypes.READ and id_status != ReadingTypes.TO_READ:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Status do livro inválido.")
 
-    return CrudUser(session).get_company_status(id_book, id_status)
+    return CrudUser(session).get_company_status(id_book, id_status, page)
 
 
 

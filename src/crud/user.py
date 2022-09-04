@@ -371,14 +371,14 @@ class CrudUser:
             }
         }
 
-    def get_company_status(self, id_book: int, id_status: int):
+    def get_company_status(self, id_book: int, id_status: int, page: int):
             query = self.session.query(models.User.id.label('id'),
                                    models.User.nickname,
                                    models.User.photo,
                             )\
                             .where(and_(models.UserBook.fk_book == id_book, models.UserBook.fk_status == id_status))\
-                            .join(models.UserBook, models.UserBook.fk_user == models.User.id)\
-                            .all()
+                            .join(models.UserBook, models.UserBook.fk_user == models.User.id) \
+                            .offset(page * 20).limit(20).all()
             query_status = self.session.query(models.Status).where(models.Status.id == id_status).first()
 
             return {
