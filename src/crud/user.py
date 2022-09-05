@@ -141,7 +141,6 @@ class CrudUser:
         FROM result
             JOIN "user" on result.suggestion = "user".id
         WHERE "user".id <> :x 
-            AND "user".id NOT IN (SELECT f.fk_origin FROM friend f where f.fk_destiny = 3)
             AND "user".id NOT IN (SELECT f.fk_destiny FROM friend f where f.fk_origin = 3)
         ORDER BY result.quantity DESC
         OFFSET :y
@@ -161,7 +160,7 @@ class CrudUser:
                 'description': query.description,
                 }
 
-    def get_by_id(self, id):
+    def get_by_id(self, id, current_user):
         query = self.session.query(models.User.id,
                                    models.User.name,
                                    func.count(models.Friend.fk_destiny).label('followers'),
@@ -175,36 +174,12 @@ class CrudUser:
         if not query:
             raise HTTPException(status_code=404, detail='Não encontrado')
 
-        query_books_reading = self.session.query(
-            models.Book.id,
-            models.Book.identifier,
-            func.count(models.UserBook.fk_status).label('count')) \
-            .filter(and_(models.UserBook.fk_status == ReadingTypes.READING, models.UserBook.fk_user == id)) \
-            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
-
-        query_books_read = self.session.query(
-            models.Book.id,
-            models.Book.identifier,
-            func.count(models.UserBook.fk_status).label('count')) \
-            .filter(and_(models.UserBook.fk_status == ReadingTypes.READ, models.UserBook.fk_user == id)) \
-            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
-
-        query_books_to_read = self.session.query(
-            models.Book.id,
-            models.Book.identifier,
-            func.count(models.UserBook.fk_status).label('count')) \
-            .filter(and_(models.UserBook.fk_status == ReadingTypes.TO_READ, models.UserBook.fk_user == id)) \
-            .join(models.Book, models.Book.id == models.UserBook.fk_book) \
-            .group_by(models.Book.identifier, models.Book.id).limit(1).all()
-
+        you_follow = self.session.query(models.Friend).where(and_(models.Friend.fk_destiny == id, models.Friend.fk_origin == current_user)).first()
         query_books_count = self.session.query(
             func.count(models.UserBook.fk_book).label('count'), models.UserBook.fk_status) \
             .where(and_(models.UserBook.fk_user == id))\
             .group_by(models.UserBook.fk_status).all()
 
-        
         def arrange_book(x):
             book = format_book_output(get_by_identifier(x['identifier']))
             book.update({  
@@ -212,14 +187,7 @@ class CrudUser:
                 'count': 0
             })
             return book
-        
-        def books(query_book, count_book):
-            if len(query_book) > 0:
-                book = list(map(arrange_book, query_book))
-                book[0]['count'] = count_book
-                return book
-            return None
-       
+
         aux = [0,0,0]
         for o in query_books_count:
             aux[o[1]-1] = o[0]
@@ -231,9 +199,7 @@ class CrudUser:
                 'description': query.description,
                 'booksQt': aux[ReadingTypes.READ-1],
                 'followers': query.followers,
-                'books_to_read': books(query_books_to_read, aux[ReadingTypes.TO_READ-1]),
-                'books_read': books(query_books_read, aux[ReadingTypes.READ-1]),
-                'books_reading': books(query_books_reading, aux[ReadingTypes.READING-1])
+                'you_follow': True if you_follow else False
                 }
 
 

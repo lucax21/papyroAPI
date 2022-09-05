@@ -30,9 +30,7 @@ class CrudFeed:
                                    literal('r').label("type")
                                    )\
                     .where(and_(
-                                models.Friend.fk_origin==id,
-                                models.Friend.pending==False,
-                                models.Friend.ignored==False
+                                models.Friend.fk_origin==id
                                 ))\
                     .join(models.Friend, models.User.id == models.Friend.fk_destiny)\
                     .join(models.Rate, models.User.id == models.Rate.fk_user)\
@@ -59,9 +57,7 @@ class CrudFeed:
                                     literal('c').label("type")
                                     )\
                                 .where(and_(
-                                models.Friend.fk_origin==id,
-                                models.Friend.pending==False,
-                                models.Friend.ignored==False
+                                models.Friend.fk_origin==id
                                 ))\
                             .join(models.Friend, models.User.id == models.Friend.fk_destiny)\
                             .join(models.Comment, models.Comment.fk_user == models.User.id)\

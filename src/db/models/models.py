@@ -38,7 +38,6 @@ class Book(Base):
     __tablename__ = 'book'
 
     id = Column(Integer, primary_key=True, index=True)
-
     identifier = Column(String(25))
 
 
@@ -109,7 +108,7 @@ class Friend(Base):
     pending = Column(Boolean)
     ignored = Column(Boolean)
     formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
-    
+
     fk_origin = Column(ForeignKey("user.id"), primary_key=True)
     fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
 

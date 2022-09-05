@@ -49,7 +49,7 @@ async def view_profile(id: Optional[int] = None, session: Session = Depends(get_
                        current_user: User = Depends(obter_usuario_logado)):
     if not id:
         id = current_user.id
-    return CrudUser(session).get_by_id(id)
+    return CrudUser(session).get_by_id(id, current_user.id)
 
 
 @router.put("/editProfile", status_code=status.HTTP_200_OK)
