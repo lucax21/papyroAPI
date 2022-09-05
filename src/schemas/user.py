@@ -79,9 +79,7 @@ class UserUpdate(BaseModel):
 class Usuario(UserDB):
     booksQt: Optional[int] = None
     followers: Optional[int] = None
-    books_reading: Optional[List[BookBase]] = None
-    books_read: Optional[List[BookBase]] = None
-    books_to_read: Optional[List[BookBase]] = None
+    you_follow: Optional[bool] = False
 
 
 class UserSuperBasic(BaseModel):

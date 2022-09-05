@@ -37,9 +37,10 @@ async def accept_or_ignored_friend(
     return CrudFriend(session).accept_or_ignored_friend(current_user.id, oper_type, mode, id_friend)
 
 
-@router.post("/{id_friend}")
+@router.post("/{id_friend}/{mode}")
 async def add_friend(
         id_friend: int,
+        mode: bool,
         current_user: User = Depends(obter_usuario_logado),
         session: Session = Depends(get_db)):
-    return CrudFriend(session).add_friend(current_user.id, id_friend)
+    return CrudFriend(session).add_friend(current_user.id, id_friend, mode)
