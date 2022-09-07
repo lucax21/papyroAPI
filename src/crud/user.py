@@ -142,7 +142,7 @@ class CrudUser:
         FROM result
             JOIN "user" on result.suggestion = "user".id
         WHERE "user".id <> :x 
-            AND "user".id NOT IN (SELECT f.fk_destiny FROM friend f where f.fk_origin = 3)
+            AND "user".id NOT IN (SELECT f.fk_destiny FROM friend f where f.fk_origin = id)
         ORDER BY result.quantity DESC
         OFFSET :y
         LIMIT 20
