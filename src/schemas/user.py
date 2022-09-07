@@ -13,7 +13,7 @@ from src.schemas.genre import Genre
 class BaseUser(BaseModel):
     name: Optional[str] = None
     nickname: Optional[str] = None
-    photo: Optional[str] = None
+    photo: Optional[str] = 'https://i.pinimg.com/736x/67/4f/c5/674fc554838de6abdbf274bdc0ca446c.jpg'
     description: Optional[str] = None
 
 

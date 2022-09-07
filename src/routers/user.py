@@ -1,6 +1,8 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from fastapi_jwt_auth import AuthJWT
+from src.crud.login import CrudLogin
 from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.routers.login_utils import obter_usuario_logado
@@ -12,7 +14,7 @@ router = APIRouter()
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def new_user(user: NewUser, session: Session = Depends(get_db)):
+async def new_user(user: NewUser, session: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     if not user.name:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Preencha o seu Nome.")
     elif not user.nickname:
@@ -26,9 +28,9 @@ async def new_user(user: NewUser, session: Session = Depends(get_db)):
     if email_buscado:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Já existe um usuário com esse email.")
 
-    CrudUser(session).new_user(user)
+    new_user = CrudUser(session).new_user(user)
 
-    return 1
+    return CrudLogin(session, Authorize).login(new_user, user.password)
 
 
 @router.get("/search"
