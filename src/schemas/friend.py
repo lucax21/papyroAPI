@@ -5,4 +5,4 @@ from typing import Optional
 class Friend(BaseModel):
     id: int
     nickname: str
-    photo: Optional[HttpUrl] = None
+    photo: Optional[HttpUrl] = 'https://i.pinimg.com/736x/67/4f/c5/674fc554838de6abdbf274bdc0ca446c.jpg'

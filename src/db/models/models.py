@@ -105,21 +105,10 @@ class Friend(Base):
     __tablename__ = 'friend'
 
     date = Column(DateTime)
-    pending = Column(Boolean)
-    ignored = Column(Boolean)
     formatted_date = column_property(func.to_char(date, 'DD/MM/YYYY HH:MM'))
 
     fk_origin = Column(ForeignKey("user.id"), primary_key=True)
     fk_destiny = Column(ForeignKey("user.id"), primary_key=True)
 
-# class Message(Base):
-#     __tablename__ = 'message'
 
-#     id = Column(Integer, primary_key=True, index=True)
-
-#     text = Column(T, nullable=False)
-#     date = Column(DateTime)
-
-#     # fk_origin = Column(ForeignKey("user.id"))
-#     # fk_destiny = Column(ForeignKey("user.id"))
 

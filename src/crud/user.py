@@ -19,11 +19,6 @@ class CrudUser:
     def __init__(self, session: Session):
         self.session = session
     
-    def aa(self):
-        aa = models.User.select()
-        
-        return 1
-
     def new_user(self, user: NewUser):
         try:
             stmt = models.User(name=user.name,
