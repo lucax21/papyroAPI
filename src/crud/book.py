@@ -177,7 +177,7 @@ class CrudBook:
                 self.session.refresh(stmt)
 
             aux.append({'id': query_book.id if query_book else stmt.id,
-                        # 'rate': 0 if not query_book.sum and not query_book.count else query_book.sum / query_book.count,
+                        'rate': query_book.sum / query_book.count if query_book.count else 0,
                         'cover': book['cover'],
                         'identifier': book['identifier'],
                         'book_title': book['book_title'],
