@@ -42,6 +42,7 @@ class CrudComment:
             .where(Comment.fk_rate == rate_id) \
             .join(User, User.id == Comment.fk_user) \
             .join(Like, and_(Like.fk_user == user_id, Like.fk_comment == Comment.id), isouter=True) \
+			.order_by(Comment.date.desc())\
             .offset(page * 20).limit(20).all()
 
         def format_comment(comment):
