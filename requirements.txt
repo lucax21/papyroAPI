@@ -50,7 +50,3 @@ apyori==1.1.2
 numpy
 pandas
 python-dateutil
-
-firebase-admin==5.2.0
-firebase==3.0.1
-google-cloud-storage

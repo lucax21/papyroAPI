@@ -76,7 +76,6 @@ class CrudBook:
 
         people_reading = self.session.query(func.count(models.UserBook.fk_user).label('users')) \
             .where(and_(models.UserBook.fk_status == ReadingTypes.READING, models.UserBook.fk_book == id)).group_by(models.UserBook.fk_book).first()
-        print(people_reading)
         book = get_by_identifier(data.identifier)
 
         if "volumeInfo" not in book:
@@ -140,7 +139,7 @@ class CrudBook:
             
             # insert
             else:
-                stmt = insert(models.UserBook).values(fk_book=id_book,
+                stmt = insert(models.userbook).values(fk_book=id_book,
                                                     fk_user=id_user,
                                                     fk_status=id_status,
                                                     date=func.now()
@@ -150,10 +149,10 @@ class CrudBook:
                     self.session.commit()
 
                     return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
-                except IntegrityError as err:
+                except Integrityerror as err:
                     self.session.rollback()
                     print(err)
-                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Erro ao adicionar um novo status.")
+                    raise httpexception(status_code=status.http_400_bad_request, detail="erro ao adicionar um novo status.")
        
 
 
@@ -162,16 +161,23 @@ class CrudBook:
         aux = []
         for index, x in enumerate(get_books['items']):
             book = format_book_output(x)
-
+            
             query_book = self.session.query(models.Book.id.label('id'),
                                             func.count(models.Rate.id).label('count'),
                                             func.sum(models.Rate.rate).label('sum')) \
                 .where(models.Book.identifier == book['identifier']) \
-                .join(models.Rate, models.Rate.fk_book == models.Book.id) \
+                .join(models.Rate, models.Rate.fk_book == models.Book.id, isouter=True) \
                 .group_by(models.Book).first()
+            print(query_book)
+            
+            if not query_book:
+                stmt = models.Book(identifier=book['identifier'])
+                self.session.add(stmt)
+                self.session.commit()
+                self.session.refresh(stmt)
 
-            aux.append({'id': query_book.id if query_book else index,
-                        'rate': query_book.sum / query_book.count if query_book else 0,
+            aux.append({'id': query_book.id if query_book else stmt.id,
+                        'rate': query_book.sum / query_book.count if query_book.sum or query_book.count else 0,
                         'cover': book['cover'],
                         'identifier': book['identifier'],
                         'book_title': book['book_title'],

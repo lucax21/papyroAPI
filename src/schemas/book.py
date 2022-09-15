@@ -28,7 +28,7 @@ class BookSearch(BookBase):
 class BookExtended(BaseModel):
     id: Optional[int]
     book_title: str
-    cover: str
+    cover: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
     status: Optional[int] = None
     genre: List[str]
     description: str
@@ -37,7 +37,7 @@ class BookExtended(BaseModel):
 
 class BookUser(BaseModel):
     nickname: str
-    photo: Optional[str] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
+    photo: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
     id: int
 
 
@@ -68,14 +68,14 @@ class BookByID(BookExtended):
 
 class BookFeed(BaseModel):
     id: Optional[int] = None
-    cover: Optional[HttpUrl] = None
+    cover: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
     book_title: Optional[str] = None
 
 
 class BookByType(BaseModel):
     id: Optional[int] = None
     identifier: Optional[str] = None
-    cover: Optional[str] = None
+    cover: Optional[HttpUrl] = 'https://uploads.sarvgyan.com/2014/03/image-unavailable.jpg'
     book_title: str
     rate: Optional[int]
     author: List[str]

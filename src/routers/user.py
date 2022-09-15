@@ -12,7 +12,6 @@ from src.utils.enum.reading_type import ReadingTypes
 
 router = APIRouter()
 
-
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def new_user(user: NewUser, session: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     if not user.name:
