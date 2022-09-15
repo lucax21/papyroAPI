@@ -149,10 +149,10 @@ class CrudBook:
                     self.session.commit()
 
                     return {'id_book': id_book, 'id_status': id_status, 'id_user': id_user}
-                except Integrityerror as err:
+                except IntegrityError as err:
                     self.session.rollback()
                     print(err)
-                    raise httpexception(status_code=status.http_400_bad_request, detail="erro ao adicionar um novo status.")
+                    raise HTTPException(status_code=status.http_400_bad_request, detail="erro ao adicionar um novo status.")
        
 
 
@@ -168,7 +168,7 @@ class CrudBook:
                 .where(models.Book.identifier == book['identifier']) \
                 .join(models.Rate, models.Rate.fk_book == models.Book.id, isouter=True) \
                 .group_by(models.Book).first()
-            print(query_book)
+
             
             if not query_book:
                 stmt = models.Book(identifier=book['identifier'])
@@ -177,7 +177,7 @@ class CrudBook:
                 self.session.refresh(stmt)
 
             aux.append({'id': query_book.id if query_book else stmt.id,
-                        'rate': query_book.sum / query_book.count if query_book.sum or query_book.count else 0,
+                        # 'rate': 0 if not query_book.sum and not query_book.count else query_book.sum / query_book.count,
                         'cover': book['cover'],
                         'identifier': book['identifier'],
                         'book_title': book['book_title'],
