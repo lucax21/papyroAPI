@@ -25,6 +25,7 @@ class CrudNotification:
                                     literal('comment').label('type'),
                                     func.concat(models.User.nickname, ' comentou ', ' "', func.substring(models.Comment.text, 1,12),'... "', ' na sua avaliação.').label('text'),
                                     )\
+                            .where(models.Rate.fk_user == id_user) \
                             .join(models.Comment, models.Comment.fk_rate == models.Rate.id)\
                             .join(models.Book, models.Book.id == models.Rate.fk_book)\
                             .join(models.User, models.User.id == models.Comment.fk_user)\
@@ -34,7 +35,6 @@ class CrudNotification:
  
         follower = self.session.query(
                                         models.Friend.date.label('data'),
-                                        models.Friend.pending,
                                         models.Friend.formatted_date,
                                         models.User.id.label('id_user'), models.User.nickname, models.User.photo,
                                         literal('follower').label('type'),
