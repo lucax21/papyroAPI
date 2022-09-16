@@ -168,7 +168,7 @@ class CrudBook:
                 .where(models.Book.identifier == book['identifier']) \
                 .join(models.Rate, models.Rate.fk_book == models.Book.id, isouter=True) \
                 .group_by(models.Book).first()
-
+       
             
             if not query_book:
                 stmt = models.Book(identifier=book['identifier'])
@@ -176,8 +176,17 @@ class CrudBook:
                 self.session.commit()
                 self.session.refresh(stmt)
 
-            aux.append({'id': query_book.id if query_book else stmt.id,
-                        'rate': query_book.sum / query_book.count if query_book.count else 0,
+            def vl_rate(data):
+                if data:
+                    if data.count > 0:
+                        return data.sum / data.count
+                    return 0
+                else:
+                    return 0
+
+            aux.append({
+                    'id': query_book.id if query_book else stmt.id,
+                        'rate': vl_rate(query_book),
                         'cover': book['cover'],
                         'identifier': book['identifier'],
                         'book_title': book['book_title'],
