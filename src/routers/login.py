@@ -59,10 +59,10 @@ async def forgot_password(user: ForgotPassword, session: Session = Depends(get_d
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Email inválido.")
     
+    
     code_otp = generateOTP()
 
     CrudUser(session).save_reset_code(result.email, code_otp)
-
     Mailer.forgot_password(code_otp, result.email)
 
     return 1

@@ -27,7 +27,7 @@ async def get_follow(
 
 
 @router.post("/{id_follow}/{mode}")
-async def add_or_remove_follow(
+async def add_or_remove_following(
         id_follow: int,
         mode: bool,
         current_user: User = Depends(obter_usuario_logado),
