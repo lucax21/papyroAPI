@@ -10,7 +10,7 @@ class CrudNotification:
     def __init__(self, session: Session):
         self.session = session
 
-    def notification(self, id_user: int, page: int):
+    def get_notification(self, id_user: int, page: int):
       
         rates = self.session.query(
                                     models.Comment.date.label('data'),

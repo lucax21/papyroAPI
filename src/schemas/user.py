@@ -1,12 +1,11 @@
 from __future__ import annotations
-import re, datetime
-from datetime import date
+import re
 from typing import Optional, List
 
 from fastapi import HTTPException, status
 from pydantic import BaseModel, EmailStr, validator, HttpUrl
 
-from src.schemas.book import BookByID, BookBase
+from src.schemas.book import BookByID
 from src.schemas.genre import Genre
 
 

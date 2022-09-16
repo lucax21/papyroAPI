@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[Feed])
-async def feed(session: Session = Depends(get_db),
+async def get_feed(session: Session = Depends(get_db),
                current_user: User = Depends(obter_usuario_logado),
                page: int = 0):
-    return CrudFeed(session).feed(current_user.id, page)
+    return CrudFeed(session).get_feed(current_user.id, page)

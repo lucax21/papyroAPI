@@ -9,10 +9,6 @@ from src.schemas.rate import NewRate
 router = APIRouter()
 
 
-@router.get("/{id}")
-async def carregar_avaliacao(id: int, session: Session = Depends(get_db)):
-    return CrudRate(session).carregar_avaliacao(id)
-
 @router.post("/")
 async def new_rate(data: NewRate, session: Session = Depends(get_db), current_user: User = Depends(obter_usuario_logado)):
     return CrudRate(session).new_rate(current_user.id, data)

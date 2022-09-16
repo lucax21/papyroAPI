@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.crud.comment import CrudComment
 from src.db.database import get_db
@@ -10,12 +10,9 @@ router = APIRouter()
 
 
 @router.post("/", response_model=CommentReturn)
-def comment(data: NewComment,
+def new_comment(data: NewComment,
             current_user: User = Depends(obter_usuario_logado),
             session: Session = Depends(get_db)):
-
-    if not data.text or len(data.text) < 3:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Comentário muito curto.")
 
     return CrudComment(session).new_comment(data, current_user.id)
 

@@ -39,22 +39,6 @@ def refresh(Authorize: AuthJWT = Depends()):
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}
 
-@router.get("/verification")
-def verification(token: str, session: Session = Depends(get_db)):
-
-    try:
-        payload = check_access_token(token)
-    except jwt.JWSError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token has expired")
-    user = CrudUser(session).get_verification(email=payload)
-
-    if user.active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User already activated")
-    
-    CrudUser(session).active_account(user.id, None, True)
-
-    return 1
-
 
 @router.post("/resetPassword")
 def reset_password(data: ResetPassword, session: Session = Depends(get_db)):
@@ -73,7 +57,7 @@ async def forgot_password(user: ForgotPassword, session: Session = Depends(get_d
     result = CrudUser(session).get_by_email(user.email)
     if not result:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Email inválida.")
+                            detail="Email inválido.")
     
     code_otp = generateOTP()
 

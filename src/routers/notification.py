@@ -12,9 +12,9 @@ router = APIRouter()
 @router.get("/"
          , response_model=List[Notification]
         )
-async def notification(session: Session = Depends(get_db),
+async def get_notification(session: Session = Depends(get_db),
         current_user: User = Depends(obter_usuario_logado),
                         page: int = 0):
 
-    return CrudNotification(session).notification(current_user.id ,page)
+    return CrudNotification(session).get_notification(current_user.id ,page)
 
