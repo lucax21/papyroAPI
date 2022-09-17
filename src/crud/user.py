@@ -40,22 +40,22 @@ class CrudUser:
         query = self.session.query(models.User.id,
                                    models.User.nickname,
                                    models.User.photo,
-                                   func.count(models.UserGenre.fk_genre).label('common_genre'),
-                                   ).where(and_(func.lower(models.User.name).like('%' + name.lower() + '%'),
-                                                models.UserGenre.fk_genre.in_(subquery_genres))) \
-            .join(models.UserGenre, models.User.id == models.UserGenre.fk_user, isouter=True) \
-            .group_by(models.User.id) \
+                                   ).where(func.lower(models.User.name).like('%' + name.lower() + '%')) \
             .offset(page * 20).limit(20).all()
         aux = []
         for x in query:
-            query = self.session.query(func.count(models.UserBook.fk_book).label('commom_book')) \
+            query_commom_book = self.session.query(func.count(models.UserBook.fk_book).label('commom_book')) \
                 .where(and_(models.UserBook.fk_user == x.id, models.UserBook.fk_book.in_(subquery_books))).first()
+            
+            query_commom_genre = self.session.query(func.count(models.UserGenre.fk_genre).label('common_genre'))\
+                .where(and_(models.UserGenre.fk_user == x.id, models.UserGenre.fk_genre.in_(subquery_genres))).first()
+            
             aux.append({
                 'id': x.id,
                 'nickname': x.nickname,
                 'photo': x.photo,
-                'common_genre': x.common_genre,
-                'commom_book': query['commom_book']
+                'common_genre': query_commom_genre['common_genre'],
+                'commom_book': query_commom_book['commom_book']
             })
         return aux
 
