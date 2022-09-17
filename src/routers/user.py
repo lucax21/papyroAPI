@@ -59,7 +59,7 @@ async def edit_profile(data: UserUpdate, session: Session = Depends(get_db),
     
 
 @router.put("/updatePhoto", status_code=status.HTTP_200_OK)
-def update_photo(link: str, session: Session = Depends(get_db)
+async def update_photo(link: str, session: Session = Depends(get_db)
                    , current_user: User = Depends(obter_usuario_logado)
                    ):
     return CrudUser(session).update_photo(current_user.id, link)

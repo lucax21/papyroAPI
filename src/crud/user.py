@@ -240,10 +240,10 @@ class CrudUser:
         return 1
 
 
-    def update_photo(self, id_user: int, dado: str):
+    def update_photo(self, id_user: int, photo: str):
 
         try:
-            stmt = update(models.User).where(models.User.id == id_user).values(photo=dado.photo)
+            stmt = update(models.User).where(models.User.id == id_user).values(photo=photo)
             self.session.execute(stmt)
             self.session.commit()
             return 1
