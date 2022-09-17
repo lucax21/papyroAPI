@@ -1,5 +1,4 @@
-from sqlalchemy import func, Column, Integer, String, DateTime, ForeignKey, Text, Boolean
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import func, Column, Integer, String, DateTime, ForeignKey, Text
 from sqlalchemy.orm import column_property
 
 from src.db.database import Base

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.crud.feed import CrudFeed
 from src.db.database import get_db
-from src.routers.login_utils import obter_usuario_logado
+from src.utils.login_utils import obter_usuario_logado
 from src.schemas.feed import Feed
 from src.schemas.user import User
 

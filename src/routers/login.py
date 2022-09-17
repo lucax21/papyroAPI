@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
-from src.core.email_provider import Mailer
-from src.core.config import Settings
+from src.utils.email_provider import Mailer
+from src.utils.config import Settings
 from src.crud.login import CrudLogin
 from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.schemas.login import ResetPassword, ForgotPassword, Login, LoginSucesso
-from src.core.token_provider import check_access_token
-from src.routers.login_utils import generateOTP
+
+from src.utils.login_utils import generateOTP
 
 settings = Settings()
 router = APIRouter()

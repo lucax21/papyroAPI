@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.crud.book import CrudBook
 from src.db.database import get_db
-from src.routers.login_utils import obter_usuario_logado
-from src.schemas.book import BookSearch, BookByID, BookUserStatus, BookByType, BookSuggestion
+from src.utils.login_utils import obter_usuario_logado
+from src.schemas.book import BookSearch, BookByID, BookSuggestion
 from src.schemas.user import User
-from src.utils.enum.reading_type import ReadingTypes
 from typing import List, Optional
 
 router = APIRouter()

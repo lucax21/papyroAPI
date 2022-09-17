@@ -5,10 +5,8 @@ from fastapi_jwt_auth import AuthJWT
 from src.crud.login import CrudLogin
 from src.crud.user import CrudUser
 from src.db.database import get_db
-from src.routers.login_utils import obter_usuario_logado
-from src.schemas.book import BookByType
-from src.schemas.user import UserSearch, UserUpdate, User, NewUser, UsersCompanyStatus, UsersCompany, Usuario, Suggestion
-from src.utils.enum.reading_type import ReadingTypes
+from src.utils.login_utils import obter_usuario_logado
+from src.schemas.user import UserSearch, UserUpdate, User, NewUser, Usuario, Suggestion
 
 router = APIRouter()
 

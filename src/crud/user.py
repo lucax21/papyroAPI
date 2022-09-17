@@ -6,7 +6,7 @@ from sqlalchemy import update, and_, bindparam, Integer, text
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.functions import func
 
-from src.core import hash_provider
+from src.utils import hash_provider
 from src.db.models import models
 from src.external_api.get_book import get_by_identifier
 from src.schemas.user import UserUpdate, NewUser

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from pydantic import UUID4, ValidationError
 from fastapi import HTTPException, status
 
-from src.core.config import Settings
+from src.utils.config import Settings
 
 settings = Settings()
 

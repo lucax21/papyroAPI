@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.crud.user_book import CrudUserBook
 from src.db.database import get_db
-from src.routers.login_utils import obter_usuario_logado
+from src.utils.login_utils import obter_usuario_logado
 from src.schemas.book import BookUserStatus, BookByType
 from src.schemas.user import User
 from src.schemas.user_book import UsersCompany, UsersCompanyStatus

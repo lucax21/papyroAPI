@@ -1,5 +1,5 @@
-from src.core import hash_provider
-from src.core.config import settings
+from src.utils import hash_provider
+from src.utils.config import settings
 from src.crud.user import CrudUser
 from fastapi import status, HTTPException
 from sqlalchemy.orm import Session

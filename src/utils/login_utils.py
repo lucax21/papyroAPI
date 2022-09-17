@@ -4,8 +4,8 @@ from jose import JWTError
 from sqlalchemy.orm import Session
 import math, random
 
-from src.core import token_provider
-from src.core.config import Settings
+from src.utils import token_provider
+from src.utils.config import Settings
 from src.crud.user import CrudUser
 from src.db.database import get_db
 

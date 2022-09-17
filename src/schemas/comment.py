@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import Optional
 from fastapi import HTTPException, status
 from pydantic import BaseModel, validator
 
-from src.schemas.book import BookExtended, BookUser, BookReviewBase
+from src.schemas.book import BookUser
 
 
 class Comment(BaseModel):
@@ -14,13 +14,6 @@ class Comment(BaseModel):
     text: str
     you_liked: Optional[bool] = False
     user: BookUser
-
-
-class Comments(BaseModel):
-    book: BookExtended
-    review: BookReviewBase
-    reviewer: BookUser
-    comments: Optional[List[Comment]] = [None]
 
 
 class NewComment(BaseModel):

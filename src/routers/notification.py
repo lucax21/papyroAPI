@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import List
 from sqlalchemy.orm import Session
 from src.db.database import get_db
-from src.routers.login_utils import obter_usuario_logado
+from src.utils.login_utils import obter_usuario_logado
 from src.schemas.user import User
 from src.schemas.notification import Notification
 from src.crud.notification import CrudNotification
