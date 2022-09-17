@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     REFRESH_SECRET_KEY: str = os.getenv("REFRESH_SECRET_KEY")
     TOKEN_ALGORITHM: str = os.getenv("TOKEN_ALGORITHM")
     AUTHJWT_ALGORITHM: str = os.getenv("TOKEN_ALGORITHM")
-    REGISTRATION_TOKEN_LIFETIME = 60 * 60
+    REGISTRATION_TOKEN_LIFETIME = 60 * 60 * 2
     USER_TOKEN_LIFETIME = timedelta(days=10)
     REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 60 * 24 * 7
 
