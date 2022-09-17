@@ -1,12 +1,11 @@
 from __future__ import annotations
-import re, datetime
-from datetime import date
+import re
 from typing import Optional, List
 
 from fastapi import HTTPException, status
 from pydantic import BaseModel, EmailStr, validator, HttpUrl
 
-from src.schemas.book import BookByID, BookBase
+from src.schemas.book import BookByID
 from src.schemas.genre import Genre
 
 
@@ -137,21 +136,3 @@ class UserProfile(BaseUser):
 UserProfile.update_forward_refs()
 
 
-class UsersCompanyStatus(BaseModel):
-    id: int
-    status: str
-    readers: Optional[List[UserSuperBasic]] = []
-
-    class Config:
-        orm_mode = True
-        arbitrary_types_allowed = True
-
-
-class UsersCompany(BaseModel):
-    readers_reading: Optional[UsersCompanyStatus] = None
-    readers_read: Optional[UsersCompanyStatus] = None
-    readers_to_read: Optional[UsersCompanyStatus] = None
-
-    class Config:
-        orm_mode = True
-        arbitrary_types_allowed = True

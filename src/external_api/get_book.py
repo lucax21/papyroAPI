@@ -1,5 +1,5 @@
 from requests import get, HTTPError, Timeout, TooManyRedirects, RequestException
-from src.core.config import settings
+from src.utils.config import settings
 
 
 def get_by_identifier(identifier):

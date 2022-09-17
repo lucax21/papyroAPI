@@ -11,7 +11,7 @@ class CrudFeed:
     def __init__(self, session: Session):
         self.session = session
 
-    def feed(self, id: int, page: int):
+    def get_feed(self, id: int, page: int):
 
         rates = self.session.query(
                                    models.Rate.date.label('date'),

@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
-from src.core.email_provider import Mailer
-from src.core.config import Settings
+from src.utils.email_provider import Mailer
+from src.utils.config import Settings
 from src.crud.login import CrudLogin
 from src.crud.user import CrudUser
 from src.db.database import get_db
 from src.schemas.login import ResetPassword, ForgotPassword, Login, LoginSucesso
-from src.core.token_provider import check_access_token
-from src.routers.login_utils import generateOTP
+
+from src.utils.login_utils import generateOTP
 
 settings = Settings()
 router = APIRouter()
@@ -39,22 +39,6 @@ def refresh(Authorize: AuthJWT = Depends()):
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}
 
-@router.get("/verification")
-def verification(token: str, session: Session = Depends(get_db)):
-
-    try:
-        payload = check_access_token(token)
-    except jwt.JWSError:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token has expired")
-    user = CrudUser(session).get_verification(email=payload)
-
-    if user.active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User already activated")
-    
-    CrudUser(session).active_account(user.id, None, True)
-
-    return 1
-
 
 @router.post("/resetPassword")
 def reset_password(data: ResetPassword, session: Session = Depends(get_db)):
@@ -73,12 +57,12 @@ async def forgot_password(user: ForgotPassword, session: Session = Depends(get_d
     result = CrudUser(session).get_by_email(user.email)
     if not result:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Email inválida.")
+                            detail="Email inválido.")
+    
     
     code_otp = generateOTP()
 
     CrudUser(session).save_reset_code(result.email, code_otp)
-
     Mailer.forgot_password(code_otp, result.email)
 
     return 1
