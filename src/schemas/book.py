@@ -47,7 +47,7 @@ class BookReviewBase(BaseModel):
     likes: Optional[int] = 0
     comments: Optional[int] = 0
     rate: Optional[int] = None
-    you_like: Optional[bool] = False
+    you_liked: Optional[bool] = False
     text: Optional[str] = ''
 
 
