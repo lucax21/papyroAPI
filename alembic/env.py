@@ -1,6 +1,6 @@
 from src.db.database import Base
 from src.db.models.models import *
-from src.core.config import Settings
+from src.utils.config import Settings
 
 from logging.config import fileConfig
 from sqlalchemy import pool, engine_from_config
